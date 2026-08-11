@@ -1,0 +1,19 @@
+# Build artifacts
+build/
+bin/
+tools/output/
+
+# CMake generated files in root (use "build/" subdir instead)
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# Editor
+.vs/
+.vscode/
+*.user
+
+# OS
+Thumbs.db
+.DS_Store

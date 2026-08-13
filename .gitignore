@@ -1,6 +1,4 @@
 # Build artifacts
-build/
-bin/
 tools/output/
 
 # CMake generated files in root (use "build/" subdir instead)

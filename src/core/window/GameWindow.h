@@ -25,6 +25,10 @@ public:
     static bool mouseClicado();
     static void limparMouse();
 
+    static void ocultarCursor();
+    static void mostrarCursor();
+    static bool isCursorOculto();
+
     // English Aliases
     HWND getHWND() const { return obterHWND(); }
     HINSTANCE getHInstance() const { return obterHInstance(); }
@@ -48,5 +52,6 @@ private:
     static std::atomic<int> s_mouseX;
     static std::atomic<int> s_mouseY;
     static std::atomic<bool> s_mouseClicado;
+    static bool s_cursorOculto;
 };
 

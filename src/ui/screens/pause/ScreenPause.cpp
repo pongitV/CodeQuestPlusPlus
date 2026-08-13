@@ -51,40 +51,6 @@ void TelaPause::display(Character* jogador) {
                 } else if (confEscolha == 2) {
                     jogador->definirParryModerno(!jogador->obterParryModerno());
                 } else if (confEscolha == 3) {
-                    bool aparenciaAberta = true;
-                    while (aparenciaAberta) {
-                        int apEscolha = obterEscolhaAparencia(jogador);
-
-                        if (apEscolha == 0) {
-                            // Ignorado na versao Direct2D por enquanto
-                        } else if (apEscolha == 1) {
-                            std::string novoIcone = MenuRaycasterUtils::lerEntradaTextoD2D(L"Digite o novo icone (1 caractere): ", 1);
-                            if (!novoIcone.empty() && novoIcone[0] != ' ') {
-                                // Ignorado na versao Direct2D por enquanto
-                            }
-                        } else {
-                            aparenciaAberta = false;
-                        }
-                    }
-                } else if (confEscolha == 4) {
-                    bool fundoAberto = true;
-                    while (fundoAberto) {
-                        int fundoEscolha = obterEscolhaFundo(corFundoAtualIndex);
-
-                        if (fundoEscolha >= 0 && fundoEscolha <= 5) {
-                            corFundoAtualIndex = fundoEscolha;
-                            std::string hexColor;
-                            switch (fundoEscolha) {
-                                case 0: hexColor = "#0C0C0C"; break; case 1: hexColor = "#1A1A1A"; break;
-                                case 2: hexColor = "#000022"; break; case 3: hexColor = "#220000"; break;
-                                case 4: hexColor = "#002200"; break; case 5: hexColor = "#220022"; break;
-                            }
-                            // Em D2D a cor do fundo da ui talvez nao use Aparencia, mantendo a logica por compatibilidade visual
-                        } else {
-                            fundoAberto = false;
-                        }
-                    }
-                } else if (confEscolha == 5) {
                     bool sensibilidadeAberta = true;
                     while (sensibilidadeAberta) {
                         int percX = (int)((GerenciadorPerspectiva::obterSensibilidadeMouseX() / 0.002f) * 100);

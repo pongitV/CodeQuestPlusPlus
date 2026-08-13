@@ -35,7 +35,7 @@ bool Debug::isDebugKey(char tecla) {
 
 void Debug::displayDebugMenu(Character* jogador) {
     ClipCursor(nullptr);
-    ShowCursor(TRUE);
+    GameWindow::mostrarCursor();
     InputControl::clearBuffer();
 
     std::string mensagemFeedback = "";

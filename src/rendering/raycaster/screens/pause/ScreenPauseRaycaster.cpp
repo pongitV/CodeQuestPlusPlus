@@ -67,14 +67,12 @@ int TelaPauseRaycaster::renderizarMenuConfiguracoes(Character* jogador) {
         "DIFICULDADE: " + difStr,
         "PARRY: " + parryState,
         "TIPO DE PARRY: " + parryType,
-        "APARENCIA DO JOGADOR",
-        "COR DE FUNDO",
         "SENSIBILIDADE DA CAMERA",
         "VOLTAR"
     };
     int res = renderizarMenuSimplesD2D(L"[ CONFIGURACOES ]", opcoes);
     
-    if (res == -1) return 6;
+    if (res == -1) return 4;
     return res;
 }
 

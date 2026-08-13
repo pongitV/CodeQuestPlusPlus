@@ -125,7 +125,7 @@ char RaycasterControls::processarInputEControles(
     bobbingOffset = (int)(sinf(bobbingTime) * bobbingAmplitude * (ALTURA_TELA * 0.01f));
 
     if (Debug::isDebugKey()) {
-        ShowCursor(TRUE);
+        GameWindow::mostrarCursor();
         ClipCursor(nullptr);
         Debug::displayDebugMenu(jogador);
         if (auto* win = D2DContext::window) {
@@ -134,7 +134,7 @@ char RaycasterControls::processarInputEControles(
             GetWindowRect(h, &rc);
             ClipCursor(&rc);
         }
-        ShowCursor(FALSE);
+        GameWindow::ocultarCursor();
         primeiraIteracaoMouse = true;
     }
 
@@ -143,7 +143,7 @@ char RaycasterControls::processarInputEControles(
     if ((escAtual && !s_escPressionadoAnterior) || InputSystem::WasKeyPressed(VK_ESCAPE)) {
         s_escPressionadoAnterior = true;
         ClipCursor(nullptr);
-        ShowCursor(TRUE);
+        GameWindow::mostrarCursor();
         rodando = false;
         return 27;
     }
@@ -151,7 +151,7 @@ char RaycasterControls::processarInputEControles(
     for (char k : {'M', 'I', 'F', 'B', 'C', 'J'}) {
         if (InputSystem::WasKeyPressed(k)) {
             ClipCursor(nullptr);
-            ShowCursor(TRUE);
+            GameWindow::mostrarCursor();
             rodando = false;
             return k;
         }

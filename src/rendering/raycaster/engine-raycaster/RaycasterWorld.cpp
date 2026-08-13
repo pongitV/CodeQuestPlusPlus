@@ -61,6 +61,7 @@ bool RaycasterWorld::isTemaFloresta(const std::string& tituloMapa) {
 
 bool RaycasterWorld::isEntity(char c) {
     if (c == 'T' && g_currentMapTitle.find("CORACAO") != std::string::npos) return false;
+    if (c == 'C' && (g_currentMapTitle.find("VILA") != std::string::npos || g_currentMapTitle.find("INICIO") != std::string::npos)) return false;
     switch (c) {
         case 'G': case 'O': case 'B': case 'F': case 'S': case 'A':
         case 'M': case 'T': case 'H': case 'R': case 'P': case '^':
@@ -80,7 +81,7 @@ bool RaycasterWorld::isWalkable(int mapX, int mapY, const std::vector<std::strin
     
     if (c == '=' || c == '|' || c == '\'' || c == '+') return false;
 
-    if (c == '.' || c == ' ' || c == '^' || c == '~' || isEntity(c)) return true;
+    if (c == '.' || c == ' ' || c == '^' || c == '~' || c == 'C' || isEntity(c)) return true;
     if (isMapLabel(mapX, mapY, matrizDoMapa)) return true;
     return false;
 }

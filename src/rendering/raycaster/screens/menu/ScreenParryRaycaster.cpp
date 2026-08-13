@@ -203,7 +203,11 @@ namespace {
                             box.AddRect(barLeft, barTop, barW, barH, D2D1::ColorF(0.2f, 0.2f, 0.2f));
                             float ssLeft = barLeft + (Parry::sweetSpotCenter - Parry::sweetSpotSize / 2) * unitW;
                             float ssW = Parry::sweetSpotSize * unitW;
-                            box.AddRect(ssLeft, barTop, ssW, barH, D2D1::ColorF(0.0f, 0.6f, 0.0f));
+                            box.AddRect(ssLeft, barTop, ssW, barH, D2D1::ColorF(1.0f, 0.85f, 0.0f)); // Bordas amarelas
+
+                            float centerLeft = barLeft + (Parry::sweetSpotCenter - Parry::sweetSpotSize / 4) * unitW;
+                            float centerW = (Parry::sweetSpotSize / 2) * unitW;
+                            box.AddRect(centerLeft, barTop, centerW, barH, D2D1::ColorF(0.0f, 0.6f, 0.0f)); // Centro verde
                             float curLeft = barLeft + Parry::cursorPos * unitW;
                             box.AddRect(curLeft, barTop, unitW, barH, D2D1::ColorF(0.0f, 0.8f, 1.0f));
                         }

@@ -224,6 +224,7 @@ void Mapa1Vila::initializeInteracoes() {
     interacoes['P'] = std::make_unique<InteracaoPlaca>();
     interacoes['^'] = std::make_unique<InteracaoTeleporte>();
     interacoes['S'] = std::make_unique<InteracaoTeleporte>();
+    interacoes['C'] = std::make_unique<InteracaoTeleporte>();
 }
 
 ProximaTransicaoMapa Mapa1Vila::iniciarLoopDeExploracao()

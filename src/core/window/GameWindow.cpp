@@ -12,6 +12,26 @@ std::atomic<int> GameWindow::s_mouseX{0};
 std::atomic<int> GameWindow::s_mouseY{0};
 std::atomic<bool> GameWindow::s_mouseClicado{false};
 
+bool GameWindow::s_cursorOculto = false;
+
+void GameWindow::ocultarCursor() {
+    if (!s_cursorOculto) {
+        s_cursorOculto = true;
+        while (ShowCursor(FALSE) >= 0);
+    }
+}
+
+void GameWindow::mostrarCursor() {
+    if (s_cursorOculto) {
+        s_cursorOculto = false;
+        while (ShowCursor(TRUE) < 0);
+    }
+}
+
+bool GameWindow::isCursorOculto() {
+    return s_cursorOculto;
+}
+
 LRESULT CALLBACK GameWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
         case WM_KEYDOWN:
@@ -44,16 +64,25 @@ LRESULT CALLBACK GameWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
         case WM_ACTIVATE:
             if (LOWORD(wParam) == WA_INACTIVE) {
                 ClipCursor(nullptr);
-                ShowCursor(TRUE);
+                while (ShowCursor(TRUE) < 0);
+            } else {
+                if (s_cursorOculto) {
+                    while (ShowCursor(FALSE) >= 0);
+                    RECT rc;
+                    GetWindowRect(hwnd, &rc);
+                    ClipCursor(&rc);
+                } else {
+                    while (ShowCursor(TRUE) < 0);
+                }
             }
             return 0;
         case WM_KILLFOCUS:
             ClipCursor(nullptr);
-            ShowCursor(TRUE);
+            while (ShowCursor(TRUE) < 0);
             return 0;
         case WM_DESTROY:
             ClipCursor(nullptr);
-            ShowCursor(TRUE);
+            while (ShowCursor(TRUE) < 0);
             PostQuitMessage(0);
             return 0;
     }

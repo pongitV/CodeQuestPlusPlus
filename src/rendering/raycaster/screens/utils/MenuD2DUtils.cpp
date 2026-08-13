@@ -307,7 +307,7 @@ int renderizarPopupCaixa(
     int selecaoAtual = 0;
     bool aguardandoSoltarESC = ((GetAsyncKeyState(VK_ESCAPE) & 0x8000) != 0);
     ClipCursor(nullptr);
-    ShowCursor(TRUE);
+    GameWindow::mostrarCursor();
     InputControl::limparBuffer();
     
     while (true) {
@@ -427,7 +427,7 @@ void adicionarOpcaoMenu(UIDynamicBox& box, const std::wstring& texto, float x, f
 std::string lerEntradaTextoD2D(const std::wstring& prompt, int maxLength) {
     std::string inputStr = "";
     ClipCursor(nullptr);
-    ShowCursor(TRUE);
+    GameWindow::mostrarCursor();
     InputControl::limparBuffer();
 
     while (true) {

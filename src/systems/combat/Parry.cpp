@@ -269,6 +269,7 @@ bool Parry::executarMinigameDigitacao(int difficulty, int danoMitigado, int& dan
         for (size_t k = resposta.size(); k < (size_t)tamanhoSequencia; ++k)
             barText += "_";
         ss.str(""); ss << " [" << tempoRestante << "s]";
+        barText += ss.str();
         Parry::minigameBar = barText;
 
         if (Parry::onUpdateScreen) {

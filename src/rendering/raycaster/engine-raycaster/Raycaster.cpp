@@ -1,4 +1,5 @@
 #include "Raycaster.h"
+#include "../../../core/window/GameWindow.h"
 #include "../../../core/utils/InputControl.h"
 #include "../../../core/input/InputSystem.h"
 #include "../../../ui/screens/combat/ScreenCombat.h"
@@ -119,7 +120,7 @@ char Raycaster::iniciarExploracao3D(const vector<string>& matrizDoMapa, float& j
         GetWindowRect(h, &rc);
         ClipCursor(&rc);
     }
-    ShowCursor(FALSE);
+    GameWindow::ocultarCursor();
 
     auto tp1 = chrono::steady_clock::now();
     auto tp2 = chrono::steady_clock::now();
@@ -176,11 +177,11 @@ char Raycaster::iniciarExploracao3D(const vector<string>& matrizDoMapa, float& j
                 RECT rc;
                 GetWindowRect(h, &rc);
                 ClipCursor(&rc);
-                ShowCursor(FALSE);
+                GameWindow::ocultarCursor();
                 hasFocus = true;
             } else if (!isForeground && hasFocus) {
                 ClipCursor(nullptr);
-                ShowCursor(TRUE);
+                GameWindow::mostrarCursor();
                 hasFocus = false;
             }
         }
@@ -322,7 +323,7 @@ char Raycaster::iniciarExploracao3D(const vector<string>& matrizDoMapa, float& j
 
     if (hasFocus) {
         ClipCursor(nullptr);
-        ShowCursor(TRUE);
+        GameWindow::mostrarCursor();
     }
 
     // Ao apertar ESC, o loop morre, limpa o console e o controle volta para o game top-down padrao

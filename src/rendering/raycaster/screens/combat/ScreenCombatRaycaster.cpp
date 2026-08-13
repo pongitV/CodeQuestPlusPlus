@@ -417,7 +417,11 @@ static void renderizarQuadroCombateD2D(
             parryBox.AddRect(barLeft, barTop, barW, barH, D2D1::ColorF(0.18f, 0.18f, 0.20f, 0.95f));
             float ssLeft = barLeft + (Parry::sweetSpotCenter - Parry::sweetSpotSize / 2.0f) * unitW;
             float ssW = Parry::sweetSpotSize * unitW;
-            parryBox.AddRect(ssLeft, barTop, ssW, barH, D2D1::ColorF(0.0f, 0.75f, 0.2f, 1.0f));
+            parryBox.AddRect(ssLeft, barTop, ssW, barH, D2D1::ColorF(1.0f, 0.85f, 0.0f, 1.0f)); // Bordas amarelas
+
+            float centerLeft = barLeft + (Parry::sweetSpotCenter - Parry::sweetSpotSize / 4.0f) * unitW;
+            float centerW = (Parry::sweetSpotSize / 2.0f) * unitW;
+            parryBox.AddRect(centerLeft, barTop, centerW, barH, D2D1::ColorF(0.0f, 0.75f, 0.2f, 1.0f)); // Centro verde
 
             float curLeft = barLeft + Parry::cursorPos * unitW;
             parryBox.AddRect(curLeft, barTop, std::max(unitW, 6.0f), barH, D2D1::ColorF(0.0f, 0.85f, 1.0f, 1.0f));

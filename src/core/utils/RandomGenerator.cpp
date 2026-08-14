@@ -3,7 +3,7 @@
 #include <chrono>
 
 namespace {
-    std::mt19937& obterGerador() {
+    std::mt19937& getGenerator() {
         static std::mt19937 gen([]() -> unsigned int {
             std::random_device rd;
             if (rd.entropy() == 0.0) {
@@ -15,21 +15,17 @@ namespace {
     }
 }
 
-int RandomGenerator::getInteiro(int min, int max) {
+int RandomGenerator::getInt(int min, int max) {
     std::uniform_int_distribution<int> dist(min, max);
-    return dist(obterGerador());
+    return dist(getGenerator());
 }
 
-bool RandomGenerator::rolarChance(int porcentagemSucesso) {
-    if (porcentagemSucesso <= 0) return false;
-    if (porcentagemSucesso >= 100) return true;
+bool RandomGenerator::rollChance(int successPercentage) {
+    if (successPercentage <= 0) return false;
+    if (successPercentage >= 100) return true;
     
     std::uniform_int_distribution<int> dist(1, 100);
-    return dist(obterGerador()) <= porcentagemSucesso;
+    return dist(getGenerator()) <= successPercentage;
 }
-
-
-
-
 
 

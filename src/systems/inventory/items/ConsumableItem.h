@@ -3,17 +3,20 @@
 #include "../Item.h"
 #include <string>
 
-class ItemConsumivel : public Item
+class ConsumableItem : public Item
 {
 private:
-    std::string nome;
+    std::string name;
 
 public:
-    ItemConsumivel(const std::string& nome, int price = 3);
+    ConsumableItem(const std::string& name, int price = 3);
 
-    std::string getNameItem() const override;
-    TipoEquipamento obterTipo() const override;
-    std::vector<std::string> obterDetalhesInspecao(Character* character = nullptr) const override;
+    std::string getItemName() const override;
+    EquipmentType getType() const override;
+    std::vector<std::string> getInspectionDetails(Character* character = nullptr) const override;
 };
 
-std::unique_ptr<Item> fabricarItemConsumivel(ItemID id);
+using ItemConsumivel = ConsumableItem;
+
+std::unique_ptr<Item> buildConsumableItem(ItemID id);
+inline std::unique_ptr<Item> fabricarItemConsumivel(ItemID id) { return buildConsumableItem(id); }

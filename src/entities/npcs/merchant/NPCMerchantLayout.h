@@ -121,6 +121,9 @@ namespace NPCMerchantLayouts {
                                                        .:%#%%***%###%:.                                         
                                                           %%####*##-                                            
     )");
+    inline const auto& merchantArt = arteMerchant;
 }
+
+namespace NPCMercadorLayouts = NPCMerchantLayouts;
 
 

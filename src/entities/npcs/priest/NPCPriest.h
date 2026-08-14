@@ -9,18 +9,18 @@
 class NPCPriest : public NPCInteraction
 {
 public:
-    void interagir(Character* jogador);
-    void interact(Character* player) { interagir(player); }
+    void interact(Character* player);
+    void interagir(Character* player) { interact(player); }
 
 protected:
-    std::string getNameDoLugar() const override;
-    Color obterCorDoCabecalho() const override;
-    Color obterCorDaArte() const override;
-    const std::vector<std::string>& obterArteASCII() const override;
+    std::string getPlaceName() const override;
+    Color getHeaderColor() const override;
+    Color getArtColor() const override;
+    const std::vector<std::string>& getASCIIArt() const override;
 
-    std::vector<std::string> obterDialogo(Character* jogador) override;
-    std::vector<std::string> obterOpcoesMenu(Character* jogador, int larguraDoTerminal) override;
-    void processarOpcao(Character* jogador, const std::string& opcao, int larguraDoTerminal) override;
+    std::vector<std::string> getDialogue(Character* player) override;
+    std::vector<std::string> getMenuOptions(Character* player, int terminalWidth) override;
+    void processOption(Character* player, const std::string& option, int terminalWidth) override;
 };
 
-using NPCPriest = NPCPriest;
+using NPCClerigo = NPCPriest;

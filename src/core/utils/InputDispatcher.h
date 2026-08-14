@@ -7,48 +7,54 @@
 
 class InputDispatcher {
 public:
-    using Acao = std::function<void()>;
+    using Action = std::function<void()>;
+    using Acao = Action;
 
-    void registrar(int tecla, Acao acao) {
-        if (acao) acoes[tecla] = std::move(acao);
+    void registerAction(int key, Action action) {
+        if (action) actions[key] = std::move(action);
     }
+    void registrar(int tecla, Acao acao) { registerAction(tecla, std::move(acao)); }
 
-    bool executar(int tecla) const {
-        auto it = acoes.find(tecla);
-        if (it != acoes.end()) {
+    bool execute(int key) const {
+        auto it = actions.find(key);
+        if (it != actions.end()) {
             it->second();
             return true;
         }
         return false;
     }
+    bool executar(int tecla) const { return execute(tecla); }
 
-    // Poll all registered keys using GetAsyncKeyState; executes the first match found.
-    using AcaoComRetorno = std::function<char()>;
+    // Consulta todas as teclas registradas via GetAsyncKeyState; executa a primeira correspondência encontrada.
+    using ActionWithReturn = std::function<char()>;
+    using AcaoComRetorno = ActionWithReturn;
     struct PollEntry {
-        int tecla;
-        AcaoComRetorno acao; // return '\\0' to continue, anything else to return
+        int key;
+        ActionWithReturn action; // retorna '\0' para continuar, qualquer outro valor para retornar
     };
 
-    void registrarPoll(int tecla, AcaoComRetorno acao) {
-        pollAcoes.push_back({tecla, std::move(acao)});
+    void registerPoll(int key, ActionWithReturn action) {
+        pollActions.push_back({key, std::move(action)});
     }
+    void registrarPoll(int tecla, AcaoComRetorno acao) { registerPoll(tecla, std::move(acao)); }
 
     char poll() const {
-        for (const auto& entry : pollAcoes) {
-            if (GetAsyncKeyState(entry.tecla) & 0x8000) {
-                char r = entry.acao();
+        for (const auto& entry : pollActions) {
+            if (GetAsyncKeyState(entry.key) & 0x8000) {
+                char r = entry.action();
                 if (r != '\0') return r;
             }
         }
         return '\0';
     }
 
-    void limpar() {
-        acoes.clear();
-        pollAcoes.clear();
+    void clear() {
+        actions.clear();
+        pollActions.clear();
     }
+    void limpar() { clear(); }
 
 private:
-    std::unordered_map<int, Acao> acoes;
-    std::vector<PollEntry> pollAcoes;
+    std::unordered_map<int, Action> actions;
+    std::vector<PollEntry> pollActions;
 };

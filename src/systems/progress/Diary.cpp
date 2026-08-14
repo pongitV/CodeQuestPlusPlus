@@ -1,143 +1,143 @@
 #include "Diary.h"
 
-Diary& Diary::instancia() {
+Diary& Diary::instance() {
     static Diary inst;
     return inst;
 }
 
 Diary::Diary() {}
 
-void Diary::registrarItem(const std::string& nomeItem) {
+void Diary::registerItem(const std::string& name) {
     std::lock_guard<std::mutex> lock(mtx);
-    itensDescobertos.insert(nomeItem);
+    discoveredItems.insert(name);
 }
 
-void Diary::registrarNPC(const std::string& nomeNPC) {
+void Diary::registerNPC(const std::string& name) {
     std::lock_guard<std::mutex> lock(mtx);
-    npcsDescobertos.insert(nomeNPC);
+    discoveredNPCs.insert(name);
 }
 
-void Diary::registrarRaca(const std::string& nomeRaca) {
+void Diary::registerRace(const std::string& name) {
     std::lock_guard<std::mutex> lock(mtx);
-    racasDescobertas.insert(nomeRaca);
+    discoveredRaces.insert(name);
 }
 
-void Diary::registrarClasse(const std::string& nomeClasse) {
+void Diary::registerClass(const std::string& name) {
     std::lock_guard<std::mutex> lock(mtx);
-    classesDescobertas.insert(nomeClasse);
+    discoveredClasses.insert(name);
 }
 
-void Diary::registrarMissaoAceita(const std::string& idMissao) {
+void Diary::registerAcceptedQuest(const std::string& id) {
     std::lock_guard<std::mutex> lock(mtx);
-    missoesAceitas.insert(idMissao);
+    acceptedQuests.insert(id);
 }
 
-void Diary::registrarMissaoConcluida(const std::string& idMissao) {
+void Diary::registerCompletedQuest(const std::string& id) {
     std::lock_guard<std::mutex> lock(mtx);
-    missoesConcluidas.insert(idMissao);
+    completedQuests.insert(id);
 }
 
-bool Diary::itemDescoberto(const std::string& nomeItem) const {
+bool Diary::isItemDiscovered(const std::string& name) const {
     std::lock_guard<std::mutex> lock(mtx);
-    return itensDescobertos.count(nomeItem) > 0;
+    return discoveredItems.count(name) > 0;
 }
 
-bool Diary::npcDescoberto(const std::string& nomeNPC) const {
+bool Diary::isNPCDiscovered(const std::string& name) const {
     std::lock_guard<std::mutex> lock(mtx);
-    return npcsDescobertos.count(nomeNPC) > 0;
+    return discoveredNPCs.count(name) > 0;
 }
 
-bool Diary::racaDescoberta(const std::string& nomeRaca) const {
+bool Diary::isRaceDiscovered(const std::string& name) const {
     std::lock_guard<std::mutex> lock(mtx);
-    return racasDescobertas.count(nomeRaca) > 0;
+    return discoveredRaces.count(name) > 0;
 }
 
-bool Diary::classeDescoberta(const std::string& nomeClasse) const {
+bool Diary::isClassDiscovered(const std::string& name) const {
     std::lock_guard<std::mutex> lock(mtx);
-    return classesDescobertas.count(nomeClasse) > 0;
+    return discoveredClasses.count(name) > 0;
 }
 
-bool Diary::missaoAceita(const std::string& idMissao) const {
+bool Diary::isQuestAccepted(const std::string& id) const {
     std::lock_guard<std::mutex> lock(mtx);
-    return missoesAceitas.count(idMissao) > 0;
+    return acceptedQuests.count(id) > 0;
 }
 
-bool Diary::missaoConcluida(const std::string& idMissao) const {
+bool Diary::isQuestCompleted(const std::string& id) const {
     std::lock_guard<std::mutex> lock(mtx);
-    return missoesConcluidas.count(idMissao) > 0;
+    return completedQuests.count(id) > 0;
 }
 
-std::vector<std::string> Diary::obterItensDescobertos() const {
+std::vector<std::string> Diary::getDiscoveredItems() const {
     std::lock_guard<std::mutex> lock(mtx);
-    return std::vector<std::string>(itensDescobertos.begin(), itensDescobertos.end());
+    return std::vector<std::string>(discoveredItems.begin(), discoveredItems.end());
 }
 
-std::vector<std::string> Diary::obterNPCsDescobertos() const {
+std::vector<std::string> Diary::getDiscoveredNPCs() const {
     std::lock_guard<std::mutex> lock(mtx);
-    return std::vector<std::string>(npcsDescobertos.begin(), npcsDescobertos.end());
+    return std::vector<std::string>(discoveredNPCs.begin(), discoveredNPCs.end());
 }
 
-std::vector<std::string> Diary::obterRacasDescobertas() const {
+std::vector<std::string> Diary::getDiscoveredRaces() const {
     std::lock_guard<std::mutex> lock(mtx);
-    return std::vector<std::string>(racasDescobertas.begin(), racasDescobertas.end());
+    return std::vector<std::string>(discoveredRaces.begin(), discoveredRaces.end());
 }
 
-std::vector<std::string> Diary::obterClassesDescobertas() const {
+std::vector<std::string> Diary::getDiscoveredClasses() const {
     std::lock_guard<std::mutex> lock(mtx);
-    return std::vector<std::string>(classesDescobertas.begin(), classesDescobertas.end());
+    return std::vector<std::string>(discoveredClasses.begin(), discoveredClasses.end());
 }
 
-std::vector<std::string> Diary::obterMissoesAceitas() const {
+std::vector<std::string> Diary::getAcceptedQuests() const {
     std::lock_guard<std::mutex> lock(mtx);
-    return std::vector<std::string>(missoesAceitas.begin(), missoesAceitas.end());
+    return std::vector<std::string>(acceptedQuests.begin(), acceptedQuests.end());
 }
 
-std::vector<std::string> Diary::obterMissoesConcluidas() const {
+std::vector<std::string> Diary::getCompletedQuests() const {
     std::lock_guard<std::mutex> lock(mtx);
-    return std::vector<std::string>(missoesConcluidas.begin(), missoesConcluidas.end());
+    return std::vector<std::string>(completedQuests.begin(), completedQuests.end());
 }
 
-void Diary::salvar(std::ofstream& out) const {
+void Diary::save(std::ofstream& out) const {
     std::lock_guard<std::mutex> lock(mtx);
     
-    auto escreverConjunto = [&](const std::set<std::string>& conjunto) {
-        out << conjunto.size() << "\n";
-        for (const auto& item : conjunto) out << item << "\n";
+    auto writeSet = [&](const std::set<std::string>& set) {
+        out << set.size() << "\n";
+        for (const auto& item : set) out << item << "\n";
     };
 
-    escreverConjunto(itensDescobertos);
-    escreverConjunto(npcsDescobertos);
-    escreverConjunto(racasDescobertas);
-    escreverConjunto(classesDescobertas);
-    escreverConjunto(missoesAceitas);
-    escreverConjunto(missoesConcluidas);
+    writeSet(discoveredItems);
+    writeSet(discoveredNPCs);
+    writeSet(discoveredRaces);
+    writeSet(discoveredClasses);
+    writeSet(acceptedQuests);
+    writeSet(completedQuests);
 }
 
-void Diary::carregar(std::ifstream& in) {
+void Diary::load(std::ifstream& in) {
     std::lock_guard<std::mutex> lock(mtx);
     
-    itensDescobertos.clear();
-    npcsDescobertos.clear();
-    racasDescobertas.clear();
-    classesDescobertas.clear();
-    missoesAceitas.clear();
-    missoesConcluidas.clear();
+    discoveredItems.clear();
+    discoveredNPCs.clear();
+    discoveredRaces.clear();
+    discoveredClasses.clear();
+    acceptedQuests.clear();
+    completedQuests.clear();
 
-    auto lerConjunto = [&](std::set<std::string>& conjunto) {
+    auto readSet = [&](std::set<std::string>& set) {
         size_t size;
         if (!(in >> size)) return false;
-        std::string linha; std::getline(in, linha);
+        std::string line; std::getline(in, line);
         for (size_t i = 0; i < size; ++i) {
-            std::getline(in, linha);
-            conjunto.insert(linha);
+            std::getline(in, line);
+            set.insert(line);
         }
         return true;
     };
     
-    lerConjunto(itensDescobertos);
-    lerConjunto(npcsDescobertos);
-    lerConjunto(racasDescobertas);
-    lerConjunto(classesDescobertas);
-    lerConjunto(missoesAceitas);
-    lerConjunto(missoesConcluidas);
+    readSet(discoveredItems);
+    readSet(discoveredNPCs);
+    readSet(discoveredRaces);
+    readSet(discoveredClasses);
+    readSet(acceptedQuests);
+    readSet(completedQuests);
 }

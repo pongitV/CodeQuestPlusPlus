@@ -10,7 +10,10 @@ enum class MapType {
     Village,
     Forest,
     Kingdom,
-    Labirinto
+    Labyrinth,
+
+    // Compatibilidade legada
+    Labirinto = Labyrinth
 };
 
 class StateEvent {
@@ -29,7 +32,7 @@ public:
 
 class MapManager {
 private:
-    std::unordered_map<MapType, std::vector<std::string>> mapaCache;
+    std::unordered_map<MapType, std::vector<std::string>> mapCache;
     std::vector<std::shared_ptr<StateObserver>> observers;
 
 public:
@@ -41,16 +44,16 @@ public:
         return instance;
     }
 
-    void cacheMap(MapType type, const std::vector<std::string>& matriz) {
-        mapaCache[type] = matriz;
+    void cacheMap(MapType type, const std::vector<std::string>& matrix) {
+        mapCache[type] = matrix;
     }
 
     bool hasMap(MapType type) const {
-        return mapaCache.find(type) != mapaCache.end();
+        return mapCache.find(type) != mapCache.end();
     }
 
     const std::vector<std::string>& getMap(MapType type) const {
-        return mapaCache.at(type);
+        return mapCache.at(type);
     }
 
     void addObserver(std::shared_ptr<StateObserver> obs) {

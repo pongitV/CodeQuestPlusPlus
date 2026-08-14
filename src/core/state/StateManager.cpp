@@ -1,5 +1,5 @@
-// Implementation of the game state manager.
-// Controls the player's lifecycle and transitions between world maps.
+// Implementação do gerenciador de estados do jogo.
+// Controla o ciclo de vida do jogador e transições entre mapas mundiais.
 
 #include "StateManager.h"
 #include "../../entities/classes/archer/Archer.h"
@@ -19,79 +19,79 @@
 #include "../../systems/progress/Progression.h"
 #include "../../systems/progress/ProgressionFlags.h"
 
-// Executes the main menu state.
-// Displays character creation or selection options and transitions to ExplorationState.
-void EstadoMenu::executar(Jogo& jogo, ContextoDoJogo& ctx) {
-    auto jogadorAtivo = GameMenu::mainMenu();
-    if (!jogadorAtivo) {
-        jogo.mudarEstado(nullptr);
+// Executa o estado do menu principal.
+// Exibe opções de criação ou seleção de personagem e transita para ExplorationState.
+void MenuState::execute(Game& game, GameContext& ctx) {
+    auto activePlayer = GameMenu::mainMenu();
+    if (!activePlayer) {
+        game.changeState(nullptr);
         return;
     }
-    ctx.objetoJogador = std::move(jogadorAtivo);
-    jogo.mudarEstado(std::make_unique<EstadoExploracao>());
+    ctx.playerEntity = std::move(activePlayer);
+    game.changeState(std::make_unique<ExplorationState>());
 }
 
-// Resource cleanup when exiting the map exploration state.
-void EstadoExploracao::aoSair(Jogo& jogo, ContextoDoJogo& ctx) {
-    ctx.objetoJogador.reset();
+// Limpeza de recursos ao sair do estado de exploração de mapas.
+void ExplorationState::onExit(Game& game, GameContext& ctx) {
+    ctx.playerEntity.reset();
 }
 
-// Executes the game world exploration loop.
-// Instantiates maps and manages transitions between active zones.
-void EstadoExploracao::executar(Jogo& jogo, ContextoDoJogo& ctx) {
-    Character* jogador = ctx.obterJogador();
-    if (!jogador) {
-        jogo.mudarEstado(nullptr);
+// Executa o loop de exploração do mundo do jogo.
+// Instancia mapas e gerencia transições entre zonas ativas.
+void ExplorationState::execute(Game& game, GameContext& ctx) {
+    Character* player = ctx.getPlayer();
+    if (!player) {
+        game.changeState(nullptr);
         return;
     }
 
-    auto mapaVila = std::make_unique<Mapa1Vila>(jogador);
-    auto mapaFloresta = std::make_unique<Mapa2Floresta>(jogador);
-    auto mapaPonteReino = std::make_unique<Mapa3PonteReino>(jogador);
-    auto mapaReino = std::make_unique<Mapa4Reino>(jogador);
+    auto mapVillage = std::make_unique<Mapa1Vila>(player);
+    auto mapForest = std::make_unique<Mapa2Floresta>(player);
+    auto mapKingdomBridge = std::make_unique<Mapa3PonteReino>(player);
+    auto mapKingdom = std::make_unique<Mapa4Reino>(player);
 
-    IMapa* mapaAtual = mapaVila.get();
-    while (mapaAtual) {
-        ProximaTransicaoMapa transicao = mapaAtual->iniciarLoopDeExploracao();
+    IMapa* currentMap = mapVillage.get();
+    while (currentMap) {
+        ProximaTransicaoMapa transition = currentMap->iniciarLoopDeExploracao();
 
-        if (transicao == ProximaTransicaoMapa::VoltarMenu || jogador->obterVida() <= 0 || jogador->obterVoltarProMenu()) {
+        if (transition == ProximaTransicaoMapa::VoltarMenu || player->obterVida() <= 0 || player->obterVoltarProMenu()) {
             break;
         }
-        else if (transicao == ProximaTransicaoMapa::Village) {
-            mapaAtual = mapaVila.get();
-            mapaVila->exploracaoEstaAtiva = true;
+        else if (transition == ProximaTransicaoMapa::Village) {
+            currentMap = mapVillage.get();
+            mapVillage->exploracaoEstaAtiva = true;
         }
-        else if (transicao == ProximaTransicaoMapa::Forest) {
-            mapaAtual = mapaFloresta.get();
-            mapaFloresta->exploracaoEstaAtiva = true;
+        else if (transition == ProximaTransicaoMapa::Forest) {
+            currentMap = mapForest.get();
+            mapForest->exploracaoEstaAtiva = true;
             if (!Progression::instancia().obterFlag(Flags::Visitou_Floresta)) {
                 Progression::instancia().definirFlag(Flags::Visitou_Floresta, true);
             }
         }
-        else if (transicao == ProximaTransicaoMapa::PonteReino) {
-            mapaAtual = mapaPonteReino.get();
-            mapaPonteReino->exploracaoEstaAtiva = true;
+        else if (transition == ProximaTransicaoMapa::PonteReino) {
+            currentMap = mapKingdomBridge.get();
+            mapKingdomBridge->exploracaoEstaAtiva = true;
             if (!Progression::instancia().obterFlag(Flags::Visitou_PonteReino)) {
                 Progression::instancia().definirFlag(Flags::Visitou_PonteReino, true);
             }
         }
-        else if (transicao == ProximaTransicaoMapa::Kingdom) {
-            mapaAtual = mapaReino.get();
-            mapaReino->exploracaoEstaAtiva = true;
+        else if (transition == ProximaTransicaoMapa::Kingdom) {
+            currentMap = mapKingdom.get();
+            mapKingdom->exploracaoEstaAtiva = true;
             if (!Progression::instancia().obterFlag(Flags::Visitou_Reino)) {
                 Progression::instancia().definirFlag(Flags::Visitou_Reino, true);
             }
         }
         else {
-            jogador->definirVoltarProMenu(true);
+            player->definirVoltarProMenu(true);
             break;
         }
     }
 
-    if (jogador->obterVida() > 0 && !jogador->obterVoltarProMenu()) {
-        jogo.mudarEstado(nullptr);
+    if (player->obterVida() > 0 && !player->obterVoltarProMenu()) {
+        game.changeState(nullptr);
         return;
     }
 
-    jogo.mudarEstado(std::make_unique<EstadoMenu>());
+    game.changeState(std::make_unique<MenuState>());
 }

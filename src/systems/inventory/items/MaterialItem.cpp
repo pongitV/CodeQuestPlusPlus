@@ -4,43 +4,43 @@
 #include <unordered_map>
 #include "../ItemFactory.h"
 
-MaterialItem::MaterialItem(const std::string& nome, int price) : Item(price), nome(nome)
+MaterialItem::MaterialItem(const std::string& name, int price) : Item(price), name(name)
 {
 }
 
-std::string MaterialItem::getNameItem() const { return nome; }
-TipoEquipamento MaterialItem::obterTipo() const { return TipoEquipamento::MATERIAL; }
+std::string MaterialItem::getItemName() const { return name; }
+EquipmentType MaterialItem::getType() const { return EquipmentType::Material; }
 
-std::vector<std::string> MaterialItem::obterDetalhesInspecao(Character* /*character*/) const {
-    std::vector<std::string> linhas;
-    linhas.push_back(" > Tipo: Material");
+std::vector<std::string> MaterialItem::getInspectionDetails(Character* /*character*/) const {
+    std::vector<std::string> lines;
+    lines.push_back(" > Tipo: Material");
     
-    if (!descricaoInspecao.empty()) {
-        for (const auto& desc : descricaoInspecao) linhas.push_back(" > Descricao: " + desc);
+    if (!inspectionDescription.empty()) {
+        for (const auto& desc : inspectionDescription) lines.push_back(" > Descricao: " + desc);
     } else {
-        linhas.push_back(" > Descricao: Pode ser util para construcoes ou rituais.");
+        lines.push_back(" > Descricao: Pode ser util para construcoes ou rituais.");
     }
-    return linhas;
+    return lines;
 }
 
-std::unique_ptr<Item> fabricarMaterialItem(ItemID id) {
-    auto criarMaterial = [](ItemID id, int price, const std::string& desc = "") {
+std::unique_ptr<Item> buildMaterialItem(ItemID id) {
+    auto createMaterial = [](ItemID id, int price, const std::string& desc = "") {
         auto m = std::make_unique<MaterialItem>(ItemFactory::getNameDeID(id), price);
-        if (!desc.empty()) m->definirDescricaoInspecao(desc);
+        if (!desc.empty()) m->setInspectionDescription(desc);
         return m;
     };
 
-    static const std::unordered_map<ItemID, std::function<std::unique_ptr<Item>()>> construtores = {
-        {ItemID::GosmaAcida, [criarMaterial]() { return criarMaterial(ItemID::GosmaAcida, 5); }},
-        {ItemID::DenteGoblin, [criarMaterial]() { return criarMaterial(ItemID::DenteGoblin, 1, "Pode ser usado na Cabana da Bruxa para encantar armas com Sangramento (Requer 40x)."); }},
-        {ItemID::NucleoPegajoso, [criarMaterial]() { return criarMaterial(ItemID::NucleoPegajoso, 30, "Pode ser usado na Cabana da Bruxa para encantar armas com Lentidao (Requer 5x)."); }},
-        {ItemID::PoMagico, [criarMaterial]() { return criarMaterial(ItemID::PoMagico, 15, "Pode ser usado na Cabana da Bruxa para encantar armas com Quebra de Resistencia Permanente (Requer 25x)."); }},
-        {ItemID::MadeiraEnfeiticada, [criarMaterial]() { return criarMaterial(ItemID::MadeiraEnfeiticada, 3, "Pode ser usada na Cabana da Bruxa para encantar o Arco ou o Violao (Requer 1x)."); }},
-        {ItemID::CoracaoFloresta, [criarMaterial]() { return criarMaterial(ItemID::CoracaoFloresta, 3, "Usado na Cabana da Bruxa para encantar o Cajado ou para desbloquear a passagem do labirinto (Requer 3x)."); }},
-        {ItemID::PedraUpgrade, [criarMaterial]() { return criarMaterial(ItemID::PedraUpgrade, 3, "Uma pedra extremamente rara. Pode ser usada na Forja de Bjorn para conceder +3 de Defesa (Resistencia) a uma armadura."); }},
-        {ItemID::ConviteReal, [criarMaterial]() { return criarMaterial(ItemID::ConviteReal, 1, "Permite o acesso livre aos portoes do Kingdom Real."); }}
+    static const std::unordered_map<ItemID, std::function<std::unique_ptr<Item>()>> constructors = {
+        {ItemID::AcidSlime, [createMaterial]() { return createMaterial(ItemID::AcidSlime, 5); }},
+        {ItemID::GoblinTooth, [createMaterial]() { return createMaterial(ItemID::GoblinTooth, 1, "Pode ser usado na Cabana da Bruxa para encantar armas com Sangramento (Requer 40x)."); }},
+        {ItemID::StickyCore, [createMaterial]() { return createMaterial(ItemID::StickyCore, 30, "Pode ser usado na Cabana da Bruxa para encantar armas com Lentidao (Requer 5x)."); }},
+        {ItemID::MagicDust, [createMaterial]() { return createMaterial(ItemID::MagicDust, 15, "Pode ser usado na Cabana da Bruxa para encantar armas com Quebra de Resistencia Permanente (Requer 25x)."); }},
+        {ItemID::EnchantedWood, [createMaterial]() { return createMaterial(ItemID::EnchantedWood, 3, "Pode ser usada na Cabana da Bruxa para encantar o Arco ou o Violao (Requer 1x)."); }},
+        {ItemID::ForestHeart, [createMaterial]() { return createMaterial(ItemID::ForestHeart, 3, "Usado na Cabana da Bruxa para encantar o Cajado ou para desbloquear a passagem do labirinto (Requer 3x)."); }},
+        {ItemID::UpgradeStone, [createMaterial]() { return createMaterial(ItemID::UpgradeStone, 3, "Uma pedra extremamente rara. Pode ser usada na Forja de Bjorn para conceder +3 de Defesa (Resistencia) a uma armadura."); }},
+        {ItemID::RoyalInvitation, [createMaterial]() { return createMaterial(ItemID::RoyalInvitation, 1, "Permite o acesso livre aos portoes do Kingdom Real."); }}
     };
-    auto it = construtores.find(id);
-    if (it != construtores.end()) return it->second();
+    auto it = constructors.find(id);
+    if (it != constructors.end()) return it->second();
     return nullptr;
 }

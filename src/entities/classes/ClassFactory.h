@@ -6,9 +6,11 @@
 
 class ClassFactory {
 public:
-    static std::unique_ptr<ClassBase> createClass(ClassType tipo);
-    static std::vector<ClassType> obterClassesJogaveis();
+    static std::unique_ptr<ClassBase> createClass(ClassType type);
+    static std::vector<ClassType> getPlayableClasses();
 
-    // English Alias
-    static std::vector<ClassType> getPlayableClasses() { return obterClassesJogaveis(); }
+    // Compatibilidade legada
+    static std::vector<ClassType> obterClassesJogaveis() { return getPlayableClasses(); }
 };
+
+using FabricaClasses = ClassFactory;

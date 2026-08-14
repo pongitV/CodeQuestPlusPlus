@@ -9,12 +9,12 @@ enum class ItemID;
 class Drops 
 {
 public:
-    // Centraliza o calculo e as mensagens na screen para as recompensas dos monstros
-    static void reportAndProcessXPGold(Character* jogador, int xpDrop, int ouroDrop, int& ouroTotal, int& xpTotal);
+    // Centraliza o cálculo e o processamento de XP e ouro de monstros
+    static void reportAndProcessXPGold(Character* player, int xpDrop, int goldDrop, int& totalGold, int& totalXp);
     
-    // Padroniza a mensagem verde ou branca do recebimento de um item 
-    static void reportItemDrop(const std::string& nomeItem, int amount);
+    // Padroniza a mensagem do recebimento de um item 
+    static void reportItemDrop(const std::string& itemName, int amount);
 
-    // Delega a responsabilidade de dar o item e processar a string no array (Aplicando DRY)
-    static void giveAndProcessItem(Character* jogador, ItemID itemId, int amount, std::vector<std::string>& itensObtidos, int chanceDeDrop = 100);
+    // Delega a responsabilidade de conceder o item e processar a lista de drops
+    static void giveAndProcessItem(Character* player, ItemID itemId, int amount, std::vector<std::string>& obtainedItems, int dropChance = 100);
 };

@@ -3,64 +3,64 @@
 #include <algorithm>
 
 namespace {
-    void calcularCameraAxis(int maxVisivel, int posicaoJogador, int tamanhoMapa, int& start, int& end) {
+    void calculateCameraAxis(int maxVisible, int playerPos, int mapSize, int& start, int& end) {
         start = 0;
-        end = tamanhoMapa;
+        end = mapSize;
 
-        if (end > maxVisivel) {
-            start = std::max(0, posicaoJogador - (maxVisivel / 2));
-            end = start + maxVisivel;
-            if (end > tamanhoMapa) {
-                end = tamanhoMapa;
-                start = std::max(0, end - maxVisivel);
+        if (end > maxVisible) {
+            start = std::max(0, playerPos - (maxVisible / 2));
+            end = start + maxVisible;
+            if (end > mapSize) {
+                end = mapSize;
+                start = std::max(0, end - maxVisible);
             }
         }
     }
 }
 
-void RenderizadorMapa::calcularCameraVertical(int alturaDaTela, int linhaInicial, int posicaoYDoJogador, int tamanhoDoMapa, int& startY, int& endY) {
-    int maxLinhasVisiveis = std::max(5, alturaDaTela - linhaInicial - 4);
-    calcularCameraAxis(maxLinhasVisiveis, posicaoYDoJogador, tamanhoDoMapa, startY, endY);
+void MapRenderer::calculateVerticalCamera(int screenHeight, int startLine, int playerPosY, int mapSize, int& startY, int& endY) {
+    int maxVisibleLines = std::max(5, screenHeight - startLine - 4);
+    calculateCameraAxis(maxVisibleLines, playerPosY, mapSize, startY, endY);
 }
 
-void RenderizadorMapa::calcularCameraHorizontal(int larguraDaTela, int posicaoXDoJogador, int larguraDoMapa, int& startX, int& endX) {
-    int maxColunasVisiveis = std::max(10, larguraDaTela); // Usa a largura total do terminal
-    calcularCameraAxis(maxColunasVisiveis, posicaoXDoJogador, larguraDoMapa, startX, endX);
+void MapRenderer::calculateHorizontalCamera(int screenWidth, int playerPosX, int mapWidth, int& startX, int& endX) {
+    int maxVisibleCols = std::max(10, screenWidth); // Usa a largura total do terminal
+    calculateCameraAxis(maxVisibleCols, playerPosX, mapWidth, startX, endX);
 }
 
-std::string RenderizadorMapa::calcularMargemCentralizada(int larguraDaTela, int larguraDoTexto) {
-    int espacos = (larguraDaTela - larguraDoTexto) / 2;
-    return std::string(espacos > 0 ? espacos : 0, ' ');
+std::string MapRenderer::calculateCenteredMargin(int screenWidth, int textWidth) {
+    int spaces = (screenWidth - textWidth) / 2;
+    return std::string(spaces > 0 ? spaces : 0, ' ');
 }
 
-void RenderizadorMapa::renderizarMapa(const std::vector<std::string>& matrizDoMapa, int posicaoXDoJogador, int posicaoYDoJogador, int larguraDaTela, int alturaDaTela, int linhaInicial, const std::function<std::string(char, int, int)>& formatadorCelula) {
+void MapRenderer::renderMap(const std::vector<std::string>& mapMatrix, int playerPosX, int playerPosY, int screenWidth, int screenHeight, int startLine, const std::function<std::string(char, int, int)>& cellFormatter) {
     static CameraCache cache;
     int startX, endX, startY, endY;
 
-    if (cache.estaValido(posicaoXDoJogador, posicaoYDoJogador, larguraDaTela, alturaDaTela)) {
+    if (cache.isValid(playerPosX, playerPosY, screenWidth, screenHeight)) {
         startX = cache.startX;
         endX = cache.endX;
         startY = cache.startY;
         endY = cache.endY;
     } else {
-        calcularCameraHorizontal(larguraDaTela, posicaoXDoJogador, matrizDoMapa.empty() ? 0 : static_cast<int>(matrizDoMapa[0].length()), startX, endX);
-        calcularCameraVertical(alturaDaTela, linhaInicial, posicaoYDoJogador, static_cast<int>(matrizDoMapa.size()), startY, endY);
-        cache.lastPosX = posicaoXDoJogador;
-        cache.lastPosY = posicaoYDoJogador;
-        cache.lastTermW = larguraDaTela;
-        cache.lastTermH = alturaDaTela;
+        calculateHorizontalCamera(screenWidth, playerPosX, mapMatrix.empty() ? 0 : static_cast<int>(mapMatrix[0].length()), startX, endX);
+        calculateVerticalCamera(screenHeight, startLine, playerPosY, static_cast<int>(mapMatrix.size()), startY, endY);
+        cache.lastPosX = playerPosX;
+        cache.lastPosY = playerPosY;
+        cache.lastTermW = screenWidth;
+        cache.lastTermH = screenHeight;
         cache.startX = startX; cache.endX = endX;
         cache.startY = startY; cache.endY = endY;
     }
 
-    std::string margemEsquerdaDoMapa = calcularMargemCentralizada(larguraDaTela, endX - startX);
+    std::string mapLeftMargin = calculateCenteredMargin(screenWidth, endX - startX);
 
     for (int y = startY; y < endY; y++) {
-        std::string linhaSendoRenderizada = margemEsquerdaDoMapa;
-        linhaSendoRenderizada.reserve(margemEsquerdaDoMapa.size() + (endX - startX) * 10);
+        std::string renderedLine = mapLeftMargin;
+        renderedLine.reserve(mapLeftMargin.size() + (endX - startX) * 10);
         for (int x = startX; x < endX; x++) {
-            char c = (x < static_cast<int>(matrizDoMapa[y].length())) ? matrizDoMapa[y][x] : ' ';
-            linhaSendoRenderizada += formatadorCelula(c, x, y);
+            char c = (x < static_cast<int>(mapMatrix[y].length())) ? mapMatrix[y][x] : ' ';
+            renderedLine += cellFormatter(c, x, y);
         }
     }
 }

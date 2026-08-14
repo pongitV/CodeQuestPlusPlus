@@ -26,66 +26,66 @@ std::string Mahoraga::getRaceAbilityName() const { return "A Roda da Adaptacao";
 std::string Mahoraga::getRaceAbilityDescription() const { return "Adapta-se ao alvo. Apos sofrer 10 parrys perfeitos, torna-se Imparavel."; }
 
 // --- MECANICA DE ADAPTACAO ---
-void Mahoraga::aoCausarDano(Character* atacante, Character* alvo, int danoCausado) {
+void Mahoraga::onDealingDamage(Character* attacker, Character* target, int /*damageDealt*/) {
     // Efeito popup de texto piscante
     TelaCombate::adicionarMensagemFixa(TelaCombate::margemCombate() + "* KLINK! * A Roda gira...\n");
 
     // Adaptacao de Defesa
-    int strengthFisica = alvo->getStrength() + alvo->getDexterity();
-    int strengthMagica = alvo->getInteligencia() + alvo->getWisdom();
+    int physicalStrength = target->getStrength() + target->getDexterity();
+    int magicalStrength = target->getIntelligence() + target->getWisdom();
     
-    if (strengthFisica >= strengthMagica) {
-        if (atacante->getResistance() < 50) {
-            atacante->alterarAtributoEstatico(TipoAtributo::Forca, 5);
-            atacante->alterarAtributoEstatico(TipoAtributo::Destreza, 5);
-            atacante->alterarAtributoEstatico(TipoAtributo::Resistencia, 5);
-            atacante->alterarAtributoEstatico(TipoAtributo::Constituicao, 5);
+    if (physicalStrength >= magicalStrength) {
+        if (attacker->getResistance() < 50) {
+            attacker->alterStaticAttribute(AttributeType::Strength, 5);
+            attacker->alterStaticAttribute(AttributeType::Dexterity, 5);
+            attacker->alterStaticAttribute(AttributeType::Resistance, 5);
+            attacker->alterStaticAttribute(AttributeType::Constitution, 5);
         } else {
         }
     } else {
-        if (atacante->getWisdom() < 50) {
-            atacante->alterarAtributoEstatico(TipoAtributo::Inteligencia, 5);
-            atacante->alterarAtributoEstatico(TipoAtributo::Destreza, 5);
-            atacante->alterarAtributoEstatico(TipoAtributo::Sabedoria, 5);
-            atacante->alterarAtributoEstatico(TipoAtributo::Constituicao, 5);
+        if (attacker->getWisdom() < 50) {
+            attacker->alterStaticAttribute(AttributeType::Intelligence, 5);
+            attacker->alterStaticAttribute(AttributeType::Dexterity, 5);
+            attacker->alterStaticAttribute(AttributeType::Wisdom, 5);
+            attacker->alterStaticAttribute(AttributeType::Constitution, 5);
         } else {
         }
     }
 
     // Cura
-    int cura = atacante->obterVidaMaxima() * 0.05; 
-    atacante->modificarVida(cura);
+    int healAmount = attacker->getMaxHealth() * 0.05; 
+    attacker->modifyHealth(healAmount);
 
     // Limpeza de debuffs
-    std::vector<EfeitoID> efeitos;
-    atacante->obterIDsEfeitosAtivos(efeitos);
-    if (!efeitos.empty()) {
-        atacante->limparEfeitos();
+    std::vector<EffectID> effects;
+    attacker->getActiveEffectIDs(effects);
+    if (!effects.empty()) {
+        attacker->clearEffects();
     }
 }
 
-void Mahoraga::aoSofrerParryPerfeito() {
-    parrysSofridos++;
-    if (parrysSofridos == 10) {
+void Mahoraga::onSufferingPerfectParry() {
+    sufferedParries++;
+    if (sufferedParries == 10) {
         TelaCombate::adicionarMensagemFixa(TelaCombate::margemCombate() + "* KLINK! * A Roda gira...\n");
     }
 }
 
-void Mahoraga::aoTerAtaqueBloqueadoPorEscudo() {
-    if (defesasComEscudoSofridas < 3) {
-        defesasComEscudoSofridas++;
-        if (defesasComEscudoSofridas == 3) {
+void Mahoraga::onAttackBlockedByShield() {
+    if (sufferedShieldDefenses < 3) {
+        sufferedShieldDefenses++;
+        if (sufferedShieldDefenses == 3) {
             TelaCombate::adicionarMensagemFixa(TelaCombate::margemCombate() + "* KLINK! * A Roda gira...\n");
         }
     }
 }
 
-bool Mahoraga::ignoraParry() const {
-    return parrysSofridos >= 10;
+bool Mahoraga::ignoresParry() const {
+    return sufferedParries >= 10;
 }
 
-bool Mahoraga::ignoraEscudo() const {
-    return defesasComEscudoSofridas >= 3;
+bool Mahoraga::ignoresShield() const {
+    return sufferedShieldDefenses >= 3;
 }
 
 // --- APARENCIA ---
@@ -251,23 +251,23 @@ const std::vector<std::string>& Mahoraga::getRaceAppearance() const
 
 
 // --- BESTIARIO E DROPS ---
-BestiaryInfo Mahoraga::obterBestiaryInfo() const {
+BestiaryInfo Mahoraga::getBestiaryInfo() const {
     return {
         "Labirinto Subterraneo", 
         "Sala do Chefe",
         "Uma entity lendaria de oito empunhaduras selada na escuridao. A roda sobre sua cabeca gira, adaptando-se a todos e quaisquer fenomenos.",
         "Dizem que o unico jeito de derrota-lo e com um golpe fulminante antes que a roda gire.",
-        {"Ouro Massivo", "Espada de Exterminio", "Roda da Adaptacao", ItemFactory::getNameDeID(ItemID::PedraUpgrade), ItemFactory::getNameDeID(ItemID::PocaoFuria), ItemFactory::getNameDeID(ItemID::ElixirArcano)},
+        {"Ouro Massivo", "Espada de Exterminio", "Roda da Adaptacao", ItemFactory::getNameFromID(ItemID::PedraUpgrade), ItemFactory::getNameFromID(ItemID::PocaoFuria), ItemFactory::getNameFromID(ItemID::ElixirArcano)},
         10 // Dificuldade Maxima!
     };
 }
 
-void Mahoraga::realizarDrops(Character* enemy, Character* currentPlayer, std::vector<std::string>& itensObtidos, int& ouroTotal, int& xpTotal) {
-    Drops::reportAndProcessXPGold(currentPlayer, 5000, 5000, ouroTotal, xpTotal);
+void Mahoraga::performDrops(Character* enemy, Character* currentPlayer, std::vector<std::string>& obtainedItems, int& totalGold, int& totalXp) {
+    Drops::reportAndProcessXPGold(currentPlayer, 5000, 5000, totalGold, totalXp);
     
-    Drops::giveAndProcessItem(currentPlayer, ItemID::EspadaExterminio, 1, itensObtidos);
-    Drops::giveAndProcessItem(currentPlayer, ItemID::RodaAdaptacao, 1, itensObtidos);
-    Drops::giveAndProcessItem(currentPlayer, ItemID::PedraUpgrade, 3, itensObtidos);
-    Drops::giveAndProcessItem(currentPlayer, ItemID::PocaoFuria, 3, itensObtidos);
-    Drops::giveAndProcessItem(currentPlayer, ItemID::ElixirArcano, 3, itensObtidos);
+    Drops::giveAndProcessItem(currentPlayer, ItemID::EspadaExterminio, 1, obtainedItems);
+    Drops::giveAndProcessItem(currentPlayer, ItemID::RodaAdaptacao, 1, obtainedItems);
+    Drops::giveAndProcessItem(currentPlayer, ItemID::PedraUpgrade, 3, obtainedItems);
+    Drops::giveAndProcessItem(currentPlayer, ItemID::PocaoFuria, 3, obtainedItems);
+    Drops::giveAndProcessItem(currentPlayer, ItemID::ElixirArcano, 3, obtainedItems);
 }

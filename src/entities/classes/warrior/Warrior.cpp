@@ -11,51 +11,51 @@
 #include "../../../ui/screens/combat/ScreenCombat.h"
 #include "../../../core/utils/Color.h"
 
-// --- INFORMACOES DA CLASSE ---
-std::string Warrior::getNameClasse() const 
+// --- INFORMAÇÕES DA CLASSE ---
+std::string Warrior::getClassName() const 
 { 
     return "Knight"; 
 }
 
-const std::vector<std::string>& Warrior::obterAparenciaClasseMenu() const 
+const std::vector<std::string>& Warrior::getClassMenuAppearance() const 
 {
     static const std::vector<std::string> appearance;
     return appearance;
 }
 
-Attributes Warrior::obterAtributosClasse() const
+Attributes Warrior::getClassAttributes() const
 {
     return { 0, 20, 10, 5, 10, 5, 5 };
 }
 
-std::vector<std::unique_ptr<Item>> Warrior::obterEquipamentoClasse() const 
+std::vector<std::unique_ptr<Item>> Warrior::getClassEquipment() const 
 {
-    auto equipamentos = ItemFactory::criarKitPocoes();
+    auto equipment = ItemFactory::criarKitPocoes();
 
-    equipamentos.push_back(ItemFactory::criarItem(ItemID::EspadaFerro));
-    equipamentos.push_back(ItemFactory::criarItem(ItemID::EscudoMetal));
-    equipamentos.push_back(ItemFactory::criarItem(ItemID::ArmaduraMalha));
-    return equipamentos;
+    equipment.push_back(ItemFactory::criarItem(ItemID::EspadaFerro));
+    equipment.push_back(ItemFactory::criarItem(ItemID::EscudoMetal));
+    equipment.push_back(ItemFactory::criarItem(ItemID::ArmaduraMalha));
+    return equipment;
 }
 
 // --- PASSIVA DA CLASSE ---
-std::string Warrior::getNamePassivaClasse() const 
+std::string Warrior::getClassPassiveName() const 
 { 
     return "Golpe decisivo"; 
 }
 
-std::string Warrior::obterDescricaoPassivaClasse() const 
+std::string Warrior::getClassPassiveDescription() const 
 { 
     return "Causa +10%/+20%/+30% de damage em enemies com menos de 30%/20%/10% de HP."; 
 }
 
 // --- HABILIDADE DA CLASSE ---
-std::string Warrior::obterRecargaHabilidadeClasse() const 
+std::string Warrior::getClassAbilityCooldownDescription() const 
 { 
     return "Recarga: 3 turnos."; 
 }
 
-std::string Warrior::getNameHabilidadeClasse() const 
+std::string Warrior::getClassAbilityName() const 
 { 
     return "Grito de guerra"; 
 }
@@ -65,46 +65,46 @@ std::string Warrior::getClassAbilityDescription() const
     return "Gasta seu turno para aumentar Forca e Destreza em 1.5x por 2 turnos."; 
 }
 
-void Warrior::useClassAbility(Combat* /*combat*/, Character* personagemUsuario, std::vector<Character*>& /*listaDeInimigos*/) 
+void Warrior::useClassAbility(Combat* /*combat*/, Character* userCharacter, std::vector<Character*>& /*enemyList*/) 
 {
-    int turnosRestantes = personagemUsuario->obterRecargaHabilidade(AbilityID::Determinacao);
-    if (verificarEReportarRecarga(personagemUsuario, turnosRestantes, getNameHabilidadeClasse())) return;
+    int remainingTurns = userCharacter->obterRecargaHabilidade(AbilityID::Determination);
+    if (checkAndReportCooldown(userCharacter, remainingTurns, getClassAbilityName())) return;
 
-    if (personagemUsuario->possuiEfeito(EfeitoID::GritoDeGuerra)) {
-        std::string msg = DialogFunctions::formatarMsgSistema("A habilidade " + getNameHabilidadeClasse() + " ja esta ativa!", Color::YELLOW);
+    if (userCharacter->possuiEfeito(EffectID::WarCry)) {
+        std::string msg = DialogFunctions::formatarMsgSistema("A habilidade " + getClassAbilityName() + " ja esta ativa!", Color::YELLOW);
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        personagemUsuario->definirHabilidadeCancelada(true);
+        userCharacter->definirHabilidadeCancelada(true);
         return;
     }
 
-    int bonusForca = personagemUsuario->getStrength() / 2;
-    int bonusDestreza = personagemUsuario->getDexterity() / 2;
+    int strengthBonus = userCharacter->getStrength() / 2;
+    int dexterityBonus = userCharacter->getDexterity() / 2;
     
-    personagemUsuario->adicionarEfeito(std::make_unique<EfeitoGritoGuerra>(2, bonusForca, bonusDestreza));
-    personagemUsuario->definirCooldown(AbilityID::Determinacao, 4);
+    userCharacter->adicionarEfeito(std::make_unique<WarCryEffect>(2, strengthBonus, dexterityBonus));
+    userCharacter->definirCooldown(AbilityID::Determination, 4);
     
-    std::string msg = DialogFunctions::formatarMsgHabilidade("Grito de guerra! Forca +" + std::to_string(bonusForca) + " e Destreza +" + std::to_string(bonusDestreza) + "!");
-    notificarMensagemCombate(msg, msg);
+    std::string msg = DialogFunctions::formatarMsgHabilidade("Grito de guerra! Forca +" + std::to_string(strengthBonus) + " e Destreza +" + std::to_string(dexterityBonus) + "!");
+    notifyCombatMessage(msg, msg);
 }
 
-// --- PROCESSAMENTO DE DANO  ---
-int Warrior::processarDanoPreAtaque(Character* /*atacante*/, Character* defensor, int baseDamage, bool /*isAtacanteJogador*/, size_t /*qtdInimigos*/) {
+// --- PROCESSAMENTO DE DANO ---
+int Warrior::processPreAttackDamage(Character* /*attacker*/, Character* defender, int baseDamage, bool /*isAttackerPlayer*/, size_t /*enemyCount*/) {
     int finalDamage = baseDamage;
     
-    if (!defensor) return finalDamage;
+    if (!defender) return finalDamage;
 
-    double percVida = (double)defensor->obterVida() / defensor->obterVidaMaxima();
+    double percHealth = (double)defender->obterVida() / defender->obterVidaMaxima();
     int bonus = 0;
     std::string state = "";
     
-    if (percVida < 0.10) { bonus = 30; state = "nas ultimas"; }
-    else if (percVida < 0.20) { bonus = 20; state = "gravemente ferido"; }
-    else if (percVida < 0.30) { bonus = 10; state = "ferido"; }
+    if (percHealth < 0.10) { bonus = 30; state = "nas ultimas"; }
+    else if (percHealth < 0.20) { bonus = 20; state = "gravemente ferido"; }
+    else if (percHealth < 0.30) { bonus = 10; state = "ferido"; }
     
     if (bonus > 0) {
         finalDamage = static_cast<int>(finalDamage * (1.0 + bonus / 100.0));
-        std::string textoLog = DialogFunctions::formatarMsgHabilidade("Golpe Decisivo: O enemy esta " + state + "! Damage aumentado em " + std::to_string(bonus) + "%!", Color::RED);
-        notificarMensagemCombate(textoLog, textoLog);
+        std::string logText = DialogFunctions::formatarMsgHabilidade("Golpe Decisivo: O enemy esta " + state + "! Damage aumentado em " + std::to_string(bonus) + "%!", Color::RED);
+        notifyCombatMessage(logText, logText);
     }
     
     return finalDamage;

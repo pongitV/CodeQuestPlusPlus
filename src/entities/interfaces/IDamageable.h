@@ -7,10 +7,14 @@ class IDamageable {
 public:
     virtual ~IDamageable() = default;
     
-    virtual ResultadoDano receberDano(int danoBruto, int danoPerfurante, int danoReduzidoParry, IAttacker* atacante, bool aplicarPassivas = true) = 0;
-    virtual int calcularDefesaBase(int danoBruto, int danoPerfurante) = 0;
+    virtual DamageResult takeDamage(int rawDamage, int piercingDamage, int parryReducedDamage, IAttacker* attacker, bool applyPassives = true) = 0;
+    virtual int calculateBaseDefense(int rawDamage, int piercingDamage) = 0;
 
-    virtual ResultadoDano takeDamage(int rawDmg, int perfDmg, int parryRed, IAttacker* atk, bool applyPassives = true) {
-        return receberDano(rawDmg, perfDmg, parryRed, atk, applyPassives);
+    // Métodos legados para compatibilidade
+    virtual DamageResult receberDano(int danoBruto, int danoPerfurante, int danoReduzidoParry, IAttacker* atacante, bool aplicarPassivas = true) {
+        return takeDamage(danoBruto, danoPerfurante, danoReduzidoParry, atacante, aplicarPassivas);
+    }
+    virtual int calcularDefesaBase(int danoBruto, int danoPerfurante) {
+        return calculateBaseDefense(danoBruto, danoPerfurante);
     }
 };

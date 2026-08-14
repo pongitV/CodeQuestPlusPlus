@@ -1,10 +1,10 @@
 /**
  * @file StateManager.h
- * @brief Definition of the Finite State Machine (FSM) that controls the main game flow.
+ * @brief Definição da Máquina de Estados Finitos (FSM) que controla o fluxo principal do jogo.
  * 
- * This file defines the central state architecture (State Pattern), allowing
- * smooth transitions between menus, combat, exploration, and other screens. The GameContext
- * passes the vital engine pointers between these states.
+ * Este arquivo define a arquitetura central de estados (Padrão State), permitindo
+ * transições suaves entre menus, combate, exploração e outras telas. O GameContext
+ * trafega os ponteiros vitais da engine entre estes estados.
  */
 
 #pragma once
@@ -13,170 +13,171 @@
 #include <mutex>
 #include "../../entities/character/Character.h"
 
-class Jogo;
+class Game;
 class GameWindow;
 class D2DRenderer;
 class FramePipeline;
 class GridEmulator2D;
-class GerenciadorDePerspectiva;
+class GerenciadorPerspectiva;
 
 /**
- * @struct ContextoDoJogo
- * @brief Dependency Injection Container that centralizes subsystem references.
+ * @struct GameContext
+ * @brief Contêiner de Injeção de Dependências que centraliza referências aos subsistemas.
  * 
- * The ContextoDoJogo is passed to each state to ensure access to graphics resources and
- * player persistent data without direct coupling or excessive use of Singletons.
- * - `objetoJogador`: Unique owner (unique_ptr) of the player entity, keeping the state alive between screens.
- * - `janela`, `renderizador`, etc.: Observation pointers (Views) managed by `main.cpp`.
+ * O GameContext é passado para cada estado para garantir acesso aos recursos gráficos e
+ * aos dados persistentes do jogador sem acoplamento direto ou uso excessivo de Singletons.
  */
-struct ContextoDoJogo {
-    std::unique_ptr<Character> objetoJogador;
-    GameWindow* janela = nullptr;
-    D2DRenderer* renderizador = nullptr;
+struct GameContext {
+    std::unique_ptr<Character> playerEntity;
+    GameWindow* window = nullptr;
+    D2DRenderer* renderer = nullptr;
     FramePipeline* pipeline = nullptr;
-    GridEmulator2D* grade = nullptr;
+    GridEmulator2D* grid = nullptr;
 
-    Character* obterJogador() { return objetoJogador.get(); }
-    const Character* obterJogador() const { return objetoJogador.get(); }
-    Character* player() { return obterJogador(); }
-    const Character* player() const { return obterJogador(); }
+    Character* getPlayer() { return playerEntity.get(); }
+    const Character* getPlayer() const { return playerEntity.get(); }
+    Character* player() { return getPlayer(); }
+    const Character* player() const { return getPlayer(); }
 
-    void definirJanela(GameWindow* win) { janela = win; }
-    GameWindow* obterJanela() const { return janela; }
-    bool possuiJanela() const { return janela != nullptr; }
-    void setWindow(GameWindow* win) { definirJanela(win); }
-    GameWindow* getWindow() const { return obterJanela(); }
-    bool hasWindow() const { return possuiJanela(); }
+    void setWindow(GameWindow* win) { window = win; }
+    GameWindow* getWindow() const { return window; }
+    bool hasWindow() const { return window != nullptr; }
 
-    void definirRenderizador(D2DRenderer* rnd) { renderizador = rnd; }
-    D2DRenderer* obterRenderizador() const { return renderizador; }
-    bool possuiRenderizador() const { return renderizador != nullptr; }
-    void setRenderer(D2DRenderer* rnd) { definirRenderizador(rnd); }
-    D2DRenderer* getRenderer() const { return obterRenderizador(); }
-    bool hasRenderer() const { return possuiRenderizador(); }
+    void setRenderer(D2DRenderer* rnd) { renderer = rnd; }
+    D2DRenderer* getRenderer() const { return renderer; }
+    bool hasRenderer() const { return renderer != nullptr; }
 
-    void definirPipeline(FramePipeline* pipe) { pipeline = pipe; }
-    FramePipeline* obterPipeline() const { return pipeline; }
-    bool possuiPipeline() const { return pipeline != nullptr; }
-    void setPipeline(FramePipeline* pipe) { definirPipeline(pipe); }
-    FramePipeline* getPipeline() const { return obterPipeline(); }
-    bool hasPipeline() const { return possuiPipeline(); }
+    void setPipeline(FramePipeline* pipe) { pipeline = pipe; }
+    FramePipeline* getPipeline() const { return pipeline; }
+    bool hasPipeline() const { return pipeline != nullptr; }
 
-    void definirGrade(GridEmulator2D* gr) { grade = gr; }
-    GridEmulator2D* obterGrade() const { return grade; }
-    bool possuiGrade() const { return grade != nullptr; }
-    void setGrid(GridEmulator2D* gr) { definirGrade(gr); }
-    GridEmulator2D* getGrid() const { return obterGrade(); }
-    bool hasGrid() const { return possuiGrade(); }
+    void setGrid(GridEmulator2D* gr) { grid = gr; }
+    GridEmulator2D* getGrid() const { return grid; }
+    bool hasGrid() const { return grid != nullptr; }
+
+    // Compatibilidade e delegações legadas
+    Character* obterJogador() { return getPlayer(); }
+    const Character* obterJogador() const { return getPlayer(); }
+    void definirJanela(GameWindow* win) { setWindow(win); }
+    GameWindow* obterJanela() const { return getWindow(); }
+    bool possuiJanela() const { return hasWindow(); }
+    void definirRenderizador(D2DRenderer* rnd) { setRenderer(rnd); }
+    D2DRenderer* obterRenderizador() const { return getRenderer(); }
+    bool possuiRenderizador() const { return hasRenderer(); }
+    void definirPipeline(FramePipeline* pipe) { setPipeline(pipe); }
+    FramePipeline* obterPipeline() const { return getPipeline(); }
+    bool possuiPipeline() const { return hasPipeline(); }
+    void definirGrade(GridEmulator2D* gr) { setGrid(gr); }
+    GridEmulator2D* obterGrade() const { return getGrid(); }
+    bool possuiGrade() const { return hasGrid(); }
+
+    // Aliases para membros acessados diretamente no código legado
+    std::unique_ptr<Character>& objetoJogador = playerEntity;
+    GameWindow*& janela = window;
+    D2DRenderer*& renderizador = renderer;
+    GridEmulator2D*& grade = grid;
 };
 
-using ContextoJogo = ContextoDoJogo;
-using GameContext = ContextoDoJogo;
+using ContextoDoJogo = GameContext;
+using ContextoJogo = GameContext;
 
 /**
- * @class EstadoDoJogo
- * @brief Base interface for all game state machine states.
- * 
- * Implements the "State" design pattern. Each screen or main game mode must
- * derive from this class and implement execution logic.
+ * @class GameState
+ * @brief Interface base para todos os estados da máquina de estados do jogo.
  */
-class EstadoDoJogo {
+class GameState {
 public:
-    virtual ~EstadoDoJogo() = default;
+    virtual ~GameState() = default;
 
     /**
-     * @brief Trigger fired once when entering this state.
+     * @brief Gatilho disparado uma vez ao entrar no estado.
      */
-    virtual void aoEntrar(Jogo& jogo, ContextoDoJogo& ctx) {}
+    virtual void onEnter(Game& game, GameContext& ctx) {}
 
     /**
-     * @brief Continuous update function, called each frame (Game Loop).
-     * @param jogo Reference to the orchestrator (FSM) to allow state switching.
-     * @param ctx Reference to the context to access rendering resources and player.
+     * @brief Função de atualização contínua, chamada a cada quadro (Game Loop).
      */
-    virtual void executar(Jogo& jogo, ContextoDoJogo& ctx) = 0;
+    virtual void execute(Game& game, GameContext& ctx) = 0;
 
     /**
-     * @brief Trigger fired once when exiting this state (cleanup of temporary resources).
+     * @brief Gatilho disparado uma vez ao sair do estado.
      */
-    virtual void aoSair(Jogo& jogo, ContextoDoJogo& ctx) {}
+    virtual void onExit(Game& game, GameContext& ctx) {}
 
-    void onEnter(Jogo& jogo, ContextoDoJogo& ctx) { aoEntrar(jogo, ctx); }
-    void execute(Jogo& jogo, ContextoDoJogo& ctx) { executar(jogo, ctx); }
-    void onExit(Jogo& jogo, ContextoDoJogo& ctx) { aoSair(jogo, ctx); }
+    // Compatibilidade legada
+    virtual void aoEntrar(Game& game, GameContext& ctx) { onEnter(game, ctx); }
+    virtual void executar(Game& game, GameContext& ctx) { execute(game, ctx); }
+    virtual void aoSair(Game& game, GameContext& ctx) { onExit(game, ctx); }
 };
 
-using EstadoJogo = EstadoDoJogo;
-using GameState = EstadoDoJogo;
+using EstadoDoJogo = GameState;
+using EstadoJogo = GameState;
 
 /**
- * @class Jogo
- * @brief Main orchestrator of the State Machine (Context of the State Pattern).
- * 
- * Manages ownership of the current state, queues state changes safely, and 
- * keeps the `ContextoDoJogo` alive, propagating it in the Game Loop.
+ * @class Game
+ * @brief Orquestrador principal da Máquina de Estados (Contexto do Padrão State).
  */
-class Jogo {
+class Game {
 private:
-    std::unique_ptr<EstadoDoJogo> estadoAtual;
-    std::unique_ptr<EstadoDoJogo> proximoEstado;
-    bool mudancaPendente = false; // Flag to ensure the transition occurs atomically outside the middle of the frame.
-    ContextoDoJogo contexto;
+    std::unique_ptr<GameState> currentState;
+    std::unique_ptr<GameState> nextState;
+    bool pendingChange = false; // Garante que a transição ocorra de modo atômico fora do frame
+    GameContext context;
 
 public:
-    explicit Jogo(std::unique_ptr<EstadoDoJogo> estadoInicial) noexcept
-        : estadoAtual(std::move(estadoInicial)) {}
+    explicit Game(std::unique_ptr<GameState> initialState) noexcept
+        : currentState(std::move(initialState)) {}
 
-    void mudarEstado(std::unique_ptr<EstadoDoJogo> novoEstado) noexcept {
-        proximoEstado = std::move(novoEstado);
-        mudancaPendente = true;
+    void changeState(std::unique_ptr<GameState> newState) noexcept {
+        nextState = std::move(newState);
+        pendingChange = true;
     }
 
-    void changeState(std::unique_ptr<EstadoDoJogo> newState) noexcept { mudarEstado(std::move(newState)); }
+    void mudarEstado(std::unique_ptr<GameState> novoEstado) noexcept { changeState(std::move(novoEstado)); }
 
-    ContextoDoJogo& obterContexto() noexcept { return contexto; }
-    const ContextoDoJogo& obterContexto() const noexcept { return contexto; }
-    ContextoDoJogo& getContext() noexcept { return obterContexto(); }
-    const ContextoDoJogo& getContext() const noexcept { return obterContexto(); }
+    GameContext& getContext() noexcept { return context; }
+    const GameContext& getContext() const noexcept { return context; }
+    GameContext& obterContexto() noexcept { return getContext(); }
+    const GameContext& obterContexto() const noexcept { return getContext(); }
 
-    void executarLoop() {
-        if (estadoAtual) estadoAtual->aoEntrar(*this, contexto);
-        while (estadoAtual) {
-            estadoAtual->executar(*this, contexto);
+    void runLoop() {
+        if (currentState) currentState->onEnter(*this, context);
+        while (currentState) {
+            currentState->execute(*this, context);
 
-            if (mudancaPendente) {
-                if (estadoAtual) estadoAtual->aoSair(*this, contexto);
-                estadoAtual = std::move(proximoEstado);
-                if (estadoAtual) estadoAtual->aoEntrar(*this, contexto);
-                mudancaPendente = false;
+            if (pendingChange) {
+                if (currentState) currentState->onExit(*this, context);
+                currentState = std::move(nextState);
+                if (currentState) currentState->onEnter(*this, context);
+                pendingChange = false;
             }
         }
     }
 
-    void rodar() { executarLoop(); }
-    void run() { executarLoop(); }
+    void executarLoop() { runLoop(); }
+    void rodar() { runLoop(); }
+    void run() { runLoop(); }
 };
 
-using Game = Jogo;
+using Jogo = Game;
 
-// Map world exploration state.
-class EstadoExploracao final : public EstadoDoJogo {
+// Estado de exploração do mapa mundo
+class ExplorationState final : public GameState {
 public:
-    void executar(Jogo& jogo, ContextoDoJogo& ctx) override;
-    void aoSair(Jogo& jogo, ContextoDoJogo& ctx) override;
+    void execute(Game& game, GameContext& ctx) override;
+    void onExit(Game& game, GameContext& ctx) override;
 
-    void execute(Jogo& jogo, ContextoDoJogo& ctx) { executar(jogo, ctx); }
-    void onExit(Jogo& jogo, ContextoDoJogo& ctx) { aoSair(jogo, ctx); }
+    void executar(Game& game, GameContext& ctx) override { execute(game, ctx); }
+    void aoSair(Game& game, GameContext& ctx) override { onExit(game, ctx); }
 };
 
-using ExplorationState = EstadoExploracao;
+using EstadoExploracao = ExplorationState;
 
-// Main game menu state.
-class EstadoMenu final : public EstadoDoJogo {
+// Estado do menu principal do jogo
+class MenuState final : public GameState {
 public:
-    void executar(Jogo& jogo, ContextoDoJogo& ctx) override;
-
-    void execute(Jogo& jogo, ContextoDoJogo& ctx) { executar(jogo, ctx); }
+    void execute(Game& game, GameContext& ctx) override;
+    void executar(Game& game, GameContext& ctx) override { execute(game, ctx); }
 };
 
-using MenuState = EstadoMenu;
+using EstadoMenu = MenuState;

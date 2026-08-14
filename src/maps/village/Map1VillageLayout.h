@@ -3,9 +3,10 @@
 
 #include <vector>
 #include <string>
-class Mapa1VilaLayouts {
+
+class Map1VillageLayouts {
 public:
-    static inline std::vector<std::string> obterLogoVila() {
+    static inline std::vector<std::string> getVillageLogo() {
         return StringConverter::convertRawStringToArray(R"(
  █████   █████ █████ █████         █████████      █████ ██████   █████ █████   █████████  █████   █████████   █████      
 ░░███   ░░███ ░░███ ░░███         ███░░░░░███    ░░███ ░░██████ ░░███ ░░███   ███░░░░░███░░███   ███░░░░░███ ░░███       
@@ -17,8 +18,9 @@ public:
      ░░░      ░░░░░ ░░░░░░░░░░░ ░░░░░   ░░░░░    ░░░░░ ░░░░░    ░░░░░ ░░░░░   ░░░░░░░░░  ░░░░░ ░░░░░   ░░░░░ ░░░░░░░░░░░ 
 )");
     }
+    static inline std::vector<std::string> obterLogoVila() { return getVillageLogo(); }
 
-    static inline std::vector<std::string> obterLogoSpawn() {
+    static inline std::vector<std::string> getSpawnLogo() {
         return StringConverter::convertRawStringToArray(R"(
  █████ ██████   █████ █████   █████████  █████    ███████   
 ░░███ ░░██████ ░░███ ░░███   ███░░░░░███░░███   ███░░░░░███ 
@@ -30,8 +32,9 @@ public:
 ░░░░░ ░░░░░    ░░░░░ ░░░░░   ░░░░░░░░░  ░░░░░    ░░░░░░░    
 )");
     }
+    static inline std::vector<std::string> obterLogoSpawn() { return getSpawnLogo(); }
 
-    static inline std::vector<std::string> obterLayoutVilaInicial() {
+    static inline std::vector<std::string> getInitialVillageLayout() {
         return StringConverter::convertRawStringToArray(R"(
  #####       ###############################################################################################################################################
  ###########################################################################################################################################################
@@ -88,8 +91,9 @@ public:
              ######                                                                                                      ###################################
 )");
     }
+    static inline std::vector<std::string> obterLayoutVilaInicial() { return getInitialVillageLayout(); }
 
-    static inline std::vector<std::string> obterLayoutSpawn() {
+    static inline std::vector<std::string> getSpawnLayout() {
         return StringConverter::convertRawStringToArray(R"(
     #########################################################  
    ###.....................................................### 
@@ -106,22 +110,24 @@ public:
     ########################################################   
 )");
     }
+    static inline std::vector<std::string> obterLayoutSpawn() { return getSpawnLayout(); }
 
-    static inline std::vector<std::string> obterLayoutCaverna(bool bjornResgatado) {
+    static inline std::vector<std::string> getCaveLayout(bool bjornRescued) {
         std::vector<std::string> map = StringConverter::convertRawStringToArray(R"(
   ########################################
-#############################################
-###########.........###########################
-#######.....^S..................O....B..########
-#######.........................###############
-###############################################
+ #############################################
+ ###########.........###########################
+ #######.....^S..................O....B..########
+ #######.........................###############
+ ###############################################
   ########################################
 )");
-        if (bjornResgatado) map[3] = "#######^S.......................O.......########";
+        if (bjornRescued) map[3] = "#######^S.......................O.......########";
         return map;
     }
+    static inline std::vector<std::string> obterLayoutCaverna(bool bjornResgatado) { return getCaveLayout(bjornResgatado); }
 
-    static inline std::vector<std::string> obterArteTransicaoVila() {
+    static inline std::vector<std::string> getVillageTransitionArt() {
         return StringConverter::convertRawStringToArray(R"(
                                                             |>>>
                    _                       _                |
@@ -147,7 +153,10 @@ _|_______|____[=  == ]/ |.::::::;;:::::::::::::;;;::::::.| \[  === ]______|_
 ___|_______|__[ == ==]/.::::::;;;:::::::::::::::;;;:::::::.\[=  == ]___|_____
 )");
     }
+    static inline std::vector<std::string> obterArteTransicaoVila() { return getVillageTransitionArt(); }
 };
 
-inline void displayTituloDoMapaVila(const std::string& tituloDoMapa) {
+using Mapa1VilaLayouts = Map1VillageLayouts;
+
+inline void displayTituloDoMapaVila(const std::string& /*tituloDoMapa*/) {
 }

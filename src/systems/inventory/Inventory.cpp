@@ -5,136 +5,135 @@
 #include "Item.h"
 #include "./items/ConsumableItem.h"
 #include "../../core/state/GameMenu.h"
-Inventory::Inventory() : quantidadeDeOuro(0) {}
 
-bool Inventory::estaVazio() const { return listaDeItens.empty(); }
+Inventory::Inventory() : goldAmount(0) {}
 
-int Inventory::obterOuro() const { return quantidadeDeOuro; }
+bool Inventory::isEmpty() const { return itemList.empty(); }
 
-int Inventory::contarItem(const std::string& nomeDoItem) const 
+int Inventory::getGold() const { return goldAmount; }
+
+int Inventory::countItem(const std::string& itemName) const 
 {
-    auto it = contagemItens_.find(nomeDoItem);
-    return it != contagemItens_.end() ? it->second : 0;
+    auto it = itemCountMap_.find(itemName);
+    return it != itemCountMap_.end() ? it->second : 0;
 }
 
-
-void Inventory::adicionarOuro(int quantidadeAdicional) 
+void Inventory::addGold(int additionalAmount) 
 { 
-    quantidadeDeOuro = std::max(0, quantidadeDeOuro + quantidadeAdicional); 
+    goldAmount = std::max(0, goldAmount + additionalAmount); 
 }
 
-std::vector<ItemIndex> Inventory::obterIndicesOrdenados() const {
+std::vector<ItemIndex> Inventory::getSortedIndices() const {
     std::vector<ItemIndex> indices;
-    indices.reserve(listaDeItens.size());
-    for (size_t i = 0; i < listaDeItens.size(); ++i) {
-        if (listaDeItens[i]) {
-            indices.push_back({i, listaDeItens[i]->getNameItem(), TipoEquipamento::NENHUM, false});
+    indices.reserve(itemList.size());
+    for (size_t i = 0; i < itemList.size(); ++i) {
+        if (itemList[i]) {
+            indices.push_back({i, itemList[i]->getItemName(), EquipmentType::None, false});
         }
     }
     std::sort(indices.begin(), indices.end(), [](const ItemIndex& a, const ItemIndex& b) {
-        return a.nome < b.nome;
+        return a.name < b.name;
     });
     return indices;
 }
 
-void Inventory::adicionarItem(std::unique_ptr<Item> novoItem) 
+void Inventory::addItem(std::unique_ptr<Item> newItem) 
 { 
-    if (novoItem) {
-        contagemItens_[novoItem->getNameItem()]++;
-        countCache_.invalidar();
-        listaDeItens.push_back(std::move(novoItem));
+    if (newItem) {
+        itemCountMap_[newItem->getItemName()]++;
+        countCache_.invalidate();
+        itemList.push_back(std::move(newItem));
     }
 }
 
 namespace {
-    void decrementarContagemEErapar(std::vector<std::unique_ptr<Item>>& lista, std::unordered_map<std::string, int>& mapContagem, std::vector<std::unique_ptr<Item>>::iterator it) {
-        std::string nome = (*it)->getNameItem();
-        auto mapIt = mapContagem.find(nome);
-        if (mapIt != mapContagem.end()) {
+    void decrementCountAndErase(std::vector<std::unique_ptr<Item>>& list, std::unordered_map<std::string, int>& countMap, std::vector<std::unique_ptr<Item>>::iterator it) {
+        std::string name = (*it)->getItemName();
+        auto mapIt = countMap.find(name);
+        if (mapIt != countMap.end()) {
             if (--mapIt->second <= 0) {
-                mapContagem.erase(mapIt);
+                countMap.erase(mapIt);
             }
         }
-        lista.erase(it);
+        list.erase(it);
     }
 }
 
-void Inventory::removerItem(const std::string& nomeDoItem) 
+void Inventory::removeItem(const std::string& itemName) 
 {
-    auto it = std::find_if(listaDeItens.begin(), listaDeItens.end(), [&](const std::unique_ptr<Item>& item) 
+    auto it = std::find_if(itemList.begin(), itemList.end(), [&](const std::unique_ptr<Item>& item) 
     {
-        return item->getNameItem() == nomeDoItem;
+        return item->getItemName() == itemName;
     });
     
-    if (it != listaDeItens.end()) 
+    if (it != itemList.end()) 
     {
-        decrementarContagemEErapar(listaDeItens, contagemItens_, it);
+        decrementCountAndErase(itemList, itemCountMap_, it);
     }
 }
 
-void Inventory::removerItem(Item* itemExato) 
+void Inventory::removeItem(Item* exactItem) 
 {
-    if (!itemExato) return;
-    auto it = std::find_if(listaDeItens.begin(), listaDeItens.end(), [&](const std::unique_ptr<Item>& item) 
+    if (!exactItem) return;
+    auto it = std::find_if(itemList.begin(), itemList.end(), [&](const std::unique_ptr<Item>& item) 
     {
-        return item.get() == itemExato;
+        return item.get() == exactItem;
     });
     
-    if (it != listaDeItens.end()) {
-        decrementarContagemEErapar(listaDeItens, contagemItens_, it);
+    if (it != itemList.end()) {
+        decrementCountAndErase(itemList, itemCountMap_, it);
     }
 }
 
-Item* Inventory::buscarItemPorCodigo(const std::string& codigoDigitado, Item* armaEquipada, Item* escudoEquipado, Item* armaduraEquipada)
+Item* Inventory::findItemByCode(const std::string& enteredCode, Item* equippedWeapon, Item* equippedShield, Item* equippedArmor)
 {
-    if (codigoDigitado.length() < 2) return nullptr;
+    if (enteredCode.length() < 2) return nullptr;
 
-    char letraDaCategoria = std::toupper(codigoDigitado.back());
-    std::string parteNumerica = codigoDigitado.substr(0, codigoDigitado.length() - 1);
+    char categoryLetter = std::toupper(enteredCode.back());
+    std::string numericPart = enteredCode.substr(0, enteredCode.length() - 1);
     
-    if (!std::all_of(parteNumerica.begin(), parteNumerica.end(), ::isdigit)) return nullptr;
+    if (!std::all_of(numericPart.begin(), numericPart.end(), ::isdigit)) return nullptr;
     
-    int indiceDoItem = std::stoi(parteNumerica);
-    if (indiceDoItem <= 0) return nullptr;
+    int itemIndex = std::stoi(numericPart);
+    if (itemIndex <= 0) return nullptr;
 
-    if (letraDaCategoria == 'E')
+    if (categoryLetter == 'E')
     {
-        if (indiceDoItem == 1) return armaEquipada;
-        if (indiceDoItem == 2) return escudoEquipado;
-        if (indiceDoItem == 3) return armaduraEquipada;
+        if (itemIndex == 1) return equippedWeapon;
+        if (itemIndex == 2) return equippedShield;
+        if (itemIndex == 3) return equippedArmor;
         return nullptr;
     }
 
-    auto buscarPorTipoAgrupado = [&](auto condicao) -> Item* {
-        std::unordered_map<std::string, size_t> cacheDeIndice;
-        std::vector<std::string> nomesDosItensExibidos;
+    auto searchByGroupedType = [&](auto condition) -> Item* {
+        std::unordered_map<std::string, size_t> indexCache;
+        std::vector<std::string> displayedItemNames;
 
-        for (size_t i = 0; i < listaDeItens.size(); ++i) {
-            Item* itemAtual = listaDeItens[i].get();
-            if (condicao(itemAtual)) {
-                if (cacheDeIndice.find(itemAtual->getNameItem()) == cacheDeIndice.end()) {
-                    cacheDeIndice[itemAtual->getNameItem()] = i;
-                    nomesDosItensExibidos.push_back(itemAtual->getNameItem());
+        for (size_t i = 0; i < itemList.size(); ++i) {
+            Item* currentItem = itemList[i].get();
+            if (condition(currentItem)) {
+                if (indexCache.find(currentItem->getItemName()) == indexCache.end()) {
+                    indexCache[currentItem->getItemName()] = i;
+                    displayedItemNames.push_back(currentItem->getItemName());
                 }
             }
         }
         
-
-        if (indiceDoItem > 0 && indiceDoItem <= static_cast<int>(nomesDosItensExibidos.size())) {
-            size_t indiceOriginalNoInventario = cacheDeIndice[nomesDosItensExibidos[indiceDoItem - 1]];
-            return listaDeItens[indiceOriginalNoInventario].get();
+        if (itemIndex > 0 && itemIndex <= static_cast<int>(displayedItemNames.size())) {
+            size_t originalInventoryIndex = indexCache[displayedItemNames[itemIndex - 1]];
+            return itemList[originalInventoryIndex].get();
         }
         return nullptr;
     };
 
-    switch (letraDaCategoria) {
+    switch (categoryLetter) {
         case 'A':
-            return buscarPorTipoAgrupado([&](Item* itemAvaliado) { 
-                return itemAvaliado->isEquipavel() && itemAvaliado != armaEquipada && itemAvaliado != escudoEquipado && itemAvaliado != armaduraEquipada; 
+            return searchByGroupedType([&](Item* evaluatedItem) { 
+                return evaluatedItem->isEquippable() && evaluatedItem != equippedWeapon && evaluatedItem != equippedShield && evaluatedItem != equippedArmor; 
             });
-        case 'C': return buscarPorTipoAgrupado([](Item* itemAvaliado) { return itemAvaliado->obterTipo() == TipoEquipamento::CONSUMIVEL; });
-        case 'S': return buscarPorTipoAgrupado([](Item* itemAvaliado) { return itemAvaliado->obterTipo() == TipoEquipamento::MATERIAL; });
-        case 'M': return buscarPorTipoAgrupado([](Item* itemAvaliado) { return itemAvaliado->obterTipo() == TipoEquipamento::MISSAO; });
+        case 'C': return searchByGroupedType([](Item* evaluatedItem) { return evaluatedItem->getType() == EquipmentType::Consumable; });
+        case 'S': return searchByGroupedType([](Item* evaluatedItem) { return evaluatedItem->getType() == EquipmentType::Material; });
+        case 'M': return searchByGroupedType([](Item* evaluatedItem) { return evaluatedItem->getType() == EquipmentType::Quest; });
         default:  return nullptr;
     }
 }

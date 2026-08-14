@@ -21,14 +21,14 @@ std::vector<std::pair<std::string, Item*>> TelaInventario::obterListaCategoria(C
     std::map<std::string, std::vector<Item*>> itensAgrupados;
 
     for (Item* item : currentPlayer->obterInventario()->obterTodosOsItens()) {
-        TipoEquipamento tipo = item->obterTipo();
-        if (categoria == 0 && (tipo == TipoEquipamento::ARMA || tipo == TipoEquipamento::ESCUDO || tipo == TipoEquipamento::ARMADURA)) {
+        EquipmentType tipo = item->getType();
+        if (categoria == 0 && (tipo == EquipmentType::Weapon || tipo == EquipmentType::Shield || tipo == EquipmentType::Armor)) {
             itensAgrupados[item->getNameItem() + item->obterInfoStatus()].push_back(item);
-        } else if (categoria == 1 && tipo == TipoEquipamento::CONSUMIVEL) {
+        } else if (categoria == 1 && tipo == EquipmentType::Consumable) {
             itensAgrupados[item->getNameItem()].push_back(item);
-        } else if (categoria == 2 && tipo == TipoEquipamento::MATERIAL) {
+        } else if (categoria == 2 && tipo == EquipmentType::Material) {
             itensAgrupados[item->getNameItem()].push_back(item);
-        } else if (categoria == 3 && tipo == TipoEquipamento::MISSAO) {
+        } else if (categoria == 3 && tipo == EquipmentType::Quest) {
             itensAgrupados[item->getNameItem()].push_back(item);
         }
     }

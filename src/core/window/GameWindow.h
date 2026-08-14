@@ -9,35 +9,41 @@ public:
     GameWindow(HINSTANCE hInstance, int nCmdShow);
     ~GameWindow();
 
-    HWND obterHWND() const { return m_hwnd; }
-    HINSTANCE obterHInstance() const { return m_hInstance; }
+    HWND getHWND() const { return m_hwnd; }
+    HINSTANCE getHInstance() const { return m_hInstance; }
 
-    int obterLargura() const { return m_largura; }
-    int obterAltura() const { return m_altura; }
+    int getWidth() const { return m_width; }
+    int getHeight() const { return m_height; }
 
-    bool processarMensagens();
+    bool processMessages();
 
-    static bool teclaPressionada(int vk);
-    static void limparTeclas();
+    static bool isKeyPressed(int vk);
+    static void clearKeys();
 
-    static int obterMouseX();
-    static int obterMouseY();
-    static bool mouseClicado();
-    static void limparMouse();
+    static int getMouseX();
+    static int getMouseY();
+    static bool isMouseClicked();
+    static void clearMouse();
 
-    static void ocultarCursor();
-    static void mostrarCursor();
-    static bool isCursorOculto();
+    static void hideCursor();
+    static void showCursor();
+    static bool isCursorHidden();
 
-    // English Aliases
-    HWND getHWND() const { return obterHWND(); }
-    HINSTANCE getHInstance() const { return obterHInstance(); }
-    int getWidth() const { return obterLargura(); }
-    int getHeight() const { return obterAltura(); }
-    bool processMessages() { return processarMensagens(); }
-    static bool isKeyPressed(int vk) { return teclaPressionada(vk); }
-    static int getMouseX() { return obterMouseX(); }
-    static int getMouseY() { return obterMouseY(); }
+    // Métodos legados para compatibilidade
+    HWND obterHWND() const { return getHWND(); }
+    HINSTANCE obterHInstance() const { return getHInstance(); }
+    int obterLargura() const { return getWidth(); }
+    int obterAltura() const { return getHeight(); }
+    bool processarMensagens() { return processMessages(); }
+    static bool teclaPressionada(int vk) { return isKeyPressed(vk); }
+    static void limparTeclas() { clearKeys(); }
+    static int obterMouseX() { return getMouseX(); }
+    static int obterMouseY() { return getMouseY(); }
+    static bool mouseClicado() { return isMouseClicked(); }
+    static void limparMouse() { clearMouse(); }
+    static void ocultarCursor() { hideCursor(); }
+    static void mostrarCursor() { showCursor(); }
+    static bool isCursorOculto() { return isCursorHidden(); }
 
 private:
     static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -45,13 +51,13 @@ private:
     HWND m_hwnd = nullptr;
     HINSTANCE m_hInstance = nullptr;
     HICON m_hIcon = nullptr;
-    int m_largura = 0;
-    int m_altura = 0;
+    int m_width = 0;
+    int m_height = 0;
 
-    static std::bitset<256> s_teclas;
+    static std::bitset<256> s_keys;
     static std::atomic<int> s_mouseX;
     static std::atomic<int> s_mouseY;
-    static std::atomic<bool> s_mouseClicado;
-    static bool s_cursorOculto;
+    static std::atomic<bool> s_mouseClicked;
+    static bool s_cursorHidden;
 };
 

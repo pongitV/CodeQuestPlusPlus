@@ -110,21 +110,21 @@ namespace {
 
                     int qtdPocoes = RandomGenerator::getInteiro(2, 4);
                     for (int i = 0; i < qtdPocoes; ++i) {
-                        auto pocao = std::make_unique<ItemConsumivel>("Pocao de Cura (30%VM)");
-                        pocao->adicionarPropriedade(Propriedade::ConsumivelCura);
-                        ctx.self->currentPlayer->obterInventario()->adicionarItem(std::move(pocao));
+                        auto pocao = std::make_unique<ConsumableItem>("Pocao de Cura (30%VM)");
+                        pocao->addProperty(Property::HealingConsumable);
+                        ctx.self->currentPlayer->getInventory()->addItem(std::move(pocao));
                     }
                     lootMsg.push_back("+ " + std::to_string(qtdPocoes) + "x Pocoes de Cura (30%VM)");
 
                     int qtdOuro = RandomGenerator::getInteiro(150, 300);
-                    ctx.self->currentPlayer->obterInventario()->adicionarOuro(qtdOuro);
+                    ctx.self->currentPlayer->getInventory()->addGold(qtdOuro);
                     lootMsg.push_back("+ " + std::to_string(qtdOuro) + "G");
 
                     bool isFuria = RandomGenerator::rolarChance(50);
                     std::string nomeBuff = isFuria ? "Pocao de Furia (Buff)" : "Elixir Arcano (Buff)";
-                    auto buff = std::make_unique<ItemConsumivel>(nomeBuff);
-                    buff->adicionarPropriedade(Propriedade::ConsumivelBuff);
-                    ctx.self->currentPlayer->obterInventario()->adicionarItem(std::move(buff));
+                    auto buff = std::make_unique<ConsumableItem>(nomeBuff);
+                    buff->addProperty(Property::BuffConsumable);
+                    ctx.self->currentPlayer->getInventory()->addItem(std::move(buff));
                     lootMsg.push_back("+ 1x " + nomeBuff);
 
                     ctx.self->currentPlayer->obterInventario()->adicionarItem(std::make_unique<MaterialItem>("Pedra magica de upgrade"));

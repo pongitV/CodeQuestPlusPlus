@@ -3,8 +3,13 @@
 class Character;
 class Item;
 
-class InventarioCombate
+class InventoryCombat
 {
 public:
-    static void gerenciarInventario(Character* currentPlayer, bool* turnoFoiConsumido = nullptr);
+    static void manageInventory(Character* currentPlayer, bool* turnConsumed = nullptr);
+    static void gerenciarInventario(Character* currentPlayer, bool* turnoFoiConsumido = nullptr) {
+        manageInventory(currentPlayer, turnoFoiConsumido);
+    }
 };
+
+using InventarioCombate = InventoryCombat;

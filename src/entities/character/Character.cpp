@@ -11,530 +11,544 @@
 #include "../classes/necro-clone/NecroClone.h"
 #include "../../core/utils/Constants.h"
 #include "../../ui/screens/combat/ScreenCombat.h"
-std::unordered_set<Character*> Character::personagensAtivos;
 
-bool Character::isValido(Character* p) {
-    return personagensAtivos.find(p) != personagensAtivos.end();
+std::unordered_set<Character*> Character::activeCharacters;
+
+bool Character::isValid(Character* p) {
+    return activeCharacters.find(p) != activeCharacters.end();
 }
 
 Character::Character(const Character& other)
-    : nomePersonagem(other.nomePersonagem),
-      vidaAtual(other.vidaAtual),
+    : characterName(other.characterName),
+      currentHealth(other.currentHealth),
       race(std::make_unique<RaceClone>(other.race ? other.race->getRaceName() : "Desconhecido", other.race ? other.race->getRaceAppearance() : std::vector<std::string>())),
-      classe(std::make_unique<PlayerClassClone>()),
-      statsFinais(other.statsFinais),
-      mochila(std::make_unique<Inventory>()),
-      itemSelecionadoParaUso(nullptr),
-      sistemaDeNivel(std::make_unique<SistemaDeNivel>(other.sistemaDeNivel->getLevel(), other.sistemaDeNivel->getXpAtual(), other.sistemaDeNivel->getXpParaSubir()))
+      characterClass(std::make_unique<PlayerClassClone>()),
+      finalStats(other.finalStats),
+      inventory(std::make_unique<Inventory>()),
+      itemSelectedForUse(nullptr),
+      levelSystem(std::make_unique<LevelSystem>(other.levelSystem->getLevel(), other.levelSystem->getCurrentXp(), other.levelSystem->getXpToLevelUp()))
 {
     system = other.system;
     
-    combat.estaDefendendo = other.combat.estaDefendendo;
-    // almasColetadas nao sao copiadas
-    combat.recargaDefesa = other.combat.recargaDefesa;
-    combat.recargaHabilidade = other.combat.recargaHabilidade;
-    combat.pularTurnoInimigo = other.combat.pularTurnoInimigo;
-    combat.habilidadeCancelada = other.combat.habilidadeCancelada;
-    combat.morteAnimada = other.combat.morteAnimada;
-    combat.multiplicadorAtual = other.combat.multiplicadorAtual;
+    combat.isDefending = other.combat.isDefending;
+    // collectedSouls não são copiadas
+    combat.defenseCooldown = other.combat.defenseCooldown;
+    combat.abilityCooldown = other.combat.abilityCooldown;
+    combat.skipEnemyTurn = other.combat.skipEnemyTurn;
+    combat.abilityCanceled = other.combat.abilityCanceled;
+    combat.animatedDeath = other.combat.animatedDeath;
+    combat.currentMultiplier = other.combat.currentMultiplier;
     combat.totalHealingReceived = other.combat.totalHealingReceived;
-    combat.vidaMaximaFixa = other.combat.vidaMaximaFixa;
-    combat.cooldownsAtivos = other.combat.cooldownsAtivos;
+    combat.fixedMaxHealth = other.combat.fixedMaxHealth;
+    combat.activeCooldowns = other.combat.activeCooldowns;
 
     cache_ = other.cache_;
-    personagensAtivos.insert(this);
+    activeCharacters.insert(this);
 
-    // Copia dos Itens (Conforme regra: "mas possui os mesmos items")
-    for (const auto& par : other.equipamentos) {
-        if (par.second) {
-            auto copiaItem = ItemFactory::criarItem(par.second->getNameItem());
-            if (copiaItem) { 
-                this->equipamentos[par.first] = copiaItem.get(); 
-                this->mochila->adicionarItem(std::move(copiaItem)); 
+    // Cópia dos Itens (Conforme regra: "mas possui os mesmos itens")
+    for (const auto& pair : other.equipment) {
+        if (pair.second) {
+            auto itemCopy = ItemFactory::criarItem(pair.second->getNameItem());
+            if (itemCopy) { 
+                this->equipment[pair.first] = itemCopy.get(); 
+                this->inventory->adicionarItem(std::move(itemCopy)); 
             }
         }
     }
-    atualizarCacheSeNecessario();
+    updateCacheIfNeeded();
 }
 
-Character::Character(const std::string& nome, std::unique_ptr<RaceBase> racaEscolhida, std::unique_ptr<ClassBase> classeEscolhida)
-    : nomePersonagem(nome),
-      vidaAtual(0),
-      race(std::move(racaEscolhida)),
-      classe(std::move(classeEscolhida)),
-      statsFinais{ 0, 0, 0, 0, 0, 0, 0 },
-      mochila(std::make_unique<Inventory>()),
-      itemSelecionadoParaUso(nullptr),
-      sistemaDeNivel(std::make_unique<SistemaDeNivel>(1, 0, Constants::BASE_XP_TO_LEVEL_UP))
+Character::Character(const std::string& name, std::unique_ptr<RaceBase> chosenRace, std::unique_ptr<ClassBase> chosenClass)
+    : characterName(name),
+      currentHealth(0),
+      race(std::move(chosenRace)),
+      characterClass(std::move(chosenClass)),
+      finalStats{ 0, 0, 0, 0, 0, 0, 0 },
+      inventory(std::make_unique<Inventory>()),
+      itemSelectedForUse(nullptr),
+      levelSystem(std::make_unique<LevelSystem>(1, 0, Constants::BASE_XP_TO_LEVEL_UP))
 {
-    auto receberEEquiparKit = [this](std::vector<std::unique_ptr<Item>> kit) {
+    auto receiveAndEquipKit = [this](std::vector<std::unique_ptr<Item>> kit) {
         for (auto& itemUnique : kit) {
             Item* ptr = itemUnique.get();
-            this->mochila->adicionarItem(std::move(itemUnique)); 
-            this->equiparItem(ptr);            
+            this->inventory->adicionarItem(std::move(itemUnique)); 
+            this->equipItem(ptr);            
         }
     };
 
-    receberEEquiparKit(this->classe->obterEquipamentoClasse());
-    receberEEquiparKit(this->race->getRaceEquipment());
+    receiveAndEquipKit(this->characterClass->getClassEquipment());
+    receiveAndEquipKit(this->race->getRaceEquipment());
 
-    calcularAtributos();
-    personagensAtivos.insert(this);
+    calculateAttributes();
+    activeCharacters.insert(this);
 }
 
 Character::~Character() 
 {
-    personagensAtivos.erase(this);
+    activeCharacters.erase(this);
 }  
 
 std::unique_ptr<Character> Character::clone() const {
     return std::make_unique<Character>(*this);
 }
 
-void Character::escalarAtributos(double fator) {
-    statsFinais.scaleAll(fator);
-    combat.vidaMaximaFixa = statsFinais.health; 
-    strengthrRecalculoCache();
-    vidaAtual = obterVidaMaxima();
+void Character::scaleAttributes(double factor) {
+    finalStats.scaleAll(factor);
+    combat.fixedMaxHealth = finalStats.health; 
+    forceCacheRecalculation();
+    currentHealth = getMaxHealth();
 }
 
-void Character::adicionarAlma(std::unique_ptr<Character> alma) { combat.almasColetadas.push_back(std::move(alma)); }
+void Character::addSoul(std::unique_ptr<Character> soul) { combat.collectedSouls.push_back(std::move(soul)); }
 
-std::vector<std::unique_ptr<Character>>& Character::obterAlmas() { return combat.almasColetadas; }
+std::vector<std::unique_ptr<Character>>& Character::getSouls() { return combat.collectedSouls; }
 
-size_t Character::obterNumeroDeAlmas() const { return combat.almasColetadas.size(); }
+size_t Character::getSoulCount() const { return combat.collectedSouls.size(); }
 
-std::unique_ptr<Character> Character::removerAlma(int index) {
-    if (index < 0 || index >= static_cast<int>(combat.almasColetadas.size())) return nullptr;
-    auto alma = std::move(combat.almasColetadas[index]);
-    combat.almasColetadas.erase(combat.almasColetadas.begin() + index);
-    return alma;
+std::unique_ptr<Character> Character::removeSoul(int index) {
+    if (index < 0 || index >= static_cast<int>(combat.collectedSouls.size())) return nullptr;
+    auto soul = std::move(combat.collectedSouls[index]);
+    combat.collectedSouls.erase(combat.collectedSouls.begin() + index);
+    return soul;
 }
 
-int* Character::obterPonteiroAtributoEstatico(TipoAtributo atributo) {
-    switch (atributo) {
-        case TipoAtributo::Forca: return &statsFinais.strength;
-        case TipoAtributo::Destreza: return &statsFinais.dexterity;
-        case TipoAtributo::Resistencia: return &statsFinais.resistance;
-        case TipoAtributo::Constituicao: return &statsFinais.constitution;
-        case TipoAtributo::Inteligencia: return &statsFinais.intelligence;
-        case TipoAtributo::Sabedoria: return &statsFinais.wisdom;
+int* Character::getStaticAttributePointer(AttributeType attribute) {
+    switch (attribute) {
+        case AttributeType::Strength: return &finalStats.strength;
+        case AttributeType::Dexterity: return &finalStats.dexterity;
+        case AttributeType::Resistance: return &finalStats.resistance;
+        case AttributeType::Constitution: return &finalStats.constitution;
+        case AttributeType::Intelligence: return &finalStats.intelligence;
+        case AttributeType::Wisdom: return &finalStats.wisdom;
         default: return nullptr;
     }
 }
 
-bool Character::subirDeNivel(TipoAtributo atributo)
+bool Character::levelUp(AttributeType attribute)
 {
-    if (sistemaDeNivel->getXpAtual() < sistemaDeNivel->getXpParaSubir()) return false;
+    if (levelSystem->getCurrentXp() < levelSystem->getXpToLevelUp()) return false;
 
-    if (atributo == TipoAtributo::Health) {
-        statsFinais.health += Constants::HEALTH_GAIN_PER_LEVEL;
-        vidaAtual += Constants::HEALTH_GAIN_PER_LEVEL;
-    } else if (int* attr = obterPonteiroAtributoEstatico(atributo)) {
+    if (attribute == AttributeType::Health) {
+        finalStats.health += Constants::HEALTH_GAIN_PER_LEVEL;
+        currentHealth += Constants::HEALTH_GAIN_PER_LEVEL;
+    } else if (int* attr = getStaticAttributePointer(attribute)) {
         *attr += Constants::STAT_GAIN_PER_LEVEL;
     } else {
         return false;
     }
 
-    sistemaDeNivel->definirXpAtual(sistemaDeNivel->getXpAtual() - sistemaDeNivel->getXpParaSubir());
-    sistemaDeNivel->definirXpParaSubir(static_cast<int>(std::min(sistemaDeNivel->getXpParaSubir() * Constants::XP_MULTIPLIER_PER_LEVEL, Constants::MAX_XP)));
-    sistemaDeNivel->definirNivel(sistemaDeNivel->getLevel() + 1);
-    cache_.sujo = true;
+    levelSystem->setCurrentXp(levelSystem->getCurrentXp() - levelSystem->getXpToLevelUp());
+    levelSystem->setXpToLevelUp(static_cast<int>(std::min(levelSystem->getXpToLevelUp() * Constants::XP_MULTIPLIER_PER_LEVEL, Constants::MAX_XP)));
+    levelSystem->setLevel(levelSystem->getLevel() + 1);
+    cache_.dirty = true;
     return true;
 }
 
-void Character::alterarAtributoEstatico(TipoAtributo atributo, int valor)
+void Character::modifyStaticAttribute(AttributeType attribute, int value)
 {
-    if (int* attr = obterPonteiroAtributoEstatico(atributo)) {
-        *attr = std::max(0, *attr + valor);
-        cache_.sujo = true;
+    if (int* attr = getStaticAttributePointer(attribute)) {
+        *attr = std::max(0, *attr + value);
+        cache_.dirty = true;
     }
 }
 
-void Character::reduzirCooldowns()
+void Character::reduceCooldowns()
 {
-    if (combat.recargaDefesa) combat.recargaDefesa = false;
-    if (combat.recargaHabilidade) combat.recargaHabilidade = false;
-    if (combat.cooldownsAtivos.empty()) return;
-    for (auto& par : combat.cooldownsAtivos)
+    if (combat.defenseCooldown) combat.defenseCooldown = false;
+    if (combat.abilityCooldown) combat.abilityCooldown = false;
+    if (combat.activeCooldowns.empty()) return;
+    for (auto& pair : combat.activeCooldowns)
     {
-        if (par.second > 0) par.second--;
+        if (pair.second > 0) pair.second--;
     }
 }
 
-void Character::prepararParaNovaBatalha()
+void Character::prepareForNewBattle()
 {
-    combat.resetar();
-    combat.vidaMaximaFixa = obterVidaMaxima();
-    limparEfeitos();
+    combat.reset();
+    combat.fixedMaxHealth = getMaxHealth();
+    clearEffects();
     
-    if (obterArmadura() && obterArmadura()->temPropriedade(Propriedade::ArmaduraAdaptacao)) {
-        adicionarEfeito(std::make_unique<EfeitoRodaAdaptacao>());
+    if (getArmor() && getArmor()->hasProperty(Property::AdaptationArmor)) {
+        addEffect(std::make_unique<AdaptationWheelEffect>());
     }
 }
 
-void Character::calcularAtributos()
+void Character::calculateAttributes()
 {
-    this->statsFinais.addAttributes(race->getRaceAttributes());
-    this->statsFinais.addAttributes(classe->obterAtributosClasse());
-    this->vidaAtual = obterVidaMaxima();
-    cache_.sujo = true;
+    this->finalStats.addAttributes(race->getRaceAttributes());
+    this->finalStats.addAttributes(characterClass->getClassAttributes());
+    this->currentHealth = getMaxHealth();
+    cache_.dirty = true;
 }
 
-void Character::atualizarCacheSeNecessario() const {
+void Character::updateCacheIfNeeded() const {
     std::lock_guard<std::mutex> lock(mutexCache_);
-    if (!cache_.sujo) return;
+    if (!cache_.dirty) return;
     
-    double mult = system.difficultyMultiplicador;
-    auto aplicarMult = [mult](int val) { return static_cast<int>(val * mult); };
+    double mult = system.difficultyMultiplier;
+    auto applyMult = [mult](int val) { return static_cast<int>(val * mult); };
 
-    cache_.vidaMaxima = aplicarMult(statsFinais.health);
-    cache_.strength = aplicarMult(statsFinais.strength);
-    cache_.resistance = aplicarMult(statsFinais.resistance);
-    cache_.constitution = aplicarMult(statsFinais.constitution);
-    cache_.intelligence = aplicarMult(statsFinais.intelligence);
-    cache_.wisdom = aplicarMult(statsFinais.wisdom);
+    cache_.maxHealth = applyMult(finalStats.health);
+    cache_.strength = applyMult(finalStats.strength);
+    cache_.resistance = applyMult(finalStats.resistance);
+    cache_.constitution = applyMult(finalStats.constitution);
+    cache_.intelligence = applyMult(finalStats.intelligence);
+    cache_.wisdom = applyMult(finalStats.wisdom);
 
-    int penalidade = obterArmadura() ? (obterArmadura()->obterReducaoFixa() / 3) : 0;
-    if (obterArmadura() && obterArmadura()->getNameItem() == "Armor de bau") penalidade = 10;
-    if (classe) penalidade = classe->processarPenalidadeArmaduraPassivaArqueiro(penalidade);
+    int penalty = getArmor() ? (getArmor()->obterReducaoFixa() / 3) : 0;
+    if (getArmor() && getArmor()->getNameItem() == "Armor de bau") penalty = 10;
+    if (characterClass) penalty = characterClass->processArcherPassiveArmorPenalty(penalty);
     
-    int dexterityBase = static_cast<int>(statsFinais.dexterity * mult);
-    int dexterityFinal = dexterityBase - penalidade;
-    cache_.dexterity = dexterityFinal > 0 ? dexterityFinal : 0;
+    int baseDexterity = static_cast<int>(finalStats.dexterity * mult);
+    int finalDexterity = baseDexterity - penalty;
+    cache_.dexterity = finalDexterity > 0 ? finalDexterity : 0;
 
-    int bonusArmadura = obterArmadura() ? obterArmadura()->obterReducaoFixa() : 0;
-    int reducao = cache_.resistance + bonusArmadura;
+    int armorBonus = getArmor() ? getArmor()->obterReducaoFixa() : 0;
+    int reduction = cache_.resistance + armorBonus;
     
-    double percentualReducao = cache_.constitution / 100.0;
-    if (percentualReducao > 0.50) percentualReducao = 0.50;
-    cache_.reducaoPercentual = static_cast<int>(reducao * (1.0 - percentualReducao));
+    double percentageReduction = cache_.constitution / 100.0;
+    if (percentageReduction > 0.50) percentageReduction = 0.50;
+    cache_.percentageReduction = static_cast<int>(reduction * (1.0 - percentageReduction));
 
-    cache_.sujo = false;
+    cache_.dirty = false;
 }
 
-void Character::definirMultiplicador(double novoMultiplicador) 
+void Character::setMultiplier(double newMultiplier) 
 { 
-    if (classe) {
-        combat.multiplicadorAtual = classe->processarMultiplicadorBuffPassivaBard(novoMultiplicador);
+    if (characterClass) {
+        combat.currentMultiplier = characterClass->processBardPassiveBuffMultiplier(newMultiplier);
     } else {
-        combat.multiplicadorAtual = novoMultiplicador;
+        combat.currentMultiplier = newMultiplier;
     }
 }
 
-void Character::aplicarMultiplicadorDificuldade(double mult)
+void Character::applyDifficultyMultiplier(double mult)
 {
     if (mult <= 1.0) return;
-    system.difficultyMultiplicador = mult;
-    cache_.sujo = true;
-    this->vidaAtual = obterVidaMaxima();
+    system.difficultyMultiplier = mult;
+    cache_.dirty = true;
+    this->currentHealth = getMaxHealth();
 }
 
-void Character::modificarVida(int valor) 
+void Character::modifyHealth(int value) 
 {
-    if (valor > 0 && classe != nullptr) {
-        valor = classe->processarCuraPassivaBard(valor);
+    if (value > 0 && characterClass != nullptr) {
+        value = characterClass->processBardPassiveHealing(value);
     }
 
-    int vidaAntes = this->vidaAtual;
-    this->vidaAtual = std::clamp(this->vidaAtual + valor, 0, obterVidaMaxima());
+    int healthBefore = this->currentHealth;
+    this->currentHealth = std::clamp(this->currentHealth + value, 0, getMaxHealth());
 
-    if (this->vidaAtual > vidaAntes) 
+    if (this->currentHealth > healthBefore) 
     {
-        combat.totalHealingReceived += (this->vidaAtual - vidaAntes);
+        combat.totalHealingReceived += (this->currentHealth - healthBefore);
     }
 }
 
-const EfeitoStatus* Character::encontrarEfeito(EfeitoID id) const {
-    auto it = std::find_if(efeitosAtivos.begin(), efeitosAtivos.end(), [id](const auto& ef) {
+const StatusEffect* Character::findEffect(EffectID id) const {
+    auto it = std::find_if(activeEffects.begin(), activeEffects.end(), [id](const auto& ef) {
         return ef->obterID() == id;
     });
-    return it != efeitosAtivos.end() ? it->get() : nullptr;
+    return it != activeEffects.end() ? it->get() : nullptr;
 }
 
-bool Character::possuiEfeito(EfeitoID id) const {
-    return encontrarEfeito(id) != nullptr;
+bool Character::hasEffect(EffectID id) const {
+    return findEffect(id) != nullptr;
 }
 
-int Character::obterTurnosEfeito(EfeitoID id) const {
-    const EfeitoStatus* ef = encontrarEfeito(id);
+int Character::getEffectTurns(EffectID id) const {
+    const StatusEffect* ef = findEffect(id);
     return ef ? ef->obterTurnosRestantes() : 0;
 }
 
-void Character::mostrarStatus() const 
+void Character::showStatus() const 
 {
 }
 
-std::string Character::getNameClasse() const 
+std::string Character::getClassName() const 
 {
-    return this->classe->getNameClasse();
+    return this->characterClass->getClassName();
 }
 
-ClassType Character::obterClassType() const 
+ClassType Character::getClassType() const 
 {
-    if (this->classe) return this->classe->obterClassType();
-    return ClassType::Nenhum;
+    if (this->characterClass) return this->characterClass->getClassType();
+    return ClassType::None;
 }
 
-RaceType Character::obterRaceType() const 
+RaceType Character::getRaceType() const 
 {
-    if (this->race) return this->race->obterRaceType();
-    return RaceType::Nenhum;
+    if (this->race) return this->race->getRaceType();
+    return RaceType::None;
 }
 
-void Character::equiparItem(Item* item)
+void Character::equipItem(Item* item)
 {
     if (item == nullptr) return;
-    if (item->obterTipo() == TipoEquipamento::ARMA) this->equipamentos[EquipmentSlot::MAO_PRINCIPAL] = item;
-    else if (item->obterTipo() == TipoEquipamento::ESCUDO) this->equipamentos[EquipmentSlot::MAO_SECUNDARIA] = item;
-    else if (item->obterTipo() == TipoEquipamento::ARMADURA)
+    if (item->getType() == EquipmentType::Weapon) this->equipment[EquipmentSlot::MainHand] = item;
+    else if (item->getType() == EquipmentType::Shield) this->equipment[EquipmentSlot::OffHand] = item;
+    else if (item->getType() == EquipmentType::Armor)
     {
-        this->equipamentos[EquipmentSlot::ARMADURA] = item;
-        if (combat.vidaMaximaFixa > 0 && item->temPropriedade(Propriedade::ArmaduraAdaptacao)) {
-            if (!possuiEfeito(EfeitoID::RodaAdaptacao)) {
-                adicionarEfeito(std::make_unique<EfeitoRodaAdaptacao>());
+        this->equipment[EquipmentSlot::Armor] = item;
+        if (combat.fixedMaxHealth > 0 && item->hasProperty(Property::AdaptationArmor)) {
+            if (!hasEffect(EffectID::AdaptationWheel)) {
+                addEffect(std::make_unique<AdaptationWheelEffect>());
             }
         }
     }
-    else if (item->obterTipo() == TipoEquipamento::CONSUMIVEL) this->equipamentos[EquipmentSlot::CONSUMIVEL] = item;
-    cache_.sujo = true;
+    else if (item->getType() == EquipmentType::Consumable) this->equipment[EquipmentSlot::Consumable] = item;
+    cache_.dirty = true;
 }
 
-RaceBase* Character::obterRaca() const 
+RaceBase* Character::getRace() const 
 {
     return this->race.get();
 }
 
-ClassBase* Character::obterClasse() const 
+ClassBase* Character::getClass() const 
 {
-    return this->classe.get();
+    return this->characterClass.get();
 }
 
-TipoAtaque Character::getAttackType() const 
+AttackType Character::getAttackType() const 
 {
-    if (this->classe) return this->classe->getAttackType();
-    return TipoAtaque::UNICO;
+    if (this->characterClass) return this->characterClass->getAttackType();
+    return AttackType::Single;
 }
 
-bool Character::habilidadeDaClasseConsomeTurno() const 
+bool Character::classAbilityConsumesTurn() const 
 {
-    if (this->classe) return this->classe->abilityConsumesTurn();
+    if (this->characterClass) return this->characterClass->abilityConsumesTurn();
     return true;
 }
 
-int Character::calcularDefesaBase(int danoBruto, int danoPerfurante) {
-    int danoSemPerfuracao = std::max(0, danoBruto - danoPerfurante);
+int Character::calculateBaseDefense(int rawDamage, int piercingDamage) {
+    int damageWithoutPiercing = std::max(0, rawDamage - piercingDamage);
 
-    atualizarCacheSeNecessario();
+    updateCacheIfNeeded();
 
-    int finalDamage = static_cast<int>(danoSemPerfuracao - cache_.reducaoPercentual);
-    if (finalDamage < 1 && danoSemPerfuracao > 0) finalDamage = 1;
-    else if (danoSemPerfuracao == 0) finalDamage = 0;
+    int finalDamage = static_cast<int>(damageWithoutPiercing - cache_.percentageReduction);
+    if (finalDamage < 1 && damageWithoutPiercing > 0) finalDamage = 1;
+    else if (damageWithoutPiercing == 0) finalDamage = 0;
 
-    return finalDamage + danoPerfurante;
+    return finalDamage + piercingDamage;
 }
 
-ResultadoDano Character::receberDano(int danoBruto, int danoPerfurante, int danoReduzidoParry, IAttacker* atacante, bool aplicarPassivas) {
-    ResultadoDano resultado;
+DamageResult Character::takeDamage(int rawDamage, int piercingDamage, int parryReducedDamage, IAttacker* attacker, bool applyPassives) {
+    DamageResult result;
 
-    int finalDamage = calcularDefesaBase(danoBruto, danoPerfurante);
+    int finalDamage = calculateBaseDefense(rawDamage, piercingDamage);
 
-    for (auto& ef : efeitosAtivos) {
+    for (auto& ef : activeEffects) {
         finalDamage = ef->processarDanoRecebido(finalDamage);
     }
 
-    finalDamage = std::max(0, finalDamage - danoReduzidoParry);
+    finalDamage = std::max(0, finalDamage - parryReducedDamage);
 
-    if (combat.estaDefendendo && obterEscudo() != nullptr) {
-        Item* esc = obterEscudo();
-        resultado.danoBloqueado = esc->obterReducaoDanoFixaEscudo();
-        finalDamage = std::max(0, finalDamage - resultado.danoBloqueado);
+    if (combat.isDefending && getShield() != nullptr) {
+        Item* shield = getShield();
+        result.blockedDamage = shield->obterReducaoDanoFixaEscudo();
+        finalDamage = std::max(0, finalDamage - result.blockedDamage);
 
-        esc->reduzirDurabilidade(1);
-        if (esc->obterDurabilidadeAtualEscudo() <= 0) {
-            resultado.escudoQuebrou = true;
-            resultado.nomeEscudoQuebrado = esc->getNameItem();
-            mochila->removerItem(esc);
-            desequiparEscudo();
+        shield->reduzirDurabilidade(1);
+        if (shield->obterDurabilidadeAtualEscudo() <= 0) {
+            result.shieldBroke = true;
+            result.brokenShieldName = shield->getNameItem();
+            inventory->removerItem(shield);
+            unequipShield();
         }
     }
 
-    if (aplicarPassivas && race) finalDamage = race->processDefensiveDamage(finalDamage, this);
+    if (applyPassives && race) finalDamage = race->processDefensiveDamage(finalDamage, this);
     
-    if (atacante) finalDamage = atacante->garantirDanoMinimo(finalDamage);
+    if (attacker) finalDamage = attacker->ensureMinimumDamage(finalDamage);
 
-    if (finalDamage > 0) modificarVida(-finalDamage);
+    if (finalDamage > 0) modifyHealth(-finalDamage);
 
-    resultado.finalDamage = finalDamage;
-    return resultado;
+    result.finalDamage = finalDamage;
+    return result;
 }
 
-void Character::adicionarEfeito(std::unique_ptr<EfeitoStatus> efeito) {
-    efeito->aoEntrar(this);
-    if (processandoEfeitos) {
-        efeitosFilaAdicao.push_back(std::move(efeito));
+void Character::addEffect(std::unique_ptr<StatusEffect> effect) {
+    effect->aoEntrar(this);
+    if (processingEffects) {
+        effectAdditionQueue.push_back(std::move(effect));
     } else {
-        efeitosAtivos.push_back(std::move(efeito));
+        activeEffects.push_back(std::move(effect));
     }
-    cache_.sujo = true;
+    cache_.dirty = true;
 }
 
-void Character::processarEfeitosInicioTurno() {
-    processandoEfeitos = true;
-    for (auto& ef : efeitosAtivos) {
+void Character::processTurnStartEffects() {
+    processingEffects = true;
+    for (auto& ef : activeEffects) {
         ef->aplicarInicioTurno(this);
         ef->decrementarTurno();
     }
 
-    efeitosAtivos.erase(
-        std::remove_if(efeitosAtivos.begin(), efeitosAtivos.end(),
-            [this](const std::unique_ptr<EfeitoStatus>& ef) {
+    activeEffects.erase(
+        std::remove_if(activeEffects.begin(), activeEffects.end(),
+            [this](const std::unique_ptr<StatusEffect>& ef) {
                 if (ef->expirou()) {
                     ef->aoSair(this);
-                    cache_.sujo = true;
+                    cache_.dirty = true;
                     return true;
                 }
                 return false;
             }),
-        efeitosAtivos.end()
+        activeEffects.end()
     );
-    processandoEfeitos = false;
+    processingEffects = false;
 
-    for (EfeitoID id : efeitosFilaRemocao) {
-        removerEfeito(id);
+    for (EffectID id : effectRemovalQueue) {
+        removeEffect(id);
     }
-    efeitosFilaRemocao.clear();
+    effectRemovalQueue.clear();
 
-    for (auto& ef : efeitosFilaAdicao) {
-        efeitosAtivos.push_back(std::move(ef));
+    for (auto& ef : effectAdditionQueue) {
+        activeEffects.push_back(std::move(ef));
     }
-    efeitosFilaAdicao.clear();
+    effectAdditionQueue.clear();
 }
 
-void Character::limparEfeitos() {
-    for (auto& ef : efeitosAtivos) {
-        ef->aoSair(this); // Garante que os attributes (como Forca e Destreza) sejam restaurados
+void Character::clearEffects() {
+    for (auto& ef : activeEffects) {
+        ef->aoSair(this); // Garante que os atributos (como Força e Destreza) sejam restaurados
     }
-    efeitosAtivos.clear();
-    efeitosFilaAdicao.clear();
-    efeitosFilaRemocao.clear();
-    cache_.sujo = true;
+    activeEffects.clear();
+    effectAdditionQueue.clear();
+    effectRemovalQueue.clear();
+    cache_.dirty = true;
 }
 
-void Character::removerEfeito(EfeitoID id) {
-    if (processandoEfeitos) {
-        efeitosFilaRemocao.push_back(id);
+void Character::removeEffect(EffectID id) {
+    if (processingEffects) {
+        effectRemovalQueue.push_back(id);
         return;
     }
-    auto it = std::find_if(efeitosAtivos.begin(), efeitosAtivos.end(),
-        [id](const std::unique_ptr<EfeitoStatus>& ef) {
+    auto it = std::find_if(activeEffects.begin(), activeEffects.end(),
+        [id](const std::unique_ptr<StatusEffect>& ef) {
             return ef->obterID() == id;
         });
-    if (it != efeitosAtivos.end()) {
+    if (it != activeEffects.end()) {
         (*it)->aoSair(this);
-        efeitosAtivos.erase(it);
-        cache_.sujo = true;
+        activeEffects.erase(it);
+        cache_.dirty = true;
     }
 }
 
-bool Character::podeAgir(std::string& outMotivoIncapacidade) const {
-    auto it = std::find_if(efeitosAtivos.begin(), efeitosAtivos.end(), [](const auto& ef) {
+bool Character::canAct(std::string& outIncapacityReason) const {
+    auto it = std::find_if(activeEffects.begin(), activeEffects.end(), [](const auto& ef) {
         return ef->impedeAcao();
     });
-    if (it != efeitosAtivos.end()) {
-        outMotivoIncapacidade = (*it)->getName();
+    if (it != activeEffects.end()) {
+        outIncapacityReason = (*it)->getName();
         return false;
     }
     return true;
 }
 
-void Character::obterIDsEfeitosAtivos(std::vector<EfeitoID>& outIDs) const {
+void Character::getActiveEffectIDs(std::vector<EffectID>& outIDs) const {
     outIDs.clear();
-    outIDs.reserve(efeitosAtivos.size());
-    std::transform(efeitosAtivos.begin(), efeitosAtivos.end(), std::back_inserter(outIDs), [](const auto& ef) {
+    outIDs.reserve(activeEffects.size());
+    std::transform(activeEffects.begin(), activeEffects.end(), std::back_inserter(outIDs), [](const auto& ef) {
         return ef->obterID();
     });
 }
 
-void Character::executarDrops(Character* currentPlayer, std::vector<std::string>& itensObtidos, int& ouroTotal, int& xpTotal) {
+void Character::executeDrops(Character* currentPlayer, std::vector<std::string>& obtainedItems, int& totalGold, int& totalXp) {
     if (race) {
-        race->realizarDrops(this, currentPlayer, itensObtidos, ouroTotal, xpTotal);
+        race->performDrops(this, currentPlayer, obtainedItems, totalGold, totalXp);
     }
 }
 
-int Character::garantirDanoMinimo(int danoAtual) {
-    if (obterArma()) {
-        return obterArma()->garantirDanoMinimo(danoAtual);
+int Character::ensureMinimumDamage(int currentDamage) {
+    if (getWeapon()) {
+        return getWeapon()->garantirDanoMinimo(currentDamage);
     }
-    return danoAtual;
+    return currentDamage;
 }
 
-std::pair<int, int> Character::calcularDanoOfensivoBase() {
-    double multiplicadorDeAtributos = obterMultiplicador();
+std::pair<int, int> Character::calculateBaseOffensiveDamage() {
+    double attributeMultiplier = getMultiplier();
 
-    int danoFisicoDaArma = 1;
-    int danoMagicoDaArma = 0;
-    int perfuranteAtual = 0;
+    int weaponPhysicalDamage = 1;
+    int weaponMagicalDamage = 0;
+    int currentPiercing = 0;
 
-    if (obterArma()) 
+    if (getWeapon()) 
     {
-        danoFisicoDaArma = obterArma()->obterDanoFisico();
-        danoMagicoDaArma = obterArma()->obterDanoMagico();
+        weaponPhysicalDamage = getWeapon()->obterDanoFisico();
+        weaponMagicalDamage = getWeapon()->obterDanoMagico();
 
-        if (obterArma()->temPropriedade(Propriedade::Magica)) {
-            int bonusMagico = danoFisicoDaArma / 2;
-            double bonusEscalado = bonusMagico * (1.0 + (getWisdom() / 100.0));
-            perfuranteAtual = static_cast<int>(bonusEscalado * multiplicadorDeAtributos);
+        if (getWeapon()->hasProperty(Property::Magic)) {
+            int magicBonus = weaponPhysicalDamage / 2;
+            double scaledBonus = magicBonus * (1.0 + (getWisdom() / 100.0));
+            currentPiercing = static_cast<int>(scaledBonus * attributeMultiplier);
         }
     }
 
-    int strengthEfetiva = getStrength();
-    int dexterityEfetiva = getDexterity();
-    int intelligenceEfetiva = getInteligencia();
-    int wisdomEfetiva = getWisdom();
+    int effectiveStrength = getStrength();
+    int effectiveDexterity = getDexterity();
+    int effectiveIntelligence = getIntelligence();
+    int effectiveWisdom = getWisdom();
 
-    if (danoFisicoDaArma == 0 && danoMagicoDaArma > 0) {
-        strengthEfetiva /= 10; dexterityEfetiva /= 10;
-    } else if (danoFisicoDaArma > 0 && danoMagicoDaArma == 0) {
-        intelligenceEfetiva /= 10; wisdomEfetiva /= 10;
+    if (weaponPhysicalDamage == 0 && weaponMagicalDamage > 0) {
+        effectiveStrength /= 10; effectiveDexterity /= 10;
+    } else if (weaponPhysicalDamage > 0 && weaponMagicalDamage == 0) {
+        effectiveIntelligence /= 10; effectiveWisdom /= 10;
     }
 
-    int danoFisicoCalculado = std::max(0, static_cast<int>((danoFisicoDaArma + strengthEfetiva) * (1.0 + (dexterityEfetiva / 100.0))));
-    int danoMagicoCalculado = std::max(0, static_cast<int>((danoMagicoDaArma + intelligenceEfetiva) * (1.0 + (wisdomEfetiva / 100.0))));
+    int calculatedPhysicalDamage = std::max(0, static_cast<int>((weaponPhysicalDamage + effectiveStrength) * (1.0 + (effectiveDexterity / 100.0))));
+    int calculatedMagicalDamage = std::max(0, static_cast<int>((weaponMagicalDamage + effectiveIntelligence) * (1.0 + (effectiveWisdom / 100.0))));
     
-    int total = std::max(1, danoFisicoCalculado + danoMagicoCalculado);
-    int totalFinal = static_cast<int>(total * multiplicadorDeAtributos);
-    int perfuranteFinal = perfuranteAtual;
+    int total = std::max(1, calculatedPhysicalDamage + calculatedMagicalDamage);
+    int finalTotal = static_cast<int>(total * attributeMultiplier);
+    int finalPiercing = currentPiercing;
 
-    if (obterArma() && obterArma()->temPropriedade(Propriedade::IgnoraDefesa)) {
-        perfuranteFinal = totalFinal;
+    if (getWeapon() && getWeapon()->hasProperty(Property::IgnoreDefense)) {
+        finalPiercing = finalTotal;
     }
 
-    if (race && race->ignoraEscudo()) {
-        perfuranteFinal = totalFinal;
+    if (race && race->ignoresShield()) {
+        finalPiercing = finalTotal;
     }
 
-    if (possuiEfeito(EfeitoID::MiraCerteira)) {
-        totalFinal *= 2;
-        perfuranteFinal *= 2;
-        removerEfeito(EfeitoID::MiraCerteira);
+    if (hasEffect(EffectID::TrueAim)) {
+        finalTotal *= 2;
+        finalPiercing *= 2;
+        removeEffect(EffectID::TrueAim);
     }
 
-    return { totalFinal, perfuranteFinal };
+    return { finalTotal, finalPiercing };
 }
 
-void Character::finalizarBatalha() { 
-    combat.vidaMaximaFixa = 0; 
-    if (system.possuiRegeneracaoTroll && vidaAtual > 0 && vidaAtual < obterVidaMaxima()) {
-        modificarVida(obterVidaMaxima());
+void Character::finishBattle() { 
+    combat.fixedMaxHealth = 0; 
+    if (system.hasTrollRegeneration && currentHealth > 0 && currentHealth < getMaxHealth()) {
+        modifyHealth(getMaxHealth());
         InputControl::aguardarEnter();
     }
 }
 
 bool Character::isBoss() const {
-    RaceType t = obterRaceType();
+    RaceType t = getRaceType();
     return (t == RaceType::Mahoraga || 
-            t == RaceType::OrkExilado || 
+            t == RaceType::ExiledOrc || 
             t == RaceType::Troll || 
-            t == RaceType::AbominacaoFloresta);
+            t == RaceType::ForestAbomination);
+}
+
+bool Character::isInCombat() const {
+    return false; 
+}
+
+void Character::enterCombat() {
+}
+
+void Character::exitCombat() {
+}
+
+void Character::prepareForCombat() {
 }

@@ -107,5 +107,8 @@ namespace NPCAparenciaLayouts {
                                                 #+############**###########%##########*+                                                    
     
 )");
+    inline const auto& appearanceArt = arteAparencia;
 }
+
+namespace NPCAppearanceLayouts = NPCAparenciaLayouts;
 

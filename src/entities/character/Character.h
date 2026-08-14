@@ -20,23 +20,23 @@
 
 struct Attributes 
 {
-    int health;         // Maximum health points (HP) of the character
-    int strength;        // Influences damage of frontal physical attacks and heavy weapons
-    int dexterity;     // Determines turn order, damage of agile weapons and critical hit/dodge
-    int resistance;  // Reduces physical damage received and acts as requirement for heavy shields
-    int constitution; // General vitality, reduces debuff effectiveness and acts as requirement for armor
-    int intelligence; // Base multiplier of magical damage and requirement for staffs/wands
-    int wisdom;    // Increases secondary magical attributes, strength of heals and magical defense
+    int health;         // Pontos de vida máximos (HP) do personagem
+    int strength;       // Influencia dano de ataques físicos frontais e armas pesadas
+    int dexterity;      // Determina ordem de turno, dano de armas ágeis e acerto crítico/esquiva
+    int resistance;     // Reduz dano físico recebido e age como requisito para escudos pesados
+    int constitution;   // Vitalidade geral, reduz efetividade de debuffs e age como requisito para armadura
+    int intelligence;   // Multiplicador base de dano mágico e requisito para cajados/varinhas
+    int wisdom;         // Aumenta atributos mágicos secundários, força de curas e defesa mágica
 
-    void addAttributes(const Attributes& outro) 
+    void addAttributes(const Attributes& other) 
     {
-        this->health += outro.health;
-        this->strength += outro.strength;
-        this->dexterity += outro.dexterity;
-        this->resistance += outro.resistance;
-        this->constitution += outro.constitution;
-        this->intelligence += outro.intelligence;
-        this->wisdom += outro.wisdom;
+        this->health += other.health;
+        this->strength += other.strength;
+        this->dexterity += other.dexterity;
+        this->resistance += other.resistance;
+        this->constitution += other.constitution;
+        this->intelligence += other.intelligence;
+        this->wisdom += other.wisdom;
     }
 
     void adjustAll(int delta) {
@@ -59,22 +59,26 @@ struct Attributes
     }
 };
 
-enum class TipoAtributo 
+enum class AttributeType 
 {
     Health = 1,
-    Forca,
-    Destreza,
-    Resistencia,
-    Constituicao,
-    Inteligencia,
-    Sabedoria
+    Strength,
+    Dexterity,
+    Resistance,
+    Constitution,
+    Intelligence,
+    Wisdom
 };
 
-enum class TipoAtaque 
+using TipoAtributo = AttributeType;
+
+enum class AttackType 
 {
-    UNICO,
-    AREA
+    Single,
+    Area
 };
+
+using TipoAtaque = AttackType;
 
 class RaceBase;   
 class ClassBase; 
@@ -82,319 +86,454 @@ enum class ClassType;
 enum class AbilityID;
 enum class RaceType;
 
-enum class DificuldadeJogo 
+enum class GameDifficulty 
 {
-    Facil = 1,
+    Easy = 1,
     Normal = 2,
-    Dificil = 3
+    Hard = 3
 };
 
+using DificuldadeJogo = GameDifficulty;
+
 /**
- * @brief PlayerClass central of the game that represents any living entity (Player, Enemies, NPCs).
- * Aggregates status, attributes, inventory and persistence and interaction logic.
+ * @brief Classe central do jogo que representa qualquer entidade viva (Jogador, Inimigos, NPCs).
+ * Agrega status, atributos, inventário e lógica de persistência e interação.
  */
 class Character : public IAttacker, public IDamageable
 {
 private:
-    struct ControleCombate {
-        bool estaDefendendo = false;
-        std::vector<std::unique_ptr<Character>> almasColetadas;
-        bool recargaDefesa = false;
-        bool recargaHabilidade = false;
-        bool pularTurnoInimigo = false;
-        bool habilidadeCancelada = false;
-        bool morteAnimada = false;
-        double multiplicadorAtual = 1.0;
+    struct CombatControl {
+        bool isDefending = false;
+        std::vector<std::unique_ptr<Character>> collectedSouls;
+        bool defenseCooldown = false;
+        bool abilityCooldown = false;
+        bool skipEnemyTurn = false;
+        bool abilityCanceled = false;
+        bool animatedDeath = false;
+        double currentMultiplier = 1.0;
         int totalHealingReceived = 0;
-        int vidaMaximaFixa = 0;
-        std::unordered_map<AbilityID, int> cooldownsAtivos;
+        int fixedMaxHealth = 0;
+        std::unordered_map<AbilityID, int> activeCooldowns;
         
-        void resetar() {
-            estaDefendendo = false;
-            recargaDefesa = false;
-            recargaHabilidade = false;
-            pularTurnoInimigo = false;
-            habilidadeCancelada = false;
-            morteAnimada = false;
-            multiplicadorAtual = 1.0;
+        void reset() {
+            isDefending = false;
+            defenseCooldown = false;
+            abilityCooldown = false;
+            skipEnemyTurn = false;
+            abilityCanceled = false;
+            animatedDeath = false;
+            currentMultiplier = 1.0;
             totalHealingReceived = 0;
-            vidaMaximaFixa = 0;
-            cooldownsAtivos.clear();
+            fixedMaxHealth = 0;
+            activeCooldowns.clear();
         }
     };
 
-    struct ControleSistema {
-        bool querVoltarProMenu = false;
-        bool labirintoDesbloqueado = false;
-        bool podeReviver = true;
-        bool parryAtivado = true;
-        bool parryModerno = true;
-        bool possuiRegeneracaoTroll = false;
-        bool godModeAtivo = false;
-        bool noclipAtivo = false;
+    struct SystemControl {
+        bool wantsToReturnToMenu = false;
+        bool labyrinthUnlocked = false;
+        bool canRevive = true;
+        bool parryEnabled = true;
+        bool modernParry = true;
+        bool hasTrollRegeneration = false;
+        bool godModeActive = false;
+        bool noclipActive = false;
         bool isMinion = false;
-        DificuldadeJogo difficultyAtual = DificuldadeJogo::Normal;
-        double difficultyMultiplicador = 1.0;
-        char iconeJogador = '@';
-        Color corJogador = Color::GREEN;
-        Color corFundoTerminal = Color::RESET;
+        GameDifficulty currentDifficulty = GameDifficulty::Normal;
+        double difficultyMultiplier = 1.0;
+        char playerIcon = '@';
+        Color playerColor = Color::GREEN;
+        Color terminalBackgroundColor = Color::RESET;
     };
 
-    static std::unordered_set<Character*> personagensAtivos;
+    static std::unordered_set<Character*> activeCharacters;
 
-    ControleCombate combat;
-    ControleSistema system;
+    CombatControl combat;
+    SystemControl system;
 
 protected:
-    std::string nomePersonagem;
-    int vidaAtual;
+    std::string characterName;
+    int currentHealth;
     std::unique_ptr<RaceBase> race;
-    std::unique_ptr<ClassBase> classe;
-    Attributes statsFinais;
-    std::unique_ptr<Inventory> mochila;
+    std::unique_ptr<ClassBase> characterClass;
+    Attributes finalStats;
+    std::unique_ptr<Inventory> inventory;
 
-    std::vector<std::unique_ptr<EfeitoStatus>> efeitosAtivos;
-    std::vector<std::unique_ptr<EfeitoStatus>> efeitosFilaAdicao;
-    std::vector<EfeitoID> efeitosFilaRemocao;
-    bool processandoEfeitos = false;
+    std::vector<std::unique_ptr<StatusEffect>> activeEffects;
+    std::vector<std::unique_ptr<StatusEffect>> effectAdditionQueue;
+    std::vector<EffectID> effectRemovalQueue;
+    bool processingEffects = false;
 
-    std::map<EquipmentSlot, Item*> equipamentos;
-    Item* itemSelecionadoParaUso;
+    std::map<EquipmentSlot, Item*> equipment;
+    Item* itemSelectedForUse;
 
     // Cache de getters calculados
-    // ATTENTION: This structure using 'mutable' is not thread-safe.
-    // If the game starts using multi-threading (e.g., IA running in background), it is necessary to protect with std::mutex or std::atomic.
-    struct CacheAtributos {
-        int vidaMaxima = 0;
+    struct AttributeCache {
+        int maxHealth = 0;
         int strength = 0;
         int dexterity = 0;
         int resistance = 0;
         int constitution = 0;
         int intelligence = 0;
         int wisdom = 0;
-        int reducaoPercentual = 0;
-        bool sujo = true;
+        int percentageReduction = 0;
+        bool dirty = true;
     };
-    mutable CacheAtributos cache_;
-    mutable std::mutex mutexCache_; // Protects cache access in multithread environments
+    mutable AttributeCache cache_;
+    mutable std::mutex mutexCache_; // Protege o acesso ao cache em ambientes multithread
 
-    struct CacheDano {
-        std::pair<int, int> danoFisicoMagico = {0, 0};
-        bool sujo = true;
+    struct DamageCache {
+        std::pair<int, int> physicalMagicalDamage = {0, 0};
+        bool dirty = true;
         
-        void invalidar() { sujo = true; }
+        void invalidate() { dirty = true; }
     };
-    mutable CacheDano cacheDano_;
+    mutable DamageCache cacheDamage_;
 
-    void atualizarCacheSeNecessario() const;
+    void updateCacheIfNeeded() const;
     
-    
-    std::unique_ptr<SistemaDeNivel> sistemaDeNivel;
+    std::unique_ptr<LevelSystem> levelSystem;
 
-
-    int* obterPonteiroAtributoEstatico(TipoAtributo atributo);
+    int* getStaticAttributePointer(AttributeType attribute);
 
 public:
     Character(const Character& other);
-    Character(const std::string& nome, std::unique_ptr<RaceBase> r, std::unique_ptr<ClassBase> c);
+    Character(const std::string& name, std::unique_ptr<RaceBase> r, std::unique_ptr<ClassBase> c);
     virtual ~Character();
 
-    static bool isValido(Character* p);
+    static bool isValid(Character* p);
+    static bool isValido(Character* p) { return isValid(p); }
 
-    void calcularAtributos();
+    void calculateAttributes();
+    void calcularAtributos() { calculateAttributes(); }
+
     std::unique_ptr<Character> clone() const;
-    void mostrarStatus() const;
-    void modificarVida(int valor);
-    void alterarNome(const std::string& novoNome) { nomePersonagem = novoNome; }
-    void equiparItem(Item* item);
+    void showStatus() const;
+    void mostrarStatus() const { showStatus(); }
 
-    std::string getName() const { return nomePersonagem; }
-    int obterVida() const { return vidaAtual; }
-    int obterVidaMaxima() const {
-        if (combat.vidaMaximaFixa > 0) return combat.vidaMaximaFixa;
-        atualizarCacheSeNecessario(); return cache_.vidaMaxima;
+    void modifyHealth(int value);
+    void modificarVida(int valor) { modifyHealth(valor); }
+
+    void changeName(const std::string& newName) { characterName = newName; }
+    void alterarNome(const std::string& novoNome) { changeName(novoNome); }
+
+    void equipItem(Item* item);
+    void equiparItem(Item* item) { equipItem(item); }
+
+    std::string getName() const { return characterName; }
+    int getHealth() const { return currentHealth; }
+    int obterVida() const { return getHealth(); }
+
+    int getMaxHealth() const {
+        if (combat.fixedMaxHealth > 0) return combat.fixedMaxHealth;
+        updateCacheIfNeeded(); return cache_.maxHealth;
     }
-    int getStrength() const { atualizarCacheSeNecessario(); return cache_.strength; }
-    int getDexterity() const { atualizarCacheSeNecessario(); return cache_.dexterity; }
-    int getResistance() const { atualizarCacheSeNecessario(); return cache_.resistance; }
-    int getConstitution() const { atualizarCacheSeNecessario(); return cache_.constitution; }
-    int getInteligencia() const { atualizarCacheSeNecessario(); return cache_.intelligence; }
-    int getWisdom() const { atualizarCacheSeNecessario(); return cache_.wisdom; }
+    int obterVidaMaxima() const { return getMaxHealth(); }
+
+    int getStrength() const { updateCacheIfNeeded(); return cache_.strength; }
+    int getDexterity() const { updateCacheIfNeeded(); return cache_.dexterity; }
+    int getResistance() const { updateCacheIfNeeded(); return cache_.resistance; }
+    int getConstitution() const { updateCacheIfNeeded(); return cache_.constitution; }
+    int getIntelligence() const { updateCacheIfNeeded(); return cache_.intelligence; }
+    int getInteligencia() const { return getIntelligence(); }
+    int getWisdom() const { updateCacheIfNeeded(); return cache_.wisdom; }
     
-    int getLevel() const { return sistemaDeNivel->getLevel(); }
-    int getXpAtual() const { return sistemaDeNivel->getXpAtual(); }
-    int getXpParaSubir() const { return sistemaDeNivel->getXpParaSubir(); }
-    void definirNivel(int novoNivel) { sistemaDeNivel->definirNivel(novoNivel); }
-    void definirXpAtual(int novoXp) { sistemaDeNivel->definirXpAtual(novoXp); }
-    void definirXpParaSubir(int novoXpParaSubir) { sistemaDeNivel->definirXpParaSubir(novoXpParaSubir); }
-    void definirVida(int novaVida) { vidaAtual = novaVida; }
-    void ganharXp(int valor) { sistemaDeNivel->ganharXp(valor); }
-    bool podeSubirDeNivel() const { return sistemaDeNivel->podeSubirDeNivel(); }
+    int getLevel() const { return levelSystem->getLevel(); }
+    int getCurrentXp() const { return levelSystem->getCurrentXp(); }
+    int getXpAtual() const { return getCurrentXp(); }
+    int getRequiredXpForLevelUp() const { return levelSystem->getXpToLevelUp(); }
+    int getXpParaSubir() const { return getRequiredXpForLevelUp(); }
 
-    // Professional English Property Accessors
-    int getIntelligence() const { return getInteligencia(); }
-    int getCurrentXp() const { return getXpAtual(); }
-    int getRequiredXpForLevelUp() const { return getXpParaSubir(); }
-    bool canLevelUp() const { return podeSubirDeNivel(); }
-    bool subirDeNivel(TipoAtributo atributo);
-    void escalarAtributos(double fator);
-    void adicionarAlma(std::unique_ptr<Character> alma);
-    std::vector<std::unique_ptr<Character>>& obterAlmas();
-    size_t obterNumeroDeAlmas() const;
-    std::unique_ptr<Character> removerAlma(int index);
+    void setLevel(int newLevel) { levelSystem->setLevel(newLevel); }
+    void definirNivel(int novoNivel) { setLevel(novoNivel); }
+    void setCurrentXp(int newXp) { levelSystem->setCurrentXp(newXp); }
+    void definirXpAtual(int novoXp) { setCurrentXp(novoXp); }
+    void setRequiredXpForLevelUp(int newXp) { levelSystem->setXpToLevelUp(newXp); }
+    void definirXpParaSubir(int novoXpParaSubir) { setRequiredXpForLevelUp(novoXpParaSubir); }
+    void setHealth(int newHealth) { currentHealth = newHealth; }
+    void definirVida(int novaVida) { setHealth(novaVida); }
+    void gainXp(int amount) { levelSystem->addXp(amount); }
+    void ganharXp(int valor) { gainXp(valor); }
+    void addXp(int xp) { gainXp(xp); }
+    bool canLevelUp() const { return levelSystem->canLevelUp(); }
+    bool podeSubirDeNivel() const { return canLevelUp(); }
 
-    void strengthrRecalculoCache() { cache_.sujo = true; }
+    bool levelUp(AttributeType attribute);
+    bool subirDeNivel(AttributeType atributo) { return levelUp(atributo); }
+
+    void scaleAttributes(double factor);
+    void escalarAtributos(double fator) { scaleAttributes(fator); }
+
+    void addSoul(std::unique_ptr<Character> soul);
+    void adicionarAlma(std::unique_ptr<Character> alma) { addSoul(std::move(alma)); }
+
+    std::vector<std::unique_ptr<Character>>& getSouls();
+    std::vector<std::unique_ptr<Character>>& obterAlmas() { return getSouls(); }
+
+    size_t getSoulCount() const;
+    size_t obterNumeroDeAlmas() const { return getSoulCount(); }
+
+    std::unique_ptr<Character> removeSoul(int index);
+    std::unique_ptr<Character> removerAlma(int index) { return removeSoul(index); }
+
+    void forceCacheRecalculation() { cache_.dirty = true; }
+    void strengthrRecalculoCache() { forceCacheRecalculation(); }
     
-    int obterCuraTotalRecebida() const { return combat.totalHealingReceived; }
+    int getTotalHealingReceived() const { return combat.totalHealingReceived; }
+    int obterCuraTotalRecebida() const { return getTotalHealingReceived(); }
 
-    void alterarAtributoEstatico(TipoAtributo atributo, int valor);
-    Attributes& obterAtributosFinais() { return statsFinais; }
+    void modifyStaticAttribute(AttributeType attribute, int value);
+    void alterStaticAttribute(AttributeType attribute, int value) { modifyStaticAttribute(attribute, value); }
+    void alterarAtributoEstatico(AttributeType atributo, int valor) { modifyStaticAttribute(atributo, valor); }
 
-    RaceBase* obterRaca() const;
-    ClassBase* obterClasse() const;
-    std::string getNameClasse() const;
-    ClassType obterClassType() const;
-    RaceType obterRaceType() const;
+    Attributes& getFinalAttributes() { return finalStats; }
+    Attributes& getFinalStats() { return finalStats; }
+    const Attributes& getFinalStats() const { return finalStats; }
+    Attributes& obterAtributosFinais() { return getFinalAttributes(); }
+
+    RaceBase* getRace() const;
+    RaceBase* obterRaca() const { return getRace(); }
+
+    ClassBase* getClass() const;
+    ClassBase* obterClasse() const { return getClass(); }
+
+    std::string getClassName() const;
+    std::string getNameClasse() const { return getClassName(); }
+
+    ClassType getClassType() const;
+    ClassType obterClassType() const { return getClassType(); }
+
+    RaceType getRaceType() const;
+    RaceType obterRaceType() const { return getRaceType(); }
+
     bool isBoss() const;
     
-    Item* getEquippedAt(EquipmentSlot slot) const { auto it = equipamentos.find(slot); return it != equipamentos.end() ? it->second : nullptr; }
-    Item* obterArma() const { return getEquippedAt(EquipmentSlot::MAO_PRINCIPAL); }
-    Item* obterEscudo() const { return getEquippedAt(EquipmentSlot::MAO_SECUNDARIA); }
-    Item* obterArmadura() const { return getEquippedAt(EquipmentSlot::ARMADURA); }
-    Item* obterConsumivelRapido() const { return getEquippedAt(EquipmentSlot::CONSUMIVEL); }
-    void desequiparConsumivel() { equipamentos.erase(EquipmentSlot::CONSUMIVEL); cache_.sujo = true; }
-    Inventory* obterInventario() const { return mochila.get(); }
-    Item* obterItemSelecionadoParaUso() const { return itemSelecionadoParaUso; }
-    bool isItemEquipado(Item* item) const { 
+    Item* getEquippedAt(EquipmentSlot slot) const { auto it = equipment.find(slot); return it != equipment.end() ? it->second : nullptr; }
+    Item* getWeapon() const { return getEquippedAt(EquipmentSlot::MainHand); }
+    Item* obterArma() const { return getWeapon(); }
+    Item* getShield() const { return getEquippedAt(EquipmentSlot::OffHand); }
+    Item* obterEscudo() const { return getShield(); }
+    Item* getArmor() const { return getEquippedAt(EquipmentSlot::Armor); }
+    Item* obterArmadura() const { return getArmor(); }
+    Item* getQuickConsumable() const { return getEquippedAt(EquipmentSlot::Consumable); }
+    Item* obterConsumivelRapido() const { return getQuickConsumable(); }
+
+    void unequipConsumable() { equipment.erase(EquipmentSlot::Consumable); cache_.dirty = true; }
+    void desequiparConsumivel() { unequipConsumable(); }
+    void unequipShield() { equipment.erase(EquipmentSlot::OffHand); cache_.dirty = true; }
+    void desequiparEscudo() { unequipShield(); }
+    void unequipWeapon() { equipment.erase(EquipmentSlot::MainHand); cache_.dirty = true; }
+    void desequiparArma() { unequipWeapon(); }
+    void unequipArmor() { equipment.erase(EquipmentSlot::Armor); cache_.dirty = true; }
+    void desequiparArmadura() { unequipArmor(); }
+
+    Inventory* getInventory() const { return inventory.get(); }
+    Inventory* obterInventario() const { return getInventory(); }
+
+    Item* getItemSelectedForUse() const { return itemSelectedForUse; }
+    Item* obterItemSelecionadoParaUso() const { return getItemSelectedForUse(); }
+    void setItemSelectedForUse(Item* item) { itemSelectedForUse = item; }
+    void definirItemSelecionadoParaUso(Item* item) { setItemSelectedForUse(item); }
+
+    bool isItemEquipped(Item* item) const { 
         if (!item) return false;
-        for (const auto& par : equipamentos) {
-            if (par.second == item) return true;
+        for (const auto& pair : equipment) {
+            if (pair.second == item) return true;
         }
         return false;
     }
+    bool isItemEquipado(Item* item) const { return isItemEquipped(item); }
 
-    bool estaEmCombate() const;
-    void entrarEmCombate();
-    void sairDoCombate();
-    void prepararParaCombate();
+    bool isInCombat() const;
+    bool estaEmCombate() const { return isInCombat(); }
+    void enterCombat();
+    void entrarEmCombate() { enterCombat(); }
+    void exitCombat();
+    void sairDoCombate() { exitCombat(); }
+    void prepareForCombat();
+    void prepararParaCombate() { prepareForCombat(); }
 
-    void definirItemSelecionadoParaUso(Item* item) { itemSelecionadoParaUso = item; }
-    void ganharOuro(int valor) { mochila->adicionarOuro(valor); }
-    void definirMultiplicador(double novoMultiplicador);
-    double obterMultiplicador() const { return combat.multiplicadorAtual; }
-    bool podeUsarRessurreicao() const { return system.podeReviver; }
+    void addGold(int amount) { inventory->addGold(amount); }
+    void ganharOuro(int valor) { addGold(valor); }
 
-    // English Methods & Aliases
-    int getHealth() const { return obterVida(); }
-    int getMaxHealth() const { return obterVidaMaxima(); }
-    void setHealth(int h) { definirVida(h); }
-    void setLevel(int l) { definirNivel(l); }
-    void addGold(int g) { ganharOuro(g); }
-    void addXp(int xp) { ganharXp(xp); }
-    Inventory* getInventory() const { return obterInventario(); }
-    RaceBase* getRace() const { return obterRaca(); }
-    ClassBase* getClass() const { return obterClasse(); }
-    Item* getWeapon() const { return obterArma(); }
-    Item* getShield() const { return obterEscudo(); }
-    Item* getArmor() const { return obterArmadura(); }
-    bool isInCombat() const { return estaEmCombate(); }
-    void enterCombat() { entrarEmCombate(); }
-    void exitCombat() { sairDoCombate(); }
-    void prepareForCombat() { prepararParaCombate(); }
-    void consumirRessurreicao() { system.podeReviver = false; }
+    void setMultiplier(double newMultiplier);
+    void definirMultiplicador(double novoMultiplicador) { setMultiplier(novoMultiplicador); }
+    double getMultiplier() const { return combat.currentMultiplier; }
+    double obterMultiplicador() const { return getMultiplier(); }
 
-    int obterRecargaHabilidade(AbilityID habilidade) const 
+    bool canUseResurrection() const { return system.canRevive; }
+    bool podeUsarRessurreicao() const { return canUseResurrection(); }
+    void consumeResurrection() { system.canRevive = false; }
+    void consumirRessurreicao() { consumeResurrection(); }
+
+    int getAbilityCooldown(AbilityID ability) const 
     {
-        auto it{combat.cooldownsAtivos.find(habilidade)};
-        return (it != combat.cooldownsAtivos.end()) ? it->second : 0;
+        auto it{combat.activeCooldowns.find(ability)};
+        return (it != combat.activeCooldowns.end()) ? it->second : 0;
     }
-    void definirCooldown(AbilityID habilidade, int turnos) 
+    int obterRecargaHabilidade(AbilityID habilidade) const { return getAbilityCooldown(habilidade); }
+
+    void setCooldown(AbilityID ability, int turns) 
     {
-        combat.cooldownsAtivos[habilidade] = turnos;
+        combat.activeCooldowns[ability] = turns;
     }
+    void definirCooldown(AbilityID habilidade, int turnos) { setCooldown(habilidade, turnos); }
     
-    bool obterHabilidadeCancelada() const { return combat.habilidadeCancelada; }
-    void definirHabilidadeCancelada(bool foiCancelada) { combat.habilidadeCancelada = foiCancelada; }
+    bool getAbilityCanceled() const { return combat.abilityCanceled; }
+    bool obterHabilidadeCancelada() const { return getAbilityCanceled(); }
+    void setAbilityCanceled(bool wasCanceled) { combat.abilityCanceled = wasCanceled; }
+    void definirHabilidadeCancelada(bool foiCancelada) { setAbilityCanceled(foiCancelada); }
 
-    void definirRecarga(bool emRecarga) { combat.recargaHabilidade = emRecarga; }
-    bool obterRecarga() const { return combat.recargaHabilidade; }
-    void definirPularTurnoInimigo(bool pularTurno) { combat.pularTurnoInimigo = pularTurno; }
-    bool obterPularTurnoInimigo() const { return combat.pularTurnoInimigo; }
+    void setCooldownState(bool onCooldown) { combat.abilityCooldown = onCooldown; }
+    void definirRecarga(bool emRecarga) { setCooldownState(emRecarga); }
+    bool getCooldownState() const { return combat.abilityCooldown; }
+    bool obterRecarga() const { return getCooldownState(); }
+
+    void setSkipEnemyTurn(bool skipTurn) { combat.skipEnemyTurn = skipTurn; }
+    void definirPularTurnoInimigo(bool pularTurno) { setSkipEnemyTurn(pularTurno); }
+    bool getSkipEnemyTurn() const { return combat.skipEnemyTurn; }
+    bool obterPularTurnoInimigo() const { return getSkipEnemyTurn(); }
     
-    void definirVoltarProMenu(bool voltar) { system.querVoltarProMenu = voltar; }
-    bool obterVoltarProMenu() const { return system.querVoltarProMenu; }
-    void setReturnToMenu(bool returnToMenu) { definirVoltarProMenu(returnToMenu); }
-    bool shouldReturnToMenu() const { return obterVoltarProMenu(); }
+    void setReturnToMenu(bool returnToMenu) { system.wantsToReturnToMenu = returnToMenu; }
+    void definirVoltarProMenu(bool voltar) { setReturnToMenu(voltar); }
+    bool shouldReturnToMenu() const { return system.wantsToReturnToMenu; }
+    bool obterVoltarProMenu() const { return shouldReturnToMenu(); }
 
-    void desbloquearLabirinto() { system.labirintoDesbloqueado = true; }
-    bool obterLabirintoDesbloqueado() const { return system.labirintoDesbloqueado; }
+    void unlockLabyrinth() { system.labyrinthUnlocked = true; }
+    void desbloquearLabirinto() { unlockLabyrinth(); }
+    bool isLabyrinthUnlocked() const { return system.labyrinthUnlocked; }
+    bool obterLabirintoDesbloqueado() const { return isLabyrinthUnlocked(); }
 
-    void desbloquearRegeneracaoTroll() { system.possuiRegeneracaoTroll = true; }
-    bool possuiRegeneracaoTroll() const { return system.possuiRegeneracaoTroll; }
+    void unlockTrollRegeneration() { system.hasTrollRegeneration = true; }
+    void desbloquearRegeneracaoTroll() { unlockTrollRegeneration(); }
+    bool hasTrollRegeneration() const { return system.hasTrollRegeneration; }
+    bool possuiRegeneracaoTroll() const { return hasTrollRegeneration(); }
 
-    void alternarGodMode() { system.godModeAtivo = !system.godModeAtivo; }
-    bool isGodMode() const { return system.godModeAtivo; }
+    void toggleGodMode() { system.godModeActive = !system.godModeActive; }
+    void alternarGodMode() { toggleGodMode(); }
+    bool isGodMode() const { return system.godModeActive; }
 
-    void alternarNoclip() { system.noclipAtivo = !system.noclipAtivo; }
-    bool isNoclip() const { return system.noclipAtivo; }
+    void toggleNoclip() { system.noclipActive = !system.noclipActive; }
+    void alternarNoclip() { toggleNoclip(); }
+    bool isNoclip() const { return system.noclipActive; }
 
-    void reduzirCooldowns();
-    void prepararParaNovaBatalha();
-    void finalizarBatalha();
+    void reduceCooldowns();
+    void reduzirCooldowns() { reduceCooldowns(); }
 
-    bool possuiEfeito(EfeitoID id) const;
-    int obterTurnosEfeito(EfeitoID id) const;
-    const EfeitoStatus* encontrarEfeito(EfeitoID id) const;
+    void prepareForNewBattle();
+    void prepararParaNovaBatalha() { prepareForNewBattle(); }
 
+    void finishBattle();
+    void finalizarBatalha() { finishBattle(); }
 
-    void definirDefendendo(bool d) { combat.estaDefendendo = d; }
-    bool obterDefendendo() const { return combat.estaDefendendo; }
-    void definirRecargaDefesa(bool r) { combat.recargaDefesa = r; }
-    bool obterRecargaDefesa() const { return combat.recargaDefesa; }
-    void desequiparEscudo() { equipamentos.erase(EquipmentSlot::MAO_SECUNDARIA); cache_.sujo = true; }
-    void desequiparArma() { equipamentos.erase(EquipmentSlot::MAO_PRINCIPAL); cache_.sujo = true; }
-    void desequiparArmadura() { equipamentos.erase(EquipmentSlot::ARMADURA); cache_.sujo = true; }
+    bool hasEffect(EffectID id) const;
+    bool possuiEfeito(EffectID id) const { return hasEffect(id); }
 
-    void definirMorteAnimada(bool m) { combat.morteAnimada = m; }
-    bool obterMorteAnimada() const { return combat.morteAnimada; }
+    int getEffectTurns(EffectID id) const;
+    int obterTurnosEfeito(EffectID id) const { return getEffectTurns(id); }
 
-    void definirParryAtivado(bool p) { system.parryAtivado = p; }
-    bool obterParryAtivado() const { return system.parryAtivado; }
-    void definirParryModerno(bool m) { system.parryModerno = m; }
-    bool obterParryModerno() const { return system.parryModerno; }
+    const StatusEffect* findEffect(EffectID id) const;
+    const StatusEffect* encontrarEfeito(EffectID id) const { return findEffect(id); }
+
+    void setDefending(bool d) { combat.isDefending = d; }
+    void definirDefendendo(bool d) { setDefending(d); }
+    bool isDefending() const { return combat.isDefending; }
+    bool obterDefendendo() const { return isDefending(); }
+
+    void setDefenseCooldown(bool r) { combat.defenseCooldown = r; }
+    void definirRecargaDefesa(bool r) { setDefenseCooldown(r); }
+    bool getDefenseCooldown() const { return combat.defenseCooldown; }
+    bool obterRecargaDefesa() const { return getDefenseCooldown(); }
+
+    void setAnimatedDeath(bool m) { combat.animatedDeath = m; }
+    void definirMorteAnimada(bool m) { setAnimatedDeath(m); }
+    bool getAnimatedDeath() const { return combat.animatedDeath; }
+    bool obterMorteAnimada() const { return getAnimatedDeath(); }
+
+    void setParryEnabled(bool p) { system.parryEnabled = p; }
+    void definirParryAtivado(bool p) { setParryEnabled(p); }
+    bool isParryEnabled() const { return system.parryEnabled; }
+    bool obterParryAtivado() const { return isParryEnabled(); }
+
+    void setModernParry(bool m) { system.modernParry = m; }
+    void definirParryModerno(bool m) { setModernParry(m); }
+    bool isModernParry() const { return system.modernParry; }
+    bool obterParryModerno() const { return isModernParry(); }
 
     void setAsMinion(bool minion) { system.isMinion = minion; }
     bool isMinion() const { return system.isMinion; }
 
-    void definirDificuldade(DificuldadeJogo d) { system.difficultyAtual = d; }
-    DificuldadeJogo obterDificuldade() const { return system.difficultyAtual; }
-    void aplicarMultiplicadorDificuldade(double mult);
+    void setDifficulty(GameDifficulty d) { system.currentDifficulty = d; }
+    void definirDificuldade(GameDifficulty d) { setDifficulty(d); }
+    GameDifficulty getDifficulty() const { return system.currentDifficulty; }
+    GameDifficulty obterDificuldade() const { return getDifficulty(); }
 
-    void definirIconeJogador(char icone) { system.iconeJogador = icone; }
-    char obterIconeJogador() const { return system.iconeJogador; }
+    void applyDifficultyMultiplier(double mult);
+    void aplicarMultiplicadorDificuldade(double mult) { applyDifficultyMultiplier(mult); }
 
-    void definirCorJogador(Color cor) { system.corJogador = cor; }
-    Color obterCorJogador() const { return system.corJogador; }
+    void setPlayerIcon(char icon) { system.playerIcon = icon; }
+    void definirIconeJogador(char icone) { setPlayerIcon(icone); }
+    char getPlayerIcon() const { return system.playerIcon; }
+    char obterIconeJogador() const { return getPlayerIcon(); }
 
-    void definirCorFundoTerminal(Color cor) { system.corFundoTerminal = cor; }
-    Color obterCorFundoTerminal() const { return system.corFundoTerminal; }
+    void setPlayerColor(Color color) { system.playerColor = color; }
+    void definirCorJogador(Color cor) { setPlayerColor(cor); }
+    Color getPlayerColor() const { return system.playerColor; }
+    Color obterCorJogador() const { return getPlayerColor(); }
 
-    TipoAtaque getAttackType() const;
-    bool habilidadeDaClasseConsomeTurno() const;
+    void setTerminalBackgroundColor(Color color) { system.terminalBackgroundColor = color; }
+    void definirCorFundoTerminal(Color cor) { setTerminalBackgroundColor(cor); }
+    Color getTerminalBackgroundColor() const { return system.terminalBackgroundColor; }
+    Color obterCorFundoTerminal() const { return getTerminalBackgroundColor(); }
 
-    void adicionarEfeito(std::unique_ptr<EfeitoStatus> efeito);
-    void processarEfeitosInicioTurno();
-    bool podeAgir(std::string& outMotivoIncapacidade) const;
+    AttackType getAttackType() const;
+    bool classAbilityConsumesTurn() const;
+    bool habilidadeDaClasseConsomeTurno() const { return classAbilityConsumesTurn(); }
 
-    // Fills the vector with the IDs of all active effects (avoids unwanted allocations)
-    void obterIDsEfeitosAtivos(std::vector<EfeitoID>& outIDs) const;
-    void limparEfeitos();
-    void removerEfeito(EfeitoID id);
+    void addEffect(std::unique_ptr<StatusEffect> effect);
+    void adicionarEfeito(std::unique_ptr<StatusEffect> efeito) { addEffect(std::move(efeito)); }
 
-    int calcularDefesaBase(int danoBruto, int danoPerfurante) override;
-    ResultadoDano receberDano(int danoBruto, int danoPerfurante, int danoReduzidoParry, IAttacker* atacante, bool aplicarPassivas = true) override;
-    std::pair<int, int> calcularDanoOfensivoBase() override;
-    int garantirDanoMinimo(int danoAtual) override;
+    void processTurnStartEffects();
+    void processarEfeitosInicioTurno() { processTurnStartEffects(); }
 
-    virtual void executarDrops(Character* currentPlayer, std::vector<std::string>& itensObtidos, int& ouroTotal, int& xpTotal);
+    bool canAct(std::string& outIncapacityReason) const;
+    bool podeAgir(std::string& outMotivoIncapacidade) const { return canAct(outMotivoIncapacidade); }
+
+    // Preenche o vetor com os IDs de todos os efeitos ativos
+    void getActiveEffectIDs(std::vector<EffectID>& outIDs) const;
+    void obterIDsEfeitosAtivos(std::vector<EffectID>& outIDs) const { getActiveEffectIDs(outIDs); }
+
+    void clearEffects();
+    void limparEfeitos() { clearEffects(); }
+
+    void removeEffect(EffectID id);
+    void removerEfeito(EffectID id) { removeEffect(id); }
+
+    DamageResult takeDamage(int rawDamage, int piercingDamage, int parryReducedDamage, IAttacker* attacker, bool applyPassives = true) override;
+    DamageResult receberDano(int danoBruto, int danoPerfurante, int danoReduzidoParry, IAttacker* atacante, bool aplicarPassivas = true) override {
+        return takeDamage(danoBruto, danoPerfurante, danoReduzidoParry, atacante, aplicarPassivas);
+    }
+
+    int calculateBaseDefense(int rawDamage, int piercingDamage) override;
+    int calcularDefesaBase(int danoBruto, int danoPerfurante) override {
+        return calculateBaseDefense(danoBruto, danoPerfurante);
+    }
+
+    std::pair<int, int> calculateBaseOffensiveDamage() override;
+    std::pair<int, int> calcularDanoOfensivoBase() override {
+        return calculateBaseOffensiveDamage();
+    }
+
+    int ensureMinimumDamage(int currentDamage) override;
+    int garantirDanoMinimo(int danoAtual) override {
+        return ensureMinimumDamage(danoAtual);
+    }
+
+    virtual void executeDrops(Character* currentPlayer, std::vector<std::string>& obtainedItems, int& totalGold, int& totalXp);
+    virtual void executarDrops(Character* currentPlayer, std::vector<std::string>& itensObtidos, int& ouroTotal, int& xpTotal) {
+        executeDrops(currentPlayer, itensObtidos, ouroTotal, xpTotal);
+    }
 };
+
+using Personagem = Character;
+using Atributos = Attributes;

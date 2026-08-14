@@ -1,2 +1,2 @@
 #include "RendererProvider.h"
-std::atomic<UIRenderer*> RendererProvider::instancia{nullptr};
+std::atomic<UIRenderer*> RendererProvider::instance{nullptr};

@@ -2,16 +2,16 @@
 #include "../../../entities/interfaces/IAttacker.h"
 #include "../../../entities/interfaces/IDamageable.h"
 
-std::pair<int, int> CalculadoraDano::calcularDanoOfensivoBase(IAttacker* atacante) {
-    if (atacante) {
-        return atacante->calcularDanoOfensivoBase();
+std::pair<int, int> DamageCalculator::calculateOffensiveBaseDamage(IAttacker* attacker) {
+    if (attacker) {
+        return attacker->calculateBaseOffensiveDamage();
     }
     return {0, 0};
 }
 
-int CalculadoraDano::calcularMitigacaoDefensiva(IDamageable* alvo, int danoBruto, int danoPerfurante) {
-    if (alvo) {
-        return alvo->calcularDefesaBase(danoBruto, danoPerfurante);
+int DamageCalculator::calculateDefensiveMitigation(IDamageable* target, int rawDamage, int piercingDamage) {
+    if (target) {
+        return target->calculateBaseDefense(rawDamage, piercingDamage);
     }
-    return danoBruto + danoPerfurante;
+    return rawDamage + piercingDamage;
 }

@@ -109,12 +109,12 @@ void TelaBestiarioRaycaster::display(const std::vector<Character*>& enemies) {
                 textoContexto.push_back("Total de Derrotas: " + std::to_string(derrotas));
 
                 if (info) {
-                    textoContexto.push_back("Nome: " + info->nome);
+                    textoContexto.push_back("Nome: " + info->name);
                     if (!info->habitat.empty()) textoContexto.push_back("Habitat: " + info->habitat);
                     if (!info->lore.empty()) textoContexto.push_back("Lore: " + info->lore);
                     if (!info->funFact.empty()) textoContexto.push_back("Curiosidade: " + info->funFact);
-                    if (!info->habilidadePassiva.empty()) textoContexto.push_back("Passiva: " + info->habilidadePassiva);
-                    for (const auto& atr : info->atributosTexto) textoContexto.push_back(" " + atr);
+                    if (!info->passiveAbility.empty()) textoContexto.push_back("Passiva: " + info->passiveAbility);
+                    for (const auto& atr : info->attributesText) textoContexto.push_back(" " + atr);
                 } else {
                     textoContexto.push_back("Informações detalhadas indisponíveis.");
                 }

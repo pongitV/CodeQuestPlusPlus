@@ -5,46 +5,55 @@
 #include <memory>
 #include "../../../entities/character/Character.h"
 
-
-class EquipamentoEscudo : public BaseEquipment 
+class ShieldEquipment : public BaseEquipment 
 {
 private:
-    std::string nome;
-    int reducaoFixa;
-    int durabilidade;
-    int durabilidadeMaxima;
-    int reqResistencia;
-    int reqSecundario;
-    TipoAtributo tipoSecundario;
+    std::string name;
+    int fixedReduction;
+    int durability;
+    int maxDurability;
+    int reqResistance;
+    int reqSecondary;
+    AttributeType secondaryType;
 
 public:
-    EquipamentoEscudo(const std::string& nome, int reducaoFixa, int durabilidade, int reqResistencia, int reqSecundario, TipoAtributo tipoSecundario, int price = 3);
+    ShieldEquipment(const std::string& name, int fixedReduction, int durability, int reqResistance, int reqSecondary, AttributeType secondaryType, int price = 3);
     
-    int obterReqResistencia() const;
-    int obterReqSecundario() const;
-    TipoAtributo obterTipoSecundario() const;
+    int getReqResistance() const;
+    int getReqSecondary() const;
+    AttributeType getSecondaryType() const;
 
-    std::string getNameItem() const override;
-    TipoEquipamento obterTipo() const override;
+    int obterReqResistencia() const { return getReqResistance(); }
+    int obterReqSecundario() const { return getReqSecondary(); }
+    AttributeType obterTipoSecundario() const { return getSecondaryType(); }
 
-    int obterDurabilidadeAtualEscudo() const override;
-    int obterDurabilidadeMaxima() const;
-    int obterReducaoDanoFixaEscudo() const override;
-    void definirDurabilidade(int novaDurabilidade);
-    void reduzirDurabilidade(int qtd) override;
-    void aumentarDurabilidade(int qtd) override;
+    std::string getItemName() const override;
+    EquipmentType getType() const override;
 
-    std::string obterInfoStatus() const override;
+    int getShieldCurrentDurability() const override;
+    int getCurrentShieldDurability() const { return getShieldCurrentDurability(); }
+    int getMaxDurability() const;
+    int obterDurabilidadeMaxima() const { return getMaxDurability(); }
+    int getShieldFixedDamageReduction() const override;
+    void setDurability(int newDurability);
+    void definirDurabilidade(int novaDurabilidade) { setDurability(novaDurabilidade); }
+    void reduceDurability(int qty) override;
+    void increaseDurability(int qty) override;
+
+    std::string getStatusInfo() const override;
 
 protected:
-    bool checarRequisitosEspecificos(Character* character) const override;
+    bool checkSpecificRequirements(Character* character) const override;
 
 public:
-    bool podeSerEquipadoPor(Character* character) const override;
-    bool isEquipavel() const override { return true; }
-    std::vector<std::string> obterDetalhesInspecao(Character* character = nullptr) const override;
+    bool canBeEquippedBy(Character* character) const override;
+    bool isEquippable() const override { return true; }
+    std::vector<std::string> getInspectionDetails(Character* character = nullptr) const override;
 
-    std::unique_ptr<Item> gerarCopiaMelhorada() const override;
+    std::unique_ptr<Item> generateUpgradedCopy() const override;
 };
 
-std::unique_ptr<Item> fabricarEquipamentoEscudo(ItemID id);
+using EquipamentoEscudo = ShieldEquipment;
+
+std::unique_ptr<Item> buildShieldEquipment(ItemID id);
+inline std::unique_ptr<Item> fabricarEquipamentoEscudo(ItemID id) { return buildShieldEquipment(id); }

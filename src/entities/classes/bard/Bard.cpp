@@ -13,62 +13,62 @@
 #include "../../../ui/screens/combat/ScreenCombat.h"
 #include "../../../core/utils/Color.h"
 
-// --- INFORMACOES DA CLASSE ---
-std::string Bard::getNameClasse() const 
+// --- INFORMAÇÕES DA CLASSE ---
+std::string Bard::getClassName() const 
 {
      return "Bard"; 
 }
 
-const std::vector<std::string>& Bard::obterAparenciaClasseMenu() const 
+const std::vector<std::string>& Bard::getClassMenuAppearance() const 
 {
     static const std::vector<std::string> appearance;
     return appearance;
 }
 
-Attributes Bard::obterAtributosClasse() const
+Attributes Bard::getClassAttributes() const
 {
     return { 0, 10, 10, 3, 10, 10, 10};
 }
 
-std::vector<std::unique_ptr<Item>> Bard::obterEquipamentoClasse() const 
+std::vector<std::unique_ptr<Item>> Bard::getClassEquipment() const 
 {
-    auto equipamentos = ItemFactory::criarKitPocoes();
+    auto equipment = ItemFactory::criarKitPocoes();
     
-    equipamentos.push_back(ItemFactory::criarItem(ItemID::ViolaoEncantado));
-    equipamentos.push_back(ItemFactory::criarItem(ItemID::CapaMagica));
-    equipamentos.push_back(ItemFactory::criarItem(ItemID::TrajeNobre));
-    return equipamentos;
+    equipment.push_back(ItemFactory::criarItem(ItemID::ViolaoEncantado));
+    equipment.push_back(ItemFactory::criarItem(ItemID::CapaMagica));
+    equipment.push_back(ItemFactory::criarItem(ItemID::TrajeNobre));
+    return equipment;
 }
 
 // --- PASSIVA DA CLASSE ---
-std::string Bard::getNamePassivaClasse() const 
+std::string Bard::getClassPassiveName() const 
 { 
     return "Touch the sky"; 
 }
 
-std::string Bard::obterDescricaoPassivaClasse() const 
+std::string Bard::getClassPassiveDescription() const 
 { 
     return "Curas e buffs recebidos sao 40% mais fortes."; 
 }
 
-int Bard::processarCuraPassivaBard(int curaBase) const 
+int Bard::processBardPassiveHealing(int baseHeal) const 
 {
-    return static_cast<int>(curaBase * Constants::BARD_HEAL_MULTIPLIER);
+    return static_cast<int>(baseHeal * Constants::BARD_HEAL_MULTIPLIER);
 }
 
-double Bard::processarMultiplicadorBuffPassivaBard(double multBase) const 
+double Bard::processBardPassiveBuffMultiplier(double baseMultiplier) const 
 {
-    if (multBase > 1.0) return 1.0 + (multBase - 1.0) * 1.4;
-    return multBase;
+    if (baseMultiplier > 1.0) return 1.0 + (baseMultiplier - 1.0) * 1.4;
+    return baseMultiplier;
 }
 
 // --- HABILIDADE DA CLASSE ---
-std::string Bard::obterRecargaHabilidadeClasse() const 
+std::string Bard::getClassAbilityCooldownDescription() const 
 { 
     return "Recarga: 3 turnos (Individuais)."; 
 }
 
-std::string Bard::getNameHabilidadeClasse() const 
+std::string Bard::getClassAbilityName() const 
 { 
     return "Sinfonia do Bard"; 
 }
@@ -78,55 +78,55 @@ std::string Bard::getClassAbilityDescription() const
     return "Possui 3 habilidades: Flashing lights, On sight e Through the wire."; 
 }
 
-void Bard::useClassAbility(Combat* /*combat*/, Character* personagemUsuario, std::vector<Character*>& /*listaDeInimigos*/)
+void Bard::useClassAbility(Combat* /*combat*/, Character* userCharacter, std::vector<Character*>& /*enemyList*/)
 {
-    struct SubHabilidade {
+    struct SubAbility {
         AbilityID id;
-        std::string nome;
-        std::string descricao;
-        std::function<void(Character*)> acao;
+        std::string name;
+        std::string description;
+        std::function<void(Character*)> action;
     };
 
-    const std::array<SubHabilidade, 3> habilidades = {{
-        { AbilityID::FlashingLights, "Flashing lights", "Cura e pula o turno", [this](Character* personagemHabilidade) {
-            personagemHabilidade->definirPularTurnoInimigo(true);
-            int cura = static_cast<int>((personagemHabilidade->getWisdom() * 2) + (personagemHabilidade->obterVidaMaxima() * 0.15));
-            personagemHabilidade->modificarVida(cura);
-            personagemHabilidade->definirCooldown(AbilityID::FlashingLights, 3);
-            std::string msg = DialogFunctions::formatarMsgHabilidade("!Flashing lights! Voce recuperou " + std::to_string(cura) + " HP e encantou os enemies!", Color::GREEN);
-            this->notificarMensagemCombate(msg, msg);
+    const std::array<SubAbility, 3> abilities = {{
+        { AbilityID::FlashingLights, "Flashing lights", "Cura e pula o turno", [this](Character* character) {
+            character->definirPularTurnoInimigo(true);
+            int heal = static_cast<int>((character->getWisdom() * 2) + (character->obterVidaMaxima() * 0.15));
+            character->modificarVida(heal);
+            character->definirCooldown(AbilityID::FlashingLights, 3);
+            std::string msg = DialogFunctions::formatarMsgHabilidade("!Flashing lights! Voce recuperou " + std::to_string(heal) + " HP e encantou os enemies!", Color::GREEN);
+            this->notifyCombatMessage(msg, msg);
         }},
-        { AbilityID::OnSight, "On sight", "1.5x Damage no proximo ataque", [this](Character* personagemHabilidade) {
-            personagemHabilidade->definirMultiplicador(1.5);
-            personagemHabilidade->definirCooldown(AbilityID::OnSight, 3);
-            std::string msg = DialogFunctions::formatarMsgHabilidade(personagemHabilidade->getName() + " tocou 'On sight'! Proximo ataque com 1.5x damage!");
-            this->notificarMensagemCombate(msg, msg);
+        { AbilityID::OnSight, "On sight", "1.5x Damage no proximo ataque", [this](Character* character) {
+            character->definirMultiplicador(1.5);
+            character->definirCooldown(AbilityID::OnSight, 3);
+            std::string msg = DialogFunctions::formatarMsgHabilidade(character->getName() + " tocou 'On sight'! Proximo ataque com 1.5x damage!");
+            this->notifyCombatMessage(msg, msg);
         }},
-        { AbilityID::ThroughTheWire, "Through the wire", "Metade do damage recebido", [this](Character* personagemHabilidade) {
-            personagemHabilidade->adicionarEfeito(std::make_unique<EfeitoMetadeDano>(1));
-            personagemHabilidade->definirCooldown(AbilityID::ThroughTheWire, 3);
+        { AbilityID::ThroughTheWire, "Through the wire", "Metade do damage recebido", [this](Character* character) {
+            character->adicionarEfeito(std::make_unique<HalfDamageEffect>(1));
+            character->definirCooldown(AbilityID::ThroughTheWire, 3);
             std::string msg = DialogFunctions::formatarMsgHabilidade("!Through the wire! Voce esta protegido contra metade do damage recebido!", Color::CYAN);
-            this->notificarMensagemCombate(msg, msg);
+            this->notifyCombatMessage(msg, msg);
         }}
     }};
 
-    std::vector<std::string> opcoesHabilidades;
-    for (size_t i = 0; i < habilidades.size(); ++i) {
-        int cd = personagemUsuario->obterRecargaHabilidade(habilidades[i].id);
-        opcoesHabilidades.push_back(habilidades[i].nome + " (" + habilidades[i].descricao + " | Recarga: " + std::to_string(cd) + ")");
+    std::vector<std::string> abilityOptions;
+    for (size_t i = 0; i < abilities.size(); ++i) {
+        int cd = userCharacter->obterRecargaHabilidade(abilities[i].id);
+        abilityOptions.push_back(abilities[i].name + " (" + abilities[i].description + " | Recarga: " + std::to_string(cd) + ")");
     }
-    opcoesHabilidades.push_back("CANCELAR");
+    abilityOptions.push_back("CANCELAR");
 
-    int escolha = InputControl::lerSelecaoMenuComSetas(opcoesHabilidades, false, TelaCombate::margemCombate());
+    int choice = InputControl::readMenuSelectionWithArrows(abilityOptions, false, TelaCombate::margemCombate());
 
-    if (escolha == static_cast<int>(habilidades.size())) {
-        personagemUsuario->definirHabilidadeCancelada(true);
+    if (choice == static_cast<int>(abilities.size())) {
+        userCharacter->definirHabilidadeCancelada(true);
         return;
     }
     
-    const auto& hab = habilidades[escolha];
-    int cd = personagemUsuario->obterRecargaHabilidade(hab.id);
-    if (verificarEReportarRecarga(personagemUsuario, cd, hab.nome)) return;
+    const auto& hab = abilities[choice];
+    int cd = userCharacter->obterRecargaHabilidade(hab.id);
+    if (checkAndReportCooldown(userCharacter, cd, hab.name)) return;
 
-    hab.acao(personagemUsuario);
+    hab.action(userCharacter);
 }

@@ -5,23 +5,25 @@
 
 #include "../classes/ClassBase.h"
 
-class ClassBaseInimigo : public ClassBase
+class ClassBaseEnemy : public ClassBase
 {
 public:
-    std::string getNameClasse() const override;
-    ClassType obterClassType() const override { return ClassType::Nenhum; }
-    Attributes obterAtributosClasse() const override;
-    const std::vector<std::string>& obterAparenciaClasseMenu() const override;
-    std::vector<std::unique_ptr<Item>> obterEquipamentoClasse() const override;
+    std::string getClassName() const override;
+    ClassType getClassType() const override { return ClassType::None; }
+    Attributes getClassAttributes() const override;
+    const std::vector<std::string>& getClassMenuAppearance() const override;
+    std::vector<std::unique_ptr<Item>> getClassEquipment() const override;
 
-    std::string getNamePassivaClasse() const override;
-    std::string obterDescricaoPassivaClasse() const override;
-    std::string obterRecargaHabilidadeClasse() const override;
+    std::string getClassPassiveName() const override;
+    std::string getClassPassiveDescription() const override;
+    std::string getClassAbilityCooldownDescription() const override;
 
-    void useClassAbility(Combat* combat, Character* personagemUsuario, std::vector<Character*>& listaDeInimigos) override;
-    std::string getNameHabilidadeClasse() const override;
+    void useClassAbility(Combat* combat, Character* userCharacter, std::vector<Character*>& enemyList) override;
+    std::string getClassAbilityName() const override;
     std::string getClassAbilityDescription() const override;
     
-    TipoAtaque getAttackType() const override;
+    AttackType getAttackType() const override;
     bool abilityConsumesTurn() const override;
 };
+
+using ClassBaseInimigo = ClassBaseEnemy;

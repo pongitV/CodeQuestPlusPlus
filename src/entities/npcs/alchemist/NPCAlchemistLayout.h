@@ -109,4 +109,8 @@ namespace NPCAlchemistLayouts {
                                         #=                                        *@@@@@%%+                   
                                                                                   .#@*+##:                    
 )");
+    inline const auto& alchemistArt = arteAlchemist;
+    inline const auto& arteAlquimista = arteAlchemist;
 }
+
+namespace NPCAlquimistaLayouts = NPCAlchemistLayouts;

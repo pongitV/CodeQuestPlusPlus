@@ -27,41 +27,41 @@ std::atomic<bool> Debug::isNoclipActive{false};
 std::atomic<bool> Debug::isOneHitKillActive{false};
 std::atomic<bool> Debug::isSpeedHackActive{false};
 
-bool Debug::isDebugKey(char tecla) {
-    if (tecla == '=' || tecla == '\\' || tecla == '`') return true;
-    auto isPressed = [](int key) { return (GetAsyncKeyState(key) & 0x8000) != 0; };
+bool Debug::isDebugKey(char key) {
+    if (key == '=' || key == '\\' || key == '`') return true;
+    auto isPressed = [](int k) { return (GetAsyncKeyState(k) & 0x8000) != 0; };
     return isPressed(VK_F12) || isPressed(VK_OEM_PLUS) || isPressed(0xBB);
 }
 
-void Debug::displayDebugMenu(Character* jogador) {
+void Debug::showDebugMenu(Character* player) {
     ClipCursor(nullptr);
-    GameWindow::mostrarCursor();
+    GameWindow::showCursor();
     InputControl::clearBuffer();
 
-    std::string mensagemFeedback = "";
+    std::string feedbackMessage = "";
     bool inMenu = true;
 
     while (inMenu) {
-        int ouro = (jogador && jogador->obterInventario()) ? jogador->obterInventario()->obterOuro() : 0;
-        int nivel = jogador ? jogador->getLevel() : 1;
-        int hp = jogador ? jogador->obterVida() : 0;
-        int hpMax = jogador ? jogador->obterVidaMaxima() : 0;
-        int str = jogador ? jogador->getStrength() : 0;
-        int dex = jogador ? jogador->getDexterity() : 0;
-        int res = jogador ? jogador->getResistance() : 0;
-        int con = jogador ? jogador->getConstitution() : 0;
-        int intel = jogador ? jogador->getInteligencia() : 0;
-        int wis = jogador ? jogador->getWisdom() : 0;
-        int xp = jogador ? jogador->getXpAtual() : 0;
+        int gold = (player && player->obterInventario()) ? player->obterInventario()->obterOuro() : 0;
+        int level = player ? player->getLevel() : 1;
+        int hp = player ? player->obterVida() : 0;
+        int maxHp = player ? player->obterVidaMaxima() : 0;
+        int str = player ? player->getStrength() : 0;
+        int dex = player ? player->getDexterity() : 0;
+        int res = player ? player->getResistance() : 0;
+        int con = player ? player->getConstitution() : 0;
+        int intel = player ? player->getInteligencia() : 0;
+        int wis = player ? player->getWisdom() : 0;
+        int xp = player ? player->getXpAtual() : 0;
 
-        std::vector<std::string> opcoes = {
+        std::vector<std::string> options = {
             "GOD MODE: " + std::string(isGodModeActive ? "[ATIVADO]" : "[DESATIVADO]"),
             "NOCLIP (3D): " + std::string(isNoclipActive ? "[ATIVADO]" : "[DESATIVADO]"),
             "ONE-HIT KILL: " + std::string(isOneHitKillActive ? "[ATIVADO]" : "[DESATIVADO]"),
             "SUPER VELOCIDADE: " + std::string(isSpeedHackActive ? "[ATIVADO]" : "[DESATIVADO]"),
-            "DEFINIR OURO (Atual: " + std::to_string(ouro) + " G)",
-            "DEFINIR NIVEL (Atual: Lv." + std::to_string(nivel) + ")",
-            "DEFINIR VIDA MAXIMA (Atual: " + std::to_string(hp) + "/" + std::to_string(hpMax) + " HP)",
+            "DEFINIR OURO (Atual: " + std::to_string(gold) + " G)",
+            "DEFINIR NIVEL (Atual: Lv." + std::to_string(level) + ")",
+            "DEFINIR VIDA MAXIMA (Atual: " + std::to_string(hp) + "/" + std::to_string(maxHp) + " HP)",
             "DEFINIR FORCA (STR: " + std::to_string(str) + ")",
             "DEFINIR DESTREZA (DEX: " + std::to_string(dex) + ")",
             "DEFINIR RESISTENCIA (RES: " + std::to_string(res) + ")",
@@ -77,190 +77,190 @@ void Debug::displayDebugMenu(Character* jogador) {
             "VOLTAR AO JOGO"
         };
 
-        auto construtorCaixa = [&](UIDynamicBox& box, int selecaoAtual, float logicalW, float logicalH) {
+        auto boxBuilder = [&](UIDynamicBox& box, int currentSelection, float logicalW, float logicalH) {
             box.SetTitle(L"[ PAINEL DE CHEATS / DEBUG ]", D2D1::ColorF(1.0f, 0.84f, 0.0f));
 
             float startY = 75.0f;
             float stepY = 25.0f;
 
-            for (int i = 0; i < (int)opcoes.size(); ++i) {
-                std::wstring wOpc = MenuRaycasterUtils::utf8_to_wstring(opcoes[i]);
-                D2D1_COLOR_F cor = (i == selecaoAtual) ? D2D1::ColorF(0.0f, 1.0f, 0.5f) : D2D1::ColorF(0.85f, 0.85f, 0.85f);
-                MenuRaycasterUtils::adicionarOpcaoMenu(box, wOpc, logicalW / 2.0f, startY + i * stepY, (i == selecaoAtual), cor, true);
+            for (int i = 0; i < (int)options.size(); ++i) {
+                std::wstring wOpc = MenuRaycasterUtils::utf8_to_wstring(options[i]);
+                D2D1_COLOR_F cor = (i == currentSelection) ? D2D1::ColorF(0.0f, 1.0f, 0.5f) : D2D1::ColorF(0.85f, 0.85f, 0.85f);
+                MenuRaycasterUtils::adicionarOpcaoMenu(box, wOpc, logicalW / 2.0f, startY + i * stepY, (i == currentSelection), cor, true);
             }
 
-            if (!mensagemFeedback.empty()) {
-                std::wstring wFeed = MenuRaycasterUtils::utf8_to_wstring(mensagemFeedback);
-                box.AddText(wFeed, logicalW / 2.0f, startY + opcoes.size() * stepY + 12.0f, 16.0f, D2D1::ColorF(0.0f, 0.95f, 1.0f), true);
+            if (!feedbackMessage.empty()) {
+                std::wstring wFeed = MenuRaycasterUtils::utf8_to_wstring(feedbackMessage);
+                box.AddText(wFeed, logicalW / 2.0f, startY + options.size() * stepY + 12.0f, 16.0f, D2D1::ColorF(0.0f, 0.95f, 1.0f), true);
             }
 
-            box.AddText(L"[ENTER / ESPACO] Alterar / Digitar Valor  |  [ESC] Sair", logicalW / 2.0f, startY + opcoes.size() * stepY + 40.0f, 14.0f, D2D1::ColorF(0.6f, 0.6f, 0.6f), true);
+            box.AddText(L"[ENTER / ESPACO] Alterar / Digitar Valor  |  [ESC] Sair", logicalW / 2.0f, startY + options.size() * stepY + 40.0f, 14.0f, D2D1::ColorF(0.6f, 0.6f, 0.6f), true);
         };
 
-        int escolha = MenuRaycasterUtils::renderizarPopupCaixa({}, {}, (int)opcoes.size(), construtorCaixa);
+        int choice = MenuRaycasterUtils::renderizarPopupCaixa({}, {}, (int)options.size(), boxBuilder);
 
-        if (escolha == -1 || escolha == 19) {
+        if (choice == -1 || choice == 19) {
             inMenu = false;
-        } else if (escolha == 0) {
+        } else if (choice == 0) {
             isGodModeActive = !isGodModeActive.load();
-            if (jogador && isGodModeActive) {
-                jogador->obterAtributosFinais().health += 99999;
-                jogador->strengthrRecalculoCache();
-                jogador->definirVida(jogador->obterVidaMaxima());
+            if (player && isGodModeActive) {
+                player->obterAtributosFinais().health += 99999;
+                player->strengthrRecalculoCache();
+                player->definirVida(player->obterVidaMaxima());
             }
-            mensagemFeedback = isGodModeActive ? "[!] GODMODE ATIVADO!" : "[!] GODMODE DESATIVADO!";
-        } else if (escolha == 1) {
+            feedbackMessage = isGodModeActive ? "[!] GODMODE ATIVADO!" : "[!] GODMODE DESATIVADO!";
+        } else if (choice == 1) {
             isNoclipActive = !isNoclipActive.load();
-            mensagemFeedback = isNoclipActive ? "[!] NOCLIP ATIVADO!" : "[!] NOCLIP DESATIVADO!";
-        } else if (escolha == 2) {
+            feedbackMessage = isNoclipActive ? "[!] NOCLIP ATIVADO!" : "[!] NOCLIP DESATIVADO!";
+        } else if (choice == 2) {
             isOneHitKillActive = !isOneHitKillActive.load();
-            mensagemFeedback = isOneHitKillActive ? "[!] ONE-HIT KILL ATIVADO!" : "[!] ONE-HIT KILL DESATIVADO!";
-        } else if (escolha == 3) {
+            feedbackMessage = isOneHitKillActive ? "[!] ONE-HIT KILL ATIVADO!" : "[!] ONE-HIT KILL DESATIVADO!";
+        } else if (choice == 3) {
             isSpeedHackActive = !isSpeedHackActive.load();
-            mensagemFeedback = isSpeedHackActive ? "[!] SUPER VELOCIDADE ATIVADA!" : "[!] SUPER VELOCIDADE DESATIVADA!";
-        } else if (escolha == 4) { // OURO
+            feedbackMessage = isSpeedHackActive ? "[!] SUPER VELOCIDADE ATIVADA!" : "[!] SUPER VELOCIDADE DESATIVADA!";
+        } else if (choice == 4) { // OURO
             std::string input = MenuRaycasterUtils::lerEntradaTextoD2D(L"Digite a quantidade de OURO desejada:", 9);
             if (!input.empty()) {
                 try {
                     int val = std::stoi(input);
                     if (val < 0) val = 0;
-                    if (jogador && jogador->obterInventario()) {
-                        int atualVal = jogador->obterInventario()->obterOuro();
-                        jogador->ganharOuro(val - atualVal);
-                        mensagemFeedback = "[!] Ouro alterado para " + std::to_string(val) + " G!";
+                    if (player && player->obterInventario()) {
+                        int currentVal = player->obterInventario()->obterOuro();
+                        player->ganharOuro(val - currentVal);
+                        feedbackMessage = "[!] Ouro alterado para " + std::to_string(val) + " G!";
                     }
                 } catch (...) {}
             }
-        } else if (escolha == 5) { // NIVEL
+        } else if (choice == 5) { // NIVEL
             std::string input = MenuRaycasterUtils::lerEntradaTextoD2D(L"Digite o NIVEL desejado (1 - 100):", 4);
             if (!input.empty()) {
                 try {
                     int val = std::stoi(input);
-                    if (val >= 1 && val <= 100 && jogador) {
-                        jogador->definirNivel(val);
-                        mensagemFeedback = "[!] Nível alterado para " + std::to_string(val) + "!";
+                    if (val >= 1 && val <= 100 && player) {
+                        player->definirNivel(val);
+                        feedbackMessage = "[!] Nível alterado para " + std::to_string(val) + "!";
                     }
                 } catch (...) {}
             }
-        } else if (escolha == 6) { // VIDA MAXIMA
+        } else if (choice == 6) { // VIDA MAXIMA
             std::string input = MenuRaycasterUtils::lerEntradaTextoD2D(L"Digite a VIDA MAXIMA desejada:", 7);
             if (!input.empty()) {
                 try {
                     int val = std::stoi(input);
-                    if (val >= 1 && jogador) {
-                        jogador->obterAtributosFinais().health = val;
-                        jogador->strengthrRecalculoCache();
-                        jogador->definirVida(val);
-                        mensagemFeedback = "[!] Vida Máxima definida para " + std::to_string(val) + " HP!";
+                    if (val >= 1 && player) {
+                        player->obterAtributosFinais().health = val;
+                        player->strengthrRecalculoCache();
+                        player->definirVida(val);
+                        feedbackMessage = "[!] Vida Máxima definida para " + std::to_string(val) + " HP!";
                     }
                 } catch (...) {}
             }
-        } else if (escolha == 7) { // FORCA
+        } else if (choice == 7) { // FORCA
             std::string input = MenuRaycasterUtils::lerEntradaTextoD2D(L"Digite o valor de FORCA:", 5);
             if (!input.empty()) {
                 try {
                     int val = std::stoi(input);
-                    if (val >= 1 && jogador) {
-                        jogador->obterAtributosFinais().strength = val;
-                        jogador->strengthrRecalculoCache();
-                        mensagemFeedback = "[!] Força alterada para " + std::to_string(val) + "!";
+                    if (val >= 1 && player) {
+                        player->obterAtributosFinais().strength = val;
+                        player->strengthrRecalculoCache();
+                        feedbackMessage = "[!] Força alterada para " + std::to_string(val) + "!";
                     }
                 } catch (...) {}
             }
-        } else if (escolha == 8) { // DESTREZA
+        } else if (choice == 8) { // DESTREZA
             std::string input = MenuRaycasterUtils::lerEntradaTextoD2D(L"Digite o valor de DESTREZA:", 5);
             if (!input.empty()) {
                 try {
                     int val = std::stoi(input);
-                    if (val >= 1 && jogador) {
-                        jogador->obterAtributosFinais().dexterity = val;
-                        jogador->strengthrRecalculoCache();
-                        mensagemFeedback = "[!] Destreza alterada para " + std::to_string(val) + "!";
+                    if (val >= 1 && player) {
+                        player->obterAtributosFinais().dexterity = val;
+                        player->strengthrRecalculoCache();
+                        feedbackMessage = "[!] Destreza alterada para " + std::to_string(val) + "!";
                     }
                 } catch (...) {}
             }
-        } else if (escolha == 9) { // RESISTENCIA
+        } else if (choice == 9) { // RESISTENCIA
             std::string input = MenuRaycasterUtils::lerEntradaTextoD2D(L"Digite o valor de RESISTENCIA:", 5);
             if (!input.empty()) {
                 try {
                     int val = std::stoi(input);
-                    if (val >= 1 && jogador) {
-                        jogador->obterAtributosFinais().resistance = val;
-                        jogador->strengthrRecalculoCache();
-                        mensagemFeedback = "[!] Resistência alterada para " + std::to_string(val) + "!";
+                    if (val >= 1 && player) {
+                        player->obterAtributosFinais().resistance = val;
+                        player->strengthrRecalculoCache();
+                        feedbackMessage = "[!] Resistência alterada para " + std::to_string(val) + "!";
                     }
                 } catch (...) {}
             }
-        } else if (escolha == 10) { // CONSTITUICAO
+        } else if (choice == 10) { // CONSTITUICAO
             std::string input = MenuRaycasterUtils::lerEntradaTextoD2D(L"Digite o valor de CONSTITUICAO:", 5);
             if (!input.empty()) {
                 try {
                     int val = std::stoi(input);
-                    if (val >= 1 && jogador) {
-                        jogador->obterAtributosFinais().constitution = val;
-                        jogador->strengthrRecalculoCache();
-                        mensagemFeedback = "[!] Constituição alterada para " + std::to_string(val) + "!";
+                    if (val >= 1 && player) {
+                        player->obterAtributosFinais().constitution = val;
+                        player->strengthrRecalculoCache();
+                        feedbackMessage = "[!] Constituição alterada para " + std::to_string(val) + "!";
                     }
                 } catch (...) {}
             }
-        } else if (escolha == 11) { // INTELIGENCIA
+        } else if (choice == 11) { // INTELIGENCIA
             std::string input = MenuRaycasterUtils::lerEntradaTextoD2D(L"Digite o valor de INTELIGENCIA:", 5);
             if (!input.empty()) {
                 try {
                     int val = std::stoi(input);
-                    if (val >= 1 && jogador) {
-                        jogador->obterAtributosFinais().intelligence = val;
-                        jogador->strengthrRecalculoCache();
-                        mensagemFeedback = "[!] Inteligência alterada para " + std::to_string(val) + "!";
+                    if (val >= 1 && player) {
+                        player->obterAtributosFinais().intelligence = val;
+                        player->strengthrRecalculoCache();
+                        feedbackMessage = "[!] Inteligência alterada para " + std::to_string(val) + "!";
                     }
                 } catch (...) {}
             }
-        } else if (escolha == 12) { // SABEDORIA
+        } else if (choice == 12) { // SABEDORIA
             std::string input = MenuRaycasterUtils::lerEntradaTextoD2D(L"Digite o valor de SABEDORIA:", 5);
             if (!input.empty()) {
                 try {
                     int val = std::stoi(input);
-                    if (val >= 1 && jogador) {
-                        jogador->obterAtributosFinais().wisdom = val;
-                        jogador->strengthrRecalculoCache();
-                        mensagemFeedback = "[!] Sabedoria alterada para " + std::to_string(val) + "!";
+                    if (val >= 1 && player) {
+                        player->obterAtributosFinais().wisdom = val;
+                        player->strengthrRecalculoCache();
+                        feedbackMessage = "[!] Sabedoria alterada para " + std::to_string(val) + "!";
                     }
                 } catch (...) {}
             }
-        } else if (escolha == 13) { // XP
+        } else if (choice == 13) { // XP
             std::string input = MenuRaycasterUtils::lerEntradaTextoD2D(L"Digite a quantidade de XP:", 7);
             if (!input.empty()) {
                 try {
                     int val = std::stoi(input);
-                    if (val >= 0 && jogador) {
-                        jogador->definirXpAtual(val);
-                        mensagemFeedback = "[!] XP alterado para " + std::to_string(val) + "!";
+                    if (val >= 0 && player) {
+                        player->definirXpAtual(val);
+                        feedbackMessage = "[!] XP alterado para " + std::to_string(val) + "!";
                     }
                 } catch (...) {}
             }
-        } else if (escolha == 14) { // RESTAURAR VIDA
-            if (jogador) jogador->definirVida(jogador->obterVidaMaxima());
-            mensagemFeedback = "[!] Vida restaurada para 100% HP!";
-        } else if (escolha == 15) { // REGISTRAR NPCS
+        } else if (choice == 14) { // RESTAURAR VIDA
+            if (player) player->definirVida(player->obterVidaMaxima());
+            feedbackMessage = "[!] Vida restaurada para 100% HP!";
+        } else if (choice == 15) { // REGISTRAR NPCS
             Diary::instance().registerNPC("Bjorn (Blacksmith)");
             Diary::instance().registerNPC("Franchesco (Merchant)");
             Diary::instance().registerNPC("Morgana (MageNPC)");
             Diary::instance().registerNPC("Anok (Estilista)");
             Diary::instance().registerNPC("Priest Benedito");
-            mensagemFeedback = "[!] Todos os NPCs foram registrados no Diário!";
-        } else if (escolha == 16) { // BESTIARIO
+            feedbackMessage = "[!] Todos os NPCs foram registrados no Diário!";
+        } else if (choice == 16) { // BESTIARIO
             for (const auto& nome : Bestiary::instance().getEnemiesOrderedByDifficulty()) {
                 Bestiary::instance().registerFirstSight(nome);
                 Bestiary::instance().registerDefeat(nome);
             }
-            mensagemFeedback = "[!] Todos os inimigos foram desbloqueados no Bestiário!";
-        } else if (escolha == 17) { // VIAGEM RAPIDA
+            feedbackMessage = "[!] Todos os inimigos foram desbloqueados no Bestiário!";
+        } else if (choice == 17) { // VIAGEM RAPIDA
             Progression::instance().setFlag(Flags::Visited_Forest, true);
             Progression::instance().setFlag(Flags::Visited_KingdomBridge, true);
             Progression::instance().setFlag(Flags::Visited_Kingdom, true);
             Progression::instance().setFlag(Flags::Discovered_Maps, true);
-            mensagemFeedback = "[!] Viagem rápida desbloqueada para todos os mapas!";
-        } else if (escolha == 18) { // INICIAR COMBATE PERSONALIZADO
+            feedbackMessage = "[!] Viagem rápida desbloqueada para todos os mapas!";
+        } else if (choice == 18) { // INICIAR COMBATE PERSONALIZADO
             std::vector<std::string> especies = {
                 "Goblin",
                 "Slime",
@@ -294,24 +294,24 @@ void Debug::displayDebugMenu(Character* jogador) {
                     } catch (...) {}
                 }
 
-                std::vector<std::unique_ptr<Character>> inimigos;
+                std::vector<std::unique_ptr<Character>> enemies;
                 switch (escolhaEspecie) {
-                    case 0: inimigos = EnemyCreator::createGoblinEnemy(qtd); break;
-                    case 1: inimigos = EnemyCreator::createSlimeEnemy(qtd); break;
-                    case 2: inimigos = EnemyCreator::createFairyEnemy(qtd); break;
-                    case 3: inimigos = EnemyCreator::createExiledOrcEnemy(qtd); break;
-                    case 4: inimigos = EnemyCreator::createForestAbominationEnemy(qtd); break;
-                    case 5: inimigos = EnemyCreator::createTrollEnemy(qtd); break;
-                    case 6: inimigos = EnemyCreator::createMimicEnemy(qtd); break;
-                    case 7: inimigos = EnemyCreator::createMahoragaEnemy(qtd); break;
+                    case 0: enemies = EnemyCreator::createGoblinEnemy(qtd); break;
+                    case 1: enemies = EnemyCreator::createSlimeEnemy(qtd); break;
+                    case 2: enemies = EnemyCreator::createFairyEnemy(qtd); break;
+                    case 3: enemies = EnemyCreator::createExiledOrcEnemy(qtd); break;
+                    case 4: enemies = EnemyCreator::createForestAbominationEnemy(qtd); break;
+                    case 5: enemies = EnemyCreator::createTrollEnemy(qtd); break;
+                    case 6: enemies = EnemyCreator::createMimicEnemy(qtd); break;
+                    case 7: enemies = EnemyCreator::createMahoragaEnemy(qtd); break;
                 }
 
-                if (!inimigos.empty() && jogador) {
+                if (!enemies.empty() && player) {
                     std::unique_ptr<ICombateUI> ui = nullptr;
                     if (GerenciadorPerspectiva::obterInstancia().isVisao3DAtiva()) {
                         ui = std::make_unique<CombateRaycasterUIImpl>();
                     }
-                    Combat combat(jogador, std::move(inimigos), std::move(ui));
+                    Combat combat(player, std::move(enemies), std::move(ui));
                     if (GerenciadorPerspectiva::obterInstancia().isVisao3DAtiva()) {
                         combat.setContexto3D(true, MapControllera::obterMatrizDoMapaAtual(),
                                              MapControllera::obterPosCamera3DX(),
@@ -320,7 +320,7 @@ void Debug::displayDebugMenu(Character* jogador) {
                                              MapControllera::obterTituloMapaAtual());
                     }
                     combat.iniciarCombate();
-                    mensagemFeedback = "[!] Combate finalizado!";
+                    feedbackMessage = "[!] Combate finalizado!";
                 }
             }
         }

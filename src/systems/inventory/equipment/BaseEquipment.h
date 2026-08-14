@@ -9,22 +9,28 @@
 class BaseEquipment : public Item 
 {
 protected:
-    virtual bool checarRequisitosEspecificos(Character* /*character*/) const { return true; }
+    virtual bool checkSpecificRequirements(Character* /*character*/) const { return true; }
+    virtual bool checarRequisitosEspecificos(Character* character) const { return checkSpecificRequirements(character); }
 
 public:
     BaseEquipment(int price = 3) : Item(price) {}
     virtual ~BaseEquipment() = default;
 
-    bool isEquipavel() const override { return true; }
+    bool isEquippable() const override { return true; }
 
-    bool podeSerEquipadoPor(Character* character) const override {
+    bool canBeEquippedBy(Character* character) const override {
         if (!character) return false;
-        return checarRequisitosEspecificos(character);
+        return checkSpecificRequirements(character);
     }
 
+    std::vector<std::string> getBaseInspectionDetails(const std::string& typeName) const {
+        std::vector<std::string> details;
+        details.push_back(" > Tipo: " + typeName);
+        return details;
+    }
     std::vector<std::string> obterDetalhesInspecaoBase(const std::string& tipoNome) const {
-        std::vector<std::string> detalhes;
-        detalhes.push_back(" > Tipo: " + tipoNome);
-        return detalhes;
+        return getBaseInspectionDetails(tipoNome);
     }
 };
+
+using EquipamentoBase = BaseEquipment;

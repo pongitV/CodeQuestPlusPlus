@@ -9,51 +9,51 @@
 #include "../../../ui/screens/combat/ScreenCombat.h"
 #include "../../../core/utils/Color.h"
 
-// --- INFORMACOES DA CLASSE ---
-std::string Mage::getNameClasse() const 
+// --- INFORMAÇÕES DA CLASSE ---
+std::string Mage::getClassName() const 
 {
      return "Mage"; 
 }
 
-const std::vector<std::string>& Mage::obterAparenciaClasseMenu() const 
+const std::vector<std::string>& Mage::getClassMenuAppearance() const 
 {
     static const std::vector<std::string> appearance;
     return appearance;
 }
 
-Attributes Mage::obterAtributosClasse() const
+Attributes Mage::getClassAttributes() const
 {
     return { 0, 5, 5, 3, 10, 15, 15 };
 }
 
-std::vector<std::unique_ptr<Item>> Mage::obterEquipamentoClasse() const 
+std::vector<std::unique_ptr<Item>> Mage::getClassEquipment() const 
 {
-    auto equipamentos = ItemFactory::criarKitPocoes();
+    auto equipment = ItemFactory::criarKitPocoes();
 
-    equipamentos.push_back(ItemFactory::criarItem(ItemID::CajadoCristal));
-    equipamentos.push_back(ItemFactory::criarItem(ItemID::BarreiraMagica));
-    equipamentos.push_back(ItemFactory::criarItem(ItemID::Tunica));
-    return equipamentos;
+    equipment.push_back(ItemFactory::criarItem(ItemID::CajadoCristal));
+    equipment.push_back(ItemFactory::criarItem(ItemID::BarreiraMagica));
+    equipment.push_back(ItemFactory::criarItem(ItemID::Tunica));
+    return equipment;
 }
 
 // --- PASSIVA DA CLASSE ---
-std::string Mage::getNamePassivaClasse() const 
+std::string Mage::getClassPassiveName() const 
 { 
     return "Foco arcano"; 
 }
 
-std::string Mage::obterDescricaoPassivaClasse() const 
+std::string Mage::getClassPassiveDescription() const 
 { 
     return "Ataques ressoam (25% em area) ou causam +25% de damage em alvo unico."; 
 }
 
 // --- HABILIDADE DA CLASSE ---
-std::string Mage::obterRecargaHabilidadeClasse() const 
+std::string Mage::getClassAbilityCooldownDescription() const 
 { 
     return "Recarga: 3 turnos."; 
 }
 
-std::string Mage::getNameHabilidadeClasse() const 
+std::string Mage::getClassAbilityName() const 
 { 
     return "Canalizacao arcana"; 
 }
@@ -63,48 +63,48 @@ std::string Mage::getClassAbilityDescription() const
     return "Pula seu turno para se defender e dobra o damage no proximo turno. Recarga: 3 turnos."; 
 }
 
-void Mage::useClassAbility(Combat* /*combat*/, Character* personagemUsuario, std::vector<Character*>& /*listaDeInimigos*/) 
+void Mage::useClassAbility(Combat* /*combat*/, Character* userCharacter, std::vector<Character*>& /*enemyList*/) 
 {
-    int turnosRestantes = personagemUsuario->obterRecargaHabilidade(AbilityID::CanalizacaoArcana);
-    if (verificarEReportarRecarga(personagemUsuario, turnosRestantes, getNameHabilidadeClasse())) return;
+    int remainingTurns = userCharacter->obterRecargaHabilidade(AbilityID::ArcaneChanneling);
+    if (checkAndReportCooldown(userCharacter, remainingTurns, getClassAbilityName())) return;
     
-    personagemUsuario->definirMultiplicador(2.0);
-    personagemUsuario->adicionarEfeito(std::make_unique<EfeitoBuffAtributos>(2)); 
-    personagemUsuario->definirCooldown(AbilityID::CanalizacaoArcana, 4);
+    userCharacter->definirMultiplicador(2.0);
+    userCharacter->adicionarEfeito(std::make_unique<AttributeBuffEffect>(2)); 
+    userCharacter->definirCooldown(AbilityID::ArcaneChanneling, 4);
     
-    Item* escudo = personagemUsuario->obterEscudo();
-    if (escudo) {
-        personagemUsuario->definirDefendendo(true);
-        std::string msg = DialogFunctions::formatarMsgHabilidade("Canalizacao arcana! Defendendo com " + escudo->getNameItem() + "! 2x Damage no prox. ataque!");
-        notificarMensagemCombate(msg, msg);
+    Item* shield = userCharacter->obterEscudo();
+    if (shield) {
+        userCharacter->definirDefendendo(true);
+        std::string msg = DialogFunctions::formatarMsgHabilidade("Canalizacao arcana! Defendendo com " + shield->getNameItem() + "! 2x Damage no prox. ataque!");
+        notifyCombatMessage(msg, msg);
     } else {
         std::string msg = DialogFunctions::formatarMsgHabilidade("Canalizacao arcana! Foco magico para 2x Damage no proximo ataque!");
-        notificarMensagemCombate(msg, msg);
+        notifyCombatMessage(msg, msg);
     }
 }
 
-// --- PROCESSAMENTO DE DANO  ---
-int Mage::processarDanoPreAtaque(Character* /*atacante*/, Character* defensor, int baseDamage, bool isAtacanteJogador, size_t qtdInimigos) {
-    if (defensor == nullptr) return baseDamage;
-    if (!isAtacanteJogador || qtdInimigos <= 1) {
-        int danoAumentado = static_cast<int>(baseDamage * 1.25);
+// --- PROCESSAMENTO DE DANO ---
+int Mage::processPreAttackDamage(Character* /*attacker*/, Character* defender, int baseDamage, bool isAttackerPlayer, size_t enemyCount) {
+    if (defender == nullptr) return baseDamage;
+    if (!isAttackerPlayer || enemyCount <= 1) {
+        int increasedDamage = static_cast<int>(baseDamage * 1.25);
         std::string logMsg = DialogFunctions::formatarMsgHabilidade("Foco Arcano: Damage concentrado aumentado em 25%!", Color::MAGENTA);
-        notificarMensagemCombate(logMsg, logMsg);
-        return danoAumentado;
+        notifyCombatMessage(logMsg, logMsg);
+        return increasedDamage;
     }
     return baseDamage;
 }
 
-void Mage::processarDanoPosAtaque(Character* atacante, Character* alvoAtual, Character* defensorPrincipal, int baseDamage, int danoPerfurante, const std::function<void(Character*, Character*, int, int)>& applyDamage, bool isAtacanteJogador, bool isArea, bool& ativouPassiva) {
-    if (isAtacanteJogador && !isArea && alvoAtual != defensorPrincipal && alvoAtual->obterVida() > 0) {
-        if (!ativouPassiva) {
-            int danoAreaMsg = static_cast<int>(baseDamage * 0.25);
-            std::string logMsg = DialogFunctions::formatarMsgHabilidade("Foco Arcano: A magia ressoa, causando " + std::to_string(danoAreaMsg) + " de damage aos enemies proximos!", Color::MAGENTA);
-            notificarMensagemCombate(logMsg, logMsg);
-            ativouPassiva = true;
+void Mage::processPostAttackDamage(Character* attacker, Character* currentTarget, Character* mainDefender, int baseDamage, int piercingDamage, const std::function<void(Character*, Character*, int, int)>& applyDamage, bool isAttackerPlayer, bool isArea, bool& triggeredPassive) {
+    if (isAttackerPlayer && !isArea && currentTarget != mainDefender && currentTarget->obterVida() > 0) {
+        if (!triggeredPassive) {
+            int areaDmgMsg = static_cast<int>(baseDamage * 0.25);
+            std::string logMsg = DialogFunctions::formatarMsgHabilidade("Foco Arcano: A magia ressoa, causando " + std::to_string(areaDmgMsg) + " de damage aos enemies proximos!", Color::MAGENTA);
+            notifyCombatMessage(logMsg, logMsg);
+            triggeredPassive = true;
         }
-        int danoArea = static_cast<int>(baseDamage * 0.25);
-        int perfuranteArea = static_cast<int>(danoPerfurante * 0.25);
-        applyDamage(atacante, alvoAtual, danoArea, perfuranteArea);
+        int areaDamage = static_cast<int>(baseDamage * 0.25);
+        int areaPiercing = static_cast<int>(piercingDamage * 0.25);
+        applyDamage(attacker, currentTarget, areaDamage, areaPiercing);
     }
 }

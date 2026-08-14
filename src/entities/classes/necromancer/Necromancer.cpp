@@ -14,60 +14,59 @@
 #include "../../races/RaceBase.h"
 #include "../../../core/utils/Color.h"
 
-// --- INFORMACOES DA CLASSE ---
-std::string Necromancer::getNameClasse() const {
+// --- INFORMAÇÕES DA CLASSE ---
+std::string Necromancer::getClassName() const {
     return "Necromancer";
 }
 
-const std::vector<std::string>& Necromancer::obterAparenciaClasseMenu() const {
+const std::vector<std::string>& Necromancer::getClassMenuAppearance() const {
     static const std::vector<std::string> appearance;
     return appearance;
 }
 
-Attributes Necromancer::obterAtributosClasse() const {
+Attributes Necromancer::getClassAttributes() const {
     return {-20, 5, 5, 3, 10, 10, 20};
 }
 
-std::vector<std::unique_ptr<Item>> Necromancer::obterEquipamentoClasse() const {
-    auto equipamentos = ItemFactory::criarKitPocoes();
-    equipamentos.push_back(ItemFactory::criarItem(ItemID::CajadoOsso));
-    equipamentos.push_back(ItemFactory::criarItem(ItemID::RoupasRitualista));
-    return equipamentos;
+std::vector<std::unique_ptr<Item>> Necromancer::getClassEquipment() const {
+    auto equipment = ItemFactory::criarKitPocoes();
+    equipment.push_back(ItemFactory::criarItem(ItemID::CajadoOsso));
+    equipment.push_back(ItemFactory::criarItem(ItemID::RoupasRitualista));
+    return equipment;
 }
 
 // --- PASSIVA DA CLASSE ---
-std::string Necromancer::getNamePassivaClasse() const {
+std::string Necromancer::getClassPassiveName() const {
     return "Toque Necrotico";
 }
 
-std::string Necromancer::obterDescricaoPassivaClasse() const {
+std::string Necromancer::getClassPassiveDescription() const {
     return "Ataques aplicam Necrose, causando 5% da Health Max. do alvo como damage por 3 turnos.\n"
            "Ao derrotar um enemy, coleta sua alma.";
 }
 
-void Necromancer::executarAtaqueComPassivaDaClasse(Character* atacante, Character* defensor, int baseDamage, int danoPerfurante, std::vector<std::unique_ptr<Character>>& listaDeInimigos, const std::function<void(Character*, Character*, int, int)>& applyDamage, bool aplicarPassiva) {
+void Necromancer::executeAttackWithClassPassive(Character* attacker, Character* defender, int baseDamage, int piercingDamage, std::vector<std::unique_ptr<Character>>& enemyList, const std::function<void(Character*, Character*, int, int)>& applyDamage, bool applyPassive) {
     // Comportamento padrão: apenas ataca o alvo principal ou todos se a arma for de área
-    ClassBase::executarAtaqueComPassivaDaClasse(atacante, defensor, baseDamage, danoPerfurante, listaDeInimigos,
+    ClassBase::executeAttackWithClassPassive(attacker, defender, baseDamage, piercingDamage, enemyList,
         [&](Character* atk, Character* def, int dmg, int perf) {
-            // Callback para aplicar o damage e depois o efeito da passiva
+            // Callback para aplicar o dano e depois o efeito da passiva
             applyDamage(atk, def, dmg, perf);
-            if (def->obterVida() > 0 && aplicarPassiva) {
-                int danoNecrose = static_cast<int>(def->obterVidaMaxima() * 0.05);
-                if (danoNecrose < 1) danoNecrose = 1;
-                def->adicionarEfeito(std::make_unique<EfeitoNecrose>(3, danoNecrose));
-                std::string msg = DialogFunctions::formatarMsgHabilidade("Necrose! " + def->getName() + " perdera " + std::to_string(danoNecrose) + " de HP por 3 turnos.", Color::MAGENTA);
-                this->notificarMensagemCombate(msg, msg);
+            if (def->obterVida() > 0 && applyPassive) {
+                int necrosisDamage = static_cast<int>(def->obterVidaMaxima() * 0.05);
+                if (necrosisDamage < 1) necrosisDamage = 1;
+                def->adicionarEfeito(std::make_unique<NecrosisEffect>(3, necrosisDamage));
+                std::string msg = DialogFunctions::formatarMsgHabilidade("Necrose! " + def->getName() + " perdera " + std::to_string(necrosisDamage) + " de HP por 3 turnos.", Color::MAGENTA);
+                this->notifyCombatMessage(msg, msg);
             }
-        }, aplicarPassiva);
+        }, applyPassive);
 }
 
-
 // --- HABILIDADE DA CLASSE ---
-std::string Necromancer::obterRecargaHabilidadeClasse() const {
+std::string Necromancer::getClassAbilityCooldownDescription() const {
     return "Recarga: Nenhuma (consome 1 alma).";
 }
 
-std::string Necromancer::getNameHabilidadeClasse() const {
+std::string Necromancer::getClassAbilityName() const {
     return "Invocacao de Morto-Vivo";
 }
 
@@ -75,144 +74,144 @@ std::string Necromancer::getClassAbilityDescription() const {
     return "Usa uma alma para invocar um clone com 80% dos attributes (Chefes 60%). Max: 3 lacaios.\nLacaios perdem 15% de sua Health Max a cada turno do jogador.";
 }
 
-void Necromancer::useClassAbility(Combat* combat, Character* personagemUsuario, std::vector<Character*>& /*listaDeInimigos*/) {
-    bool temMiniBoss = false;
+void Necromancer::useClassAbility(Combat* combat, Character* userCharacter, std::vector<Character*>& /*enemyList*/) {
+    bool hasMiniBoss = false;
     int minionCount = 0;
-    for (const auto& aliado : combat->obterAliadosVivosRaw()) {
-        if (aliado->isMinion()) {
+    for (const auto& ally : combat->obterAliadosVivosRaw()) {
+        if (ally->isMinion()) {
             minionCount++;
-            if (aliado->isBoss()) {
-                temMiniBoss = true;
+            if (ally->isBoss()) {
+                hasMiniBoss = true;
             }
         }
     }
 
-    if (temMiniBoss) {
+    if (hasMiniBoss) {
         std::string msg = DialogFunctions::formatarMsgSistema("Seu Morto-Vivo Chefe exige todo o seu controle! Nao e possivel invocar mais lacaios.", Color::RED);
-        personagemUsuario->definirHabilidadeCancelada(true);
+        userCharacter->definirHabilidadeCancelada(true);
         return;
     }
 
     if (minionCount >= 3) {
         std::string msg = DialogFunctions::formatarMsgSistema("Limite maximo de 3 lacaios atingido!", Color::RED);
-        personagemUsuario->definirHabilidadeCancelada(true);
+        userCharacter->definirHabilidadeCancelada(true);
         return;
     }
 
-    if (personagemUsuario->obterNumeroDeAlmas() == 0) {
+    if (userCharacter->obterNumeroDeAlmas() == 0) {
         std::string msg = DialogFunctions::formatarMsgSistema("Voce nao possui almas para invocar!", Color::RED);
-        personagemUsuario->definirHabilidadeCancelada(true);
+        userCharacter->definirHabilidadeCancelada(true);
         return;
     }
 
-    int maxPossivel = std::min(3 - minionCount, static_cast<int>(personagemUsuario->obterNumeroDeAlmas()));
+    int maxPossible = std::min(3 - minionCount, static_cast<int>(userCharacter->obterNumeroDeAlmas()));
 
-    std::vector<std::string> opcoesQtd;
-    for (int i = 1; i <= maxPossivel; ++i) {
-        if (i == 1) opcoesQtd.push_back("1 Morto-Vivo");
-        else opcoesQtd.push_back(std::to_string(i) + " Mortos-Vivos (Enemy atua imediatamente)");
+    std::vector<std::string> qtyOptions;
+    for (int i = 1; i <= maxPossible; ++i) {
+        if (i == 1) qtyOptions.push_back("1 Morto-Vivo");
+        else qtyOptions.push_back(std::to_string(i) + " Mortos-Vivos (Enemy atua imediatamente)");
     }
-    opcoesQtd.push_back("Cancelar");
+    qtyOptions.push_back("Cancelar");
 
-    int qtdEscolhida = InputControl::lerSelecaoMenuComSetas(opcoesQtd, false, TelaCombate::margemCombate());
-    if (qtdEscolhida == static_cast<int>(opcoesQtd.size()) - 1 || qtdEscolhida == -1) {
-        personagemUsuario->definirHabilidadeCancelada(true);
+    int chosenQty = InputControl::readMenuSelectionWithArrows(qtyOptions, false, TelaCombate::margemCombate());
+    if (chosenQty == static_cast<int>(qtyOptions.size()) - 1 || chosenQty == -1) {
+        userCharacter->definirHabilidadeCancelada(true);
         return;
     }
 
-    int amountParaInvocar = qtdEscolhida + 1;
-    std::vector<Character*> minionsRecemInvocados;
+    int amountToSummon = chosenQty + 1;
+    std::vector<Character*> newlySummonedMinions;
 
-    for (int i = 0; i < amountParaInvocar; ++i) {
-        std::vector<std::string> opcoes;
-        auto& almas = personagemUsuario->obterAlmas();
+    for (int i = 0; i < amountToSummon; ++i) {
+        std::vector<std::string> options;
+        auto& souls = userCharacter->obterAlmas();
 
-        struct GrupoAlma {
-            std::string nome;
-            RaceType tipo;
+        struct SoulGroup {
+            std::string name;
+            RaceType type;
             bool isBoss;
             int amount;
-            int primeiroIndice;
+            int firstIndex;
         };
-        std::vector<GrupoAlma> grupos;
+        std::vector<SoulGroup> groups;
 
-        for (size_t j = 0; j < almas.size(); ++j) {
-            bool encontrou = false;
-            for (auto& g : grupos) {
-                if (g.nome == almas[j]->getName()) {
+        for (size_t j = 0; j < souls.size(); ++j) {
+            bool found = false;
+            for (auto& g : groups) {
+                if (g.name == souls[j]->getName()) {
                     g.amount++;
-                    encontrou = true;
+                    found = true;
                     break;
                 }
             }
-            if (!encontrou) grupos.push_back({almas[j]->getName(), almas[j]->obterRaceType(), almas[j]->isBoss(), 1, static_cast<int>(j)});
+            if (!found) groups.push_back({souls[j]->getName(), souls[j]->obterRaceType(), souls[j]->isBoss(), 1, static_cast<int>(j)});
         }
 
-        for (const auto& g : grupos) {
-            std::string prefixo = "";
-            std::string cor = "";
+        for (const auto& g : groups) {
+            std::string prefix = "";
+            std::string color = "";
             
             if (g.isBoss) {
-                if (g.tipo == RaceType::Mahoraga) {
-                    prefixo = "[CHEFE] ";
-                    cor = "";
+                if (g.type == RaceType::Mahoraga) {
+                    prefix = "[CHEFE] ";
+                    color = "";
                 } else {
-                    prefixo = "[MINI-CHEFE] ";
-                    cor = "";
+                    prefix = "[MINI-CHEFE] ";
+                    color = "";
                 }
             }
             
-            opcoes.push_back(cor + std::to_string(g.amount) + "x " + prefixo + "Morto-Vivo de " + g.nome + "");
+            options.push_back(color + std::to_string(g.amount) + "x " + prefix + "Morto-Vivo de " + g.name + "");
         }
-        opcoes.push_back("Cancelar Restante");
+        options.push_back("Cancelar Restante");
 
-        int escolha = InputControl::lerSelecaoMenuComSetas(opcoes, false, TelaCombate::margemCombate());
+        int choice = InputControl::readMenuSelectionWithArrows(options, false, TelaCombate::margemCombate());
 
-        if (escolha == static_cast<int>(opcoes.size()) - 1 || escolha == -1) {
+        if (choice == static_cast<int>(options.size()) - 1 || choice == -1) {
             if (i == 0) {
-                personagemUsuario->definirHabilidadeCancelada(true);
+                userCharacter->definirHabilidadeCancelada(true);
                 return;
             }
-            break; // Para as invocacoes mas mantem as que ja foram feitas
+            break; // Para as invocações mas mantém as que já foram feitas
         }
 
-        int indiceRealParaRemover = grupos[escolha].primeiroIndice;
-        auto minion = personagemUsuario->removerAlma(indiceRealParaRemover);
-        std::string nomeOriginal = minion->getName();
+        int realIndexToRemove = groups[choice].firstIndex;
+        auto minion = userCharacter->removerAlma(realIndexToRemove);
+        std::string originalName = minion->getName();
         
-        double fatorEscala = 0.8;
+        double scaleFactor = 0.8;
         if (minion->isBoss()) {
-            fatorEscala = 0.6;
+            scaleFactor = 0.6;
         }
         
-        minion->escalarAtributos(fatorEscala);
+        minion->escalarAtributos(scaleFactor);
         minion->setAsMinion(true);
-        minion->alterarNome("Morto-Vivo (" + nomeOriginal + ")");
+        minion->alterarNome("Morto-Vivo (" + originalName + ")");
 
-        std::string msg = DialogFunctions::formatarMsgHabilidade(personagemUsuario->getName() + " ergueu um Morto-Vivo de " + nomeOriginal + "!", Color::MAGENTA);
-        notificarMensagemCombate(msg, msg);
+        std::string msg = DialogFunctions::formatarMsgHabilidade(userCharacter->getName() + " ergueu um Morto-Vivo de " + originalName + "!", Color::MAGENTA);
+        notifyCombatMessage(msg, msg);
 
         Character* minionPtr = minion.get();
-        bool eraBoss = minionPtr->isBoss();
+        bool wasBoss = minionPtr->isBoss();
         combat->adicionarAliadoEmCombate(std::move(minion));
-        minionsRecemInvocados.push_back(minionPtr);
+        newlySummonedMinions.push_back(minionPtr);
 
-        if (eraBoss) {
-            if (i < amountParaInvocar - 1) {
+        if (wasBoss) {
+            if (i < amountToSummon - 1) {
                 std::string msgBoss = DialogFunctions::formatarMsgSistema("A invocacao de um Chefe consumiu seu foco! Invocacoes adicionais canceladas.", Color::YELLOW);
-                notificarMensagemCombate(msgBoss, msgBoss);
+                notifyCombatMessage(msgBoss, msgBoss);
             }
-            break; // Interrompe o laco, impedindo que os proximos mortos-vivos selecionados sejam invocados no mesmo turno
+            break; // Interrompe o laço
         }
     }
     
-    // Se invocou mais de um minion na mesma acao, eles saltam seu turno ("Stun") para que o enemy atue de imediato!
-    if (minionsRecemInvocados.size() > 1) {
-        std::string msg = DialogFunctions::formatarMsgSistema("A invocacao multipla exauriu seu controle! O turno enemy comecara imediatamente!", Color::RED_CLARO);
-        notificarMensagemCombate(msg, msg);
+    // Se invocou mais de um minion na mesma ação, eles saltam seu turno ("Stun") para que o inimigo atue de imediato!
+    if (newlySummonedMinions.size() > 1) {
+        std::string msg = DialogFunctions::formatarMsgSistema("A invocacao multipla exauriu seu controle! O turno enemy comecara imediatamente!", Color::LIGHT_RED);
+        notifyCombatMessage(msg, msg);
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        for (auto* m : minionsRecemInvocados) {
-            m->adicionarEfeito(std::make_unique<EfeitoAtordoamento>(1));
+        for (auto* m : newlySummonedMinions) {
+            m->adicionarEfeito(std::make_unique<StunEffect>(1));
         }
     }
 }

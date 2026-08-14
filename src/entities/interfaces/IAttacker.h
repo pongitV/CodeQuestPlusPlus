@@ -5,9 +5,13 @@ class IAttacker {
 public:
     virtual ~IAttacker() = default;
     
-    // Calcula o damage base e perfurante gerado pelo atacante
-    virtual std::pair<int, int> calcularDanoOfensivoBase() = 0;
+    // Calcula o dano base e perfurante gerado pelo atacante
+    virtual std::pair<int, int> calculateBaseOffensiveDamage() = 0;
     
-    // Garante um damage minimo caso possua propriedades ou buffs
-    virtual int garantirDanoMinimo(int danoAtual) = 0;
+    // Garante um dano mínimo caso possua propriedades ou buffs
+    virtual int ensureMinimumDamage(int currentDamage) = 0;
+
+    // Métodos legados para compatibilidade
+    virtual std::pair<int, int> calcularDanoOfensivoBase() { return calculateBaseOffensiveDamage(); }
+    virtual int garantirDanoMinimo(int danoAtual) { return ensureMinimumDamage(danoAtual); }
 };

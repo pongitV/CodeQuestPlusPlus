@@ -5,8 +5,8 @@
 
 class RendererProvider {
 public:
-    static UIRenderer* get() { return instancia.load(std::memory_order_relaxed); }
-    static void set(UIRenderer* r) { instancia.store(r, std::memory_order_relaxed); }
+    static UIRenderer* get() { return instance.load(std::memory_order_relaxed); }
+    static void set(UIRenderer* r) { instance.store(r, std::memory_order_relaxed); }
 private:
-    static std::atomic<UIRenderer*> instancia;
+    static std::atomic<UIRenderer*> instance;
 };

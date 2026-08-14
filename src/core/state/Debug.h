@@ -11,7 +11,7 @@ public:
     static std::atomic<bool> isOneHitKillActive;
     static std::atomic<bool> isSpeedHackActive;
 
-    static void displayDebugMenu(Character* jogador);
-    static void showDebugMenu(Character* player) { displayDebugMenu(player); }
-    static bool isDebugKey(char tecla = 0);
+    static void showDebugMenu(Character* player);
+    static void displayDebugMenu(Character* player) { showDebugMenu(player); }
+    static bool isDebugKey(char key = 0);
 };

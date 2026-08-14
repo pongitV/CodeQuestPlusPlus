@@ -6,7 +6,7 @@
 
 class Character;
 
-// GerenciadorDeProgresso gerencia as flags de progresso, marcos de missoes e porcentagens de exploracao de zonas.
+// Gerenciador de progresso, marcos de missoes e porcentagens de exploracao de zonas.
 class Progression {
 private:
     std::unordered_map<std::string, bool> flags;
@@ -14,35 +14,34 @@ private:
 
     Progression();
 public:
-    static Progression& instancia();
-    static Progression& obterInstancia() { return instancia(); }
-    static Progression& getInstance() { return instancia(); }
-    static Progression& instance() { return instancia(); }
+    static Progression& instance();
+    static Progression& getInstance() { return instance(); }
+    static Progression& instancia() { return instance(); }
+    static Progression& obterInstancia() { return instance(); }
 
-    void definirFlag(const std::string& chave, bool valor);
-    bool obterFlag(const std::string& chave) const;
+    void setFlag(const std::string& key, bool val);
+    bool getFlag(const std::string& key) const;
 
-    void setFlag(const std::string& key, bool val) { definirFlag(key, val); }
-    bool getFlag(const std::string& key) const { return obterFlag(key); }
+    void definirFlag(const std::string& chave, bool valor) { setFlag(chave, valor); }
+    bool obterFlag(const std::string& chave) const { return getFlag(chave); }
 
     // Calculos dinamicos de progresso combinando o estado do jogador e as flags salvas
-    int obterProgressoVila(Character* currentPlayer) const;
-    int obterProgressoFloresta(Character* currentPlayer) const;
-    int obterProgressoPonteReino(Character* currentPlayer) const;
-    int obterProgressoReino(Character* currentPlayer) const;
+    int getVillageProgress(Character* player) const;
+    int getForestProgress(Character* player) const;
+    int getKingdomBridgeProgress(Character* player) const;
+    int getKingdomProgress(Character* player) const;
 
-    int getVillageProgress(Character* player) const { return obterProgressoVila(player); }
-    int getForestProgress(Character* player) const { return obterProgressoFloresta(player); }
-    int getKingdomBridgeProgress(Character* player) const { return obterProgressoPonteReino(player); }
-    int getKingdomProgress(Character* player) const { return obterProgressoReino(player); }
+    int obterProgressoVila(Character* currentPlayer) const { return getVillageProgress(currentPlayer); }
+    int obterProgressoFloresta(Character* currentPlayer) const { return getForestProgress(currentPlayer); }
+    int obterProgressoPonteReino(Character* currentPlayer) const { return getKingdomBridgeProgress(currentPlayer); }
+    int obterProgressoReino(Character* currentPlayer) const { return getKingdomProgress(currentPlayer); }
 
     // Sincronizacao do sistema de salvamento
-    void salvar(std::ofstream& out) const;
-    void carregar(std::ifstream& in);
-    void save(std::ofstream& out) const { salvar(out); }
-    void load(std::ifstream& in) { carregar(in); }
+    void save(std::ofstream& out) const;
+    void load(std::ifstream& in);
+    void salvar(std::ofstream& out) const { save(out); }
+    void carregar(std::ifstream& in) { load(in); }
 };
 
 using GerenciadorDeProgresso = Progression;
 using ProgressionManager = Progression;
-using Progression = Progression;

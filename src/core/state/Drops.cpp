@@ -7,35 +7,34 @@
 #include "../utils/DialogFunctions.h"
 #include "../../core/utils/Color.h"
 
-void Drops::reportAndProcessXPGold(Character* jogador, int xpDrop, int ouroDrop, int& ouroTotal, int& xpTotal) 
+void Drops::reportAndProcessXPGold(Character* player, int xpDrop, int goldDrop, int& totalGold, int& totalXp) 
 {
-    jogador->ganharXp(xpDrop);
-    jogador->ganharOuro(ouroDrop);
-    xpTotal += xpDrop;
-    ouroTotal += ouroDrop;
-
+    player->ganharXp(xpDrop);
+    player->ganharOuro(goldDrop);
+    totalXp += xpDrop;
+    totalGold += goldDrop;
 }
 
-void Drops::reportItemDrop(const std::string& nomeItem, int amount) 
+void Drops::reportItemDrop(const std::string& itemName, int amount) 
 {
 }
 
-void Drops::giveAndProcessItem(Character* jogador, ItemID itemId, int amount, std::vector<std::string>& itensObtidos, int chanceDeDrop)
+void Drops::giveAndProcessItem(Character* player, ItemID itemId, int amount, std::vector<std::string>& obtainedItems, int dropChance)
 {
     if (amount <= 0) return;
-    if (chanceDeDrop < 100 && !RandomGenerator::rolarChance(chanceDeDrop)) return;
+    if (dropChance < 100 && !RandomGenerator::rollChance(dropChance)) return;
 
-    std::string nomeItem = ItemFactory::getNameDeID(itemId);
-    if (nomeItem.empty() || nomeItem == "Desconhecido") {
+    std::string itemName = ItemFactory::getNameDeID(itemId);
+    if (itemName.empty() || itemName == "Desconhecido") {
         auto temp = ItemFactory::criarItem(itemId);
-        if (temp) nomeItem = temp->getNameItem();
+        if (temp) itemName = temp->getNameItem();
     }
     for (int i = 0; i < amount; ++i) {
-        auto itemCriado = ItemFactory::criarItem(itemId);
-        if (itemCriado && i == 0) nomeItem = itemCriado->getNameItem(); // Pega nome com cores/degrade caso tenha
-        jogador->obterInventario()->adicionarItem(std::move(itemCriado));
-        itensObtidos.push_back(nomeItem);
+        auto createdItem = ItemFactory::criarItem(itemId);
+        if (createdItem && i == 0) itemName = createdItem->getNameItem(); // Pega nome com cores/degrade caso tenha
+        player->obterInventario()->adicionarItem(std::move(createdItem));
+        obtainedItems.push_back(itemName);
     }
-    Diary::instancia().registrarItem(nomeItem);
-    reportItemDrop(nomeItem, amount);
+    Diary::instancia().registrarItem(itemName);
+    reportItemDrop(itemName, amount);
 }

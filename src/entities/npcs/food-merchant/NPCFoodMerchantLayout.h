@@ -4,7 +4,7 @@
 #include <string>
 
 namespace NPCFoodMerchantLayouts {
-    inline const std::vector<std::string> arteFoodMerchant = {
+    inline const std::vector<std::string> foodMerchantArt = {
         "              (  (  (                     ",
         "              )  )  )                     ",
         "            .----------.                  ",
@@ -17,4 +17,5 @@ namespace NPCFoodMerchantLayouts {
         "             ||      ||                   ",
         "          ------------------              "
     };
+    inline const auto& arteFoodMerchant = foodMerchantArt;
 }

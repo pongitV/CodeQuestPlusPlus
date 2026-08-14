@@ -16,74 +16,74 @@
 #include "../../entities/enemies/mahoraga/Mahoraga.h"
 #include "../utils/RandomGenerator.h"
 
-template<typename RacaType, typename ClasseType>
+template<typename RaceType, typename ClassType>
 std::vector<std::unique_ptr<Character>> EnemyCreator::createGenericEnemies(int amount, int maxVariation)
 {
-    std::vector<std::unique_ptr<Character>> horda;
-    horda.reserve(amount); 
+    std::vector<std::unique_ptr<Character>> horde;
+    horde.reserve(amount); 
 
     for (auto i{0}; i < amount; ++i) 
     {
-        auto race{std::make_unique<RacaType>()};
-        auto nomeRaca{race->getRaceName()};
+        auto race{std::make_unique<RaceType>()};
+        auto raceName{race->getRaceName()};
         auto enemy = std::make_unique<Character>(
-            nomeRaca,
+            raceName,
             std::move(race),
-            std::make_unique<ClasseType>()
+            std::make_unique<ClassType>()
         );
 
-        // Aplica uma pequena variacao nos attributes para que cada monstro da horda seja unico
-        int variacaoVida = RandomGenerator::getInteiro(-maxVariation, maxVariation);
-        enemy->obterAtributosFinais().health += (enemy->obterAtributosFinais().health * variacaoVida) / 100;
-        enemy->definirVida(enemy->obterAtributosFinais().health); // Sincroniza a health atual com a nova health maxima
+        // Aplica uma pequena variação nos atributos para que cada monstro da horda seja único
+        int healthVariation = RandomGenerator::getInt(-maxVariation, maxVariation);
+        enemy->obterAtributosFinais().health += (enemy->obterAtributosFinais().health * healthVariation) / 100;
+        enemy->definirVida(enemy->obterAtributosFinais().health); // Sincroniza a vida atual com a nova vida máxima
         
-        int variacaoForca = RandomGenerator::getInteiro(-maxVariation, maxVariation);
-        enemy->obterAtributosFinais().strength += (enemy->obterAtributosFinais().strength * variacaoForca) / 100;
+        int strengthVariation = RandomGenerator::getInt(-maxVariation, maxVariation);
+        enemy->obterAtributosFinais().strength += (enemy->obterAtributosFinais().strength * strengthVariation) / 100;
         
-        int variacaoDestreza = RandomGenerator::getInteiro(-maxVariation, maxVariation);
-        enemy->obterAtributosFinais().dexterity += (enemy->obterAtributosFinais().dexterity * variacaoDestreza) / 100;
+        int dexterityVariation = RandomGenerator::getInt(-maxVariation, maxVariation);
+        enemy->obterAtributosFinais().dexterity += (enemy->obterAtributosFinais().dexterity * dexterityVariation) / 100;
 
-        horda.push_back(std::move(enemy));
+        horde.push_back(std::move(enemy));
     }
-    return horda;
+    return horde;
 }
 
 std::vector<std::unique_ptr<Character>> EnemyCreator::createGoblinEnemy(int amount)
 {
-    return createGenericEnemies<Goblin, ClassBaseInimigo>(amount, 10);
+    return createGenericEnemies<Goblin, ClassBaseEnemy>(amount, 10);
 }
 
 std::vector<std::unique_ptr<Character>> EnemyCreator::createSlimeEnemy(int amount)
 {
-    return createGenericEnemies<Slime, ClassBaseInimigo>(amount, 10);
+    return createGenericEnemies<Slime, ClassBaseEnemy>(amount, 10);
 }
 
 std::vector<std::unique_ptr<Character>> EnemyCreator::createFairyEnemy(int amount)
 {
-    return createGenericEnemies<Fairy, ClassBaseInimigo>(amount, 10);
+    return createGenericEnemies<Fairy, ClassBaseEnemy>(amount, 10);
 }
 
 std::vector<std::unique_ptr<Character>> EnemyCreator::createExiledOrcEnemy(int amount)
 {
-    return createGenericEnemies<OrkExilado, ClassBaseInimigo>(amount, 5);
+    return createGenericEnemies<ExiledOrc, ClassBaseEnemy>(amount, 5);
 }
 
 std::vector<std::unique_ptr<Character>> EnemyCreator::createForestAbominationEnemy(int amount)
 {
-    return createGenericEnemies<AbominacaoFloresta, ClassBaseInimigo>(amount, 5);
+    return createGenericEnemies<ForestAbomination, ClassBaseEnemy>(amount, 5);
 }
 
 std::vector<std::unique_ptr<Character>> EnemyCreator::createTrollEnemy(int amount)
 {
-    return createGenericEnemies<Troll, ClassBaseInimigo>(amount, 5);
+    return createGenericEnemies<Troll, ClassBaseEnemy>(amount, 5);
 }
 
 std::vector<std::unique_ptr<Character>> EnemyCreator::createMimicEnemy(int amount)
 {
-    return createGenericEnemies<Mimic, ClassBaseInimigo>(amount, 10);
+    return createGenericEnemies<Mimic, ClassBaseEnemy>(amount, 10);
 }
 
 std::vector<std::unique_ptr<Character>> EnemyCreator::createMahoragaEnemy(int amount)
 {
-    return createGenericEnemies<Mahoraga, ClassBaseInimigo>(amount, 5);
+    return createGenericEnemies<Mahoraga, ClassBaseEnemy>(amount, 5);
 }

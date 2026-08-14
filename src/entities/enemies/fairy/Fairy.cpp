@@ -128,22 +128,22 @@ const std::vector<std::string>& Fairy::getRaceAppearance() const
 
 
 // --- BESTIARIO E DROPS ---
-BestiaryInfo Fairy::obterBestiaryInfo() const {
+BestiaryInfo Fairy::getBestiaryInfo() const {
     return {
         "Forest", 
         "Superficie",
         "Fadas corrompidas pela energia negra da floresta.",
         "Elas costumavam guiar viajantes, agora os perdem.",
-        {ItemFactory::getNameDeID(ItemID::PoMagico), ItemFactory::getNameDeID(ItemID::VarinhaCorroida), "Ouro"},
+        {ItemFactory::getNameFromID(ItemID::PoMagico), ItemFactory::getNameFromID(ItemID::VarinhaCorroida), "Ouro"},
         3
     };
 }
 
-void Fairy::realizarDrops(Character* enemy, Character* currentPlayer, std::vector<std::string>& itensObtidos, int& ouroTotal, int& xpTotal)
+void Fairy::performDrops(Character* enemy, Character* currentPlayer, std::vector<std::string>& obtainedItems, int& totalGold, int& totalXp)
 {
-    Drops::reportAndProcessXPGold(currentPlayer, 45, 20, ouroTotal, xpTotal);
-    Drops::giveAndProcessItem(currentPlayer, ItemID::VarinhaCorroida, 1, itensObtidos, 65);
-    Drops::giveAndProcessItem(currentPlayer, ItemID::PoMagico, RandomGenerator::getInteiro(1, 6), itensObtidos);
+    Drops::reportAndProcessXPGold(currentPlayer, 45, 20, totalGold, totalXp);
+    Drops::giveAndProcessItem(currentPlayer, ItemID::VarinhaCorroida, 1, obtainedItems, 65);
+    Drops::giveAndProcessItem(currentPlayer, ItemID::PoMagico, RandomGenerator::getInt(1, 6), obtainedItems);
 }
 
 

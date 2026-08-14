@@ -6,26 +6,26 @@
 #include <memory>
 
 // --- INFORMACOES DA RACA ---
-std::string OrkExilado::getRaceName() const 
+std::string ExiledOrc::getRaceName() const 
 { 
     return "Ork Exilado"; 
 }
 
-Attributes OrkExilado::getRaceAttributes() const 
+Attributes ExiledOrc::getRaceAttributes() const 
 { 
     return { 200, 20, 10, 15, 20, 0, 0 }; 
 }
 
-std::vector<std::unique_ptr<Item>> OrkExilado::getRaceEquipment() const 
-{
-    std::vector<std::unique_ptr<Item>> equipamentos;
-    equipamentos.push_back(ItemFactory::criarItem(ItemID::MachadoGuerra));
-    equipamentos.push_back(ItemFactory::criarItem(ItemID::ArmaduraTrapos));
-    return equipamentos;
+std::vector<std::unique_ptr<Item>> ExiledOrc::getRaceEquipment() const 
+{ 
+    std::vector<std::unique_ptr<Item>> equipment;
+    equipment.push_back(ItemFactory::createItem(ItemID::MachadoGuerra));
+    equipment.push_back(ItemFactory::createItem(ItemID::ArmaduraTrapos));
+    return equipment;
 }
 
 // --- APARENCIA ---
-const std::vector<std::string>& OrkExilado::getRaceAppearance() const
+const std::vector<std::string>& ExiledOrc::getRaceAppearance() const
 {
     static const std::vector<std::string> appearance =
     {
@@ -150,22 +150,22 @@ const std::vector<std::string>& OrkExilado::getRaceAppearance() const
 
 
 // --- BESTIARIO E DROPS ---
-BestiaryInfo OrkExilado::obterBestiaryInfo() const {
+BestiaryInfo ExiledOrc::getBestiaryInfo() const {
     return {
         "Village Inicial", 
         "Caverna do Ork",
         "Um Ork expulso de seu cla, agora vive em cavernas escuras planejando vinganca.",
         "Orks exilados pintam suas armaduras com o sangue de suas vitimas.",
-        {ItemFactory::getNameDeID(ItemID::MachadoGuerra), ItemFactory::getNameDeID(ItemID::ArmaduraTrapos), "Ouro"},
+        {ItemFactory::getNameFromID(ItemID::MachadoGuerra), ItemFactory::getNameFromID(ItemID::ArmaduraTrapos), "Ouro"},
         4
     };
 }
 
-void OrkExilado::realizarDrops(Character* enemy, Character* currentPlayer, std::vector<std::string>& itensObtidos, int& ouroTotal, int& xpTotal)
+void ExiledOrc::performDrops(Character* enemy, Character* currentPlayer, std::vector<std::string>& obtainedItems, int& totalGold, int& totalXp)
 {
-    Drops::reportAndProcessXPGold(currentPlayer, 120, 100, ouroTotal, xpTotal);
-    Drops::giveAndProcessItem(currentPlayer, ItemID::MachadoGuerra, 2, itensObtidos);
-    Drops::giveAndProcessItem(currentPlayer, ItemID::ArmaduraTrapos, 1, itensObtidos);
+    Drops::reportAndProcessXPGold(currentPlayer, 120, 100, totalGold, totalXp);
+    Drops::giveAndProcessItem(currentPlayer, ItemID::MachadoGuerra, 2, obtainedItems);
+    Drops::giveAndProcessItem(currentPlayer, ItemID::ArmaduraTrapos, 1, obtainedItems);
 }
 
 

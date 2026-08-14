@@ -16,19 +16,23 @@ public:
         return instance;
     }
 
-    bool possuiTile(char c) const {
+    bool hasTile(char c) const {
         return formattedTileCache.find(c) != formattedTileCache.end();
     }
+    bool possuiTile(char c) const { return hasTile(c); }
 
-    const std::string& obterTile(char c) const {
+    const std::string& getTile(char c) const {
         return formattedTileCache.at(c);
     }
+    const std::string& obterTile(char c) const { return getTile(c); }
 
-    void armazenarTile(char c, const std::string& formatado) {
-        formattedTileCache[c] = formatado;
+    void storeTile(char c, const std::string& formatted) {
+        formattedTileCache[c] = formatted;
     }
+    void armazenarTile(char c, const std::string& formatado) { storeTile(c, formatado); }
 
-    void limpar() {
+    void clear() {
         formattedTileCache.clear();
     }
+    void limpar() { clear(); }
 };

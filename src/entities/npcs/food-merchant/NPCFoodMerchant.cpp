@@ -6,36 +6,36 @@
 #include <iostream>
 #include "../../../core/utils/Color.h"
 
-void NPCFoodMerchant::interagir(Character* jogador) {
-    NPCInteraction::interagir(jogador);
+void NPCFoodMerchant::interact(Character* player) {
+    NPCInteraction::interact(player);
 }
 
-std::string NPCFoodMerchant::getNameDoLugar() const {
+std::string NPCFoodMerchant::getPlaceName() const {
     return "FEIRA DO REINO";
 }
 
-Color NPCFoodMerchant::obterCorDoCabecalho() const {
+Color NPCFoodMerchant::getHeaderColor() const {
     return Color::GREEN_CLARO;
 }
 
-Color NPCFoodMerchant::obterCorDaArte() const {
+Color NPCFoodMerchant::getArtColor() const {
     return Color::GREEN_CLARO;
 }
 
-const std::vector<std::string>& NPCFoodMerchant::obterArteASCII() const {
-    return NPCFoodMerchantLayouts::arteFoodMerchant;
+const std::vector<std::string>& NPCFoodMerchant::getASCIIArt() const {
+    return NPCFoodMerchantLayouts::foodMerchantArt;
 }
 
-std::vector<std::string> NPCFoodMerchant::obterDialogo(Character* /*jogador*/) {
-    std::vector<std::string> linhas = {
+std::vector<std::string> NPCFoodMerchant::getDialogue(Character* /*player*/) {
+    std::vector<std::string> lines = {
         "Olá, combatente! Sente fome? A jornada deve ser cansativa.",
         "Tenho as melhores e mais frescas provisões do reino!",
         "Nossos alimentos curam sua health instantaneamente ao serem consumidos na mochila."
     };
-    return linhas;
+    return lines;
 }
 
-std::vector<std::string> NPCFoodMerchant::obterOpcoesMenu(Character* jogador, int /*larguraDoTerminal*/) {
+std::vector<std::string> NPCFoodMerchant::getMenuOptions(Character* /*player*/, int /*terminalWidth*/) {
     return {
         "Maca (Cura 15 HP) - 5G",
         "Pao (Cura 25 HP) - 10G",
@@ -45,34 +45,34 @@ std::vector<std::string> NPCFoodMerchant::obterOpcoesMenu(Character* jogador, in
     };
 }
 
-void NPCFoodMerchant::processarOpcao(Character* jogador, const std::string& opcao, int /*larguraDoTerminal*/) {
-    ItemID idCompra = ItemID::Nenhum;
-    int custo = 0;
+void NPCFoodMerchant::processOption(Character* player, const std::string& option, int /*terminalWidth*/) {
+    ItemID purchaseId = ItemID::None;
+    int cost = 0;
 
-    if (opcao.find("Maca") != std::string::npos) {
-        idCompra = ItemID::Maca;
-        custo = 5;
+    if (option.find("Maca") != std::string::npos) {
+        purchaseId = ItemID::Maca;
+        cost = 5;
     }
-    else if (opcao.find("Pao") != std::string::npos) {
-        idCompra = ItemID::Pao;
-        custo = 10;
+    else if (option.find("Pao") != std::string::npos) {
+        purchaseId = ItemID::Pao;
+        cost = 10;
     }
-    else if (opcao.find("Queijo") != std::string::npos) {
-        idCompra = ItemID::Queijo;
-        custo = 18;
+    else if (option.find("Queijo") != std::string::npos) {
+        purchaseId = ItemID::Queijo;
+        cost = 18;
     }
-    else if (opcao.find("Carne Seca") != std::string::npos) {
-        idCompra = ItemID::CarneSeca;
-        custo = 30;
+    else if (option.find("Carne Seca") != std::string::npos) {
+        purchaseId = ItemID::CarneSeca;
+        cost = 30;
     }
 
-    if (idCompra != ItemID::Nenhum) {
-        if (jogador->obterInventario()->obterOuro() >= custo) {
-            auto item = ItemFactory::criarItem(idCompra);
+    if (purchaseId != ItemID::None) {
+        if (player->getInventory()->getGold() >= cost) {
+            auto item = ItemFactory::createItem(purchaseId);
             if (item) {
-                jogador->obterInventario()->adicionarOuro(-custo);
-                std::string nomeItem = item->getNameItem();
-                jogador->obterInventario()->adicionarItem(std::move(item));
+                player->getInventory()->addGold(-cost);
+                std::string itemName = item->getItemName();
+                player->getInventory()->addItem(std::move(item));
             }
         } else {
         }

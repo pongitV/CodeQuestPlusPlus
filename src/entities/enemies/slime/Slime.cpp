@@ -110,30 +110,30 @@ const std::vector<std::string>& Slime::getRaceAppearance() const
 
 
 // --- BESTIARIO E DROPS ---
-BestiaryInfo Slime::obterBestiaryInfo() const {
+BestiaryInfo Slime::getBestiaryInfo() const {
     return {
         "Forest", 
         "Superficie",
         "Massas gelatinosas que absorvem tudo o que tocam.",
         "Slimes podem digerir materiais em dias, mas detestam sal.",
-        {ItemFactory::getNameDeID(ItemID::GosmaAcida), ItemFactory::getNameDeID(ItemID::NucleoPegajoso), "Ouro"},
+        {ItemFactory::getNameFromID(ItemID::GosmaAcida), ItemFactory::getNameFromID(ItemID::NucleoPegajoso), "Ouro"},
         2
     };
 }
 
-void Slime::realizarDrops(Character* enemy, Character* currentPlayer, std::vector<std::string>& itensObtidos, int& ouroTotal, int& xpTotal)
+void Slime::performDrops(Character* enemy, Character* currentPlayer, std::vector<std::string>& obtainedItems, int& totalGold, int& totalXp)
 {
-    Drops::reportAndProcessXPGold(currentPlayer, 35, 15, ouroTotal, xpTotal);
+    Drops::reportAndProcessXPGold(currentPlayer, 35, 15, totalGold, totalXp);
 
-    Drops::giveAndProcessItem(currentPlayer, ItemID::GosmaAcida, 3, itensObtidos);
-    Drops::giveAndProcessItem(currentPlayer, ItemID::NucleoPegajoso, 1, itensObtidos, 30);
+    Drops::giveAndProcessItem(currentPlayer, ItemID::GosmaAcida, 3, obtainedItems);
+    Drops::giveAndProcessItem(currentPlayer, ItemID::NucleoPegajoso, 1, obtainedItems, 30);
 }
 
 // --- PROCESSAMENTO DE DANO  ---
-void Slime::aoCausarDano(Character* atacante, Character* alvo, int danoCausado) {
-    if (RandomGenerator::rolarChance(15)) {
-        if (!alvo->possuiEfeito(EfeitoID::Lentidao)) {
-            alvo->adicionarEfeito(std::make_unique<EfeitoLentidao>(3));
+void Slime::onDealingDamage(Character* /*attacker*/, Character* target, int /*damageDealt*/) {
+    if (RandomGenerator::rollChance(15)) {
+        if (!target->hasEffect(EffectID::Slow)) {
+            target->addEffect(std::make_unique<SlowEffect>(3));
             // A mensagem na UI foi removida para priorizar o combat limpo
             // TelaCombate::adicionarMensagemFixa(msg);
         }

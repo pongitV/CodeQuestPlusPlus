@@ -15,7 +15,7 @@ public:
             }
             lines.push_back(line);
         }
-        // Remove an initial empty line if it was introduced by a raw string literal newline
+        // Remove uma linha vazia inicial caso tenha sido introduzida por quebra de linha de raw string literal
         if (!lines.empty() && lines.front().empty()) {
             lines.erase(lines.begin());
         }

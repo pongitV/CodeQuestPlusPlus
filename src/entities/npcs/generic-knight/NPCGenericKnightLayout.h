@@ -112,5 +112,7 @@ namespace NPCGenericKnightLayouts {
                                                                :%%%%%##%%%%%.                                   
                                                                      :=+*+                                      
 )");
-
+    inline const auto& knightArt = arteCavaleiro;
 }
+
+namespace NPCCavaleiroGenericoLayouts = NPCGenericKnightLayouts;

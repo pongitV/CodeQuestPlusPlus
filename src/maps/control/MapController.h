@@ -56,3 +56,4 @@ public:
 };
 
 using MapControl = MapControllera;
+using MapController = MapControllera;

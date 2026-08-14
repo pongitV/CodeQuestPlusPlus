@@ -1,38 +1,38 @@
 #include "ClassBaseEnemy.h"
 
 // --- INFORMACOES DA CLASSE ---
-std::string ClassBaseInimigo::getNameClasse() const 
+std::string ClassBaseEnemy::getClassName() const 
 { 
     return "Monstro"; 
 }
 
-Attributes ClassBaseInimigo::obterAtributosClasse() const 
+Attributes ClassBaseEnemy::getClassAttributes() const 
 { 
     return { 0, 0, 0, 0, 0, 0, 0 }; 
 }
 
-const std::vector<std::string>& ClassBaseInimigo::obterAparenciaClasseMenu() const 
+const std::vector<std::string>& ClassBaseEnemy::getClassMenuAppearance() const 
 { 
-    static const std::vector<std::string> aparenciaVazia = {};
-    return aparenciaVazia;
+    static const std::vector<std::string> emptyAppearance = {};
+    return emptyAppearance;
 }
 
-std::vector<std::unique_ptr<Item>> ClassBaseInimigo::obterEquipamentoClasse() const 
+std::vector<std::unique_ptr<Item>> ClassBaseEnemy::getClassEquipment() const 
 { 
     return {}; 
 }
 
 // --- PASSIVA DA CLASSE ---
-std::string ClassBaseInimigo::getNamePassivaClasse() const { return "Nenhuma"; }
-std::string ClassBaseInimigo::obterDescricaoPassivaClasse() const { return "Enemies nao possuem passivas de classe."; }
+std::string ClassBaseEnemy::getClassPassiveName() const { return "Nenhuma"; }
+std::string ClassBaseEnemy::getClassPassiveDescription() const { return "Enemies nao possuem passivas de classe."; }
 
 // --- HABILIDADE DA CLASSE ---
-std::string ClassBaseInimigo::obterRecargaHabilidadeClasse() const { return ""; }
-std::string ClassBaseInimigo::getNameHabilidadeClasse() const { return "Nenhuma"; }
-std::string ClassBaseInimigo::getClassAbilityDescription() const { return "Enemies basicos nao possuem habilidades ativas."; }
-void ClassBaseInimigo::useClassAbility(Combat* /*combat*/, Character* /*personagemUsuario*/, std::vector<Character*>& /*listaDeInimigos*/) 
+std::string ClassBaseEnemy::getClassAbilityCooldownDescription() const { return ""; }
+std::string ClassBaseEnemy::getClassAbilityName() const { return "Nenhuma"; }
+std::string ClassBaseEnemy::getClassAbilityDescription() const { return "Enemies basicos nao possuem habilidades ativas."; }
+void ClassBaseEnemy::useClassAbility(Combat* /*combat*/, Character* /*userCharacter*/, std::vector<Character*>& /*enemyList*/) 
 {
 }
 
-TipoAtaque ClassBaseInimigo::getAttackType() const { return TipoAtaque::UNICO; }
-bool ClassBaseInimigo::abilityConsumesTurn() const { return true; }
+AttackType ClassBaseEnemy::getAttackType() const { return AttackType::Single; }
+bool ClassBaseEnemy::abilityConsumesTurn() const { return true; }

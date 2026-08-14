@@ -7,38 +7,38 @@
 
 #pragma comment(lib, "gdiplus.lib")
 
-std::bitset<256> GameWindow::s_teclas;
+std::bitset<256> GameWindow::s_keys;
 std::atomic<int> GameWindow::s_mouseX{0};
 std::atomic<int> GameWindow::s_mouseY{0};
-std::atomic<bool> GameWindow::s_mouseClicado{false};
+std::atomic<bool> GameWindow::s_mouseClicked{false};
 
-bool GameWindow::s_cursorOculto = false;
+bool GameWindow::s_cursorHidden = false;
 
-void GameWindow::ocultarCursor() {
-    if (!s_cursorOculto) {
-        s_cursorOculto = true;
+void GameWindow::hideCursor() {
+    if (!s_cursorHidden) {
+        s_cursorHidden = true;
         while (ShowCursor(FALSE) >= 0);
     }
 }
 
-void GameWindow::mostrarCursor() {
-    if (s_cursorOculto) {
-        s_cursorOculto = false;
+void GameWindow::showCursor() {
+    if (s_cursorHidden) {
+        s_cursorHidden = false;
         while (ShowCursor(TRUE) < 0);
     }
 }
 
-bool GameWindow::isCursorOculto() {
-    return s_cursorOculto;
+bool GameWindow::isCursorHidden() {
+    return s_cursorHidden;
 }
 
 LRESULT CALLBACK GameWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
         case WM_KEYDOWN:
-            if (wParam < 256) s_teclas.set(wParam);
+            if (wParam < 256) s_keys.set(wParam);
             return 0;
         case WM_KEYUP:
-            if (wParam < 256) s_teclas.reset(wParam);
+            if (wParam < 256) s_keys.reset(wParam);
             return 0;
         case WM_MOUSEMOVE:
             s_mouseX = (int)(short)LOWORD(lParam);
@@ -47,11 +47,11 @@ LRESULT CALLBACK GameWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
         case WM_LBUTTONDOWN:
             s_mouseX = (int)(short)LOWORD(lParam);
             s_mouseY = (int)(short)HIWORD(lParam);
-            s_mouseClicado = true;
+            s_mouseClicked = true;
             return 0;
         case WM_SIZE:
             if (D2DContext::renderer) {
-                D2DContext::renderer->redimensionar(hwnd);
+                D2DContext::renderer->resize(hwnd);
             }
             return 0;
         case WM_PAINT: {
@@ -66,7 +66,7 @@ LRESULT CALLBACK GameWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
                 ClipCursor(nullptr);
                 while (ShowCursor(TRUE) < 0);
             } else {
-                if (s_cursorOculto) {
+                if (s_cursorHidden) {
                     while (ShowCursor(FALSE) >= 0);
                     RECT rc;
                     GetWindowRect(hwnd, &rc);
@@ -89,11 +89,11 @@ LRESULT CALLBACK GameWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
-static std::wstring resolverCaminhoAsset(const wchar_t* meuarquivo) {
-    if (GetFileAttributesW(meuarquivo) != INVALID_FILE_ATTRIBUTES) {
-        return meuarquivo;
+static std::wstring resolveAssetPath(const wchar_t* assetFile) {
+    if (GetFileAttributesW(assetFile) != INVALID_FILE_ATTRIBUTES) {
+        return assetFile;
     }
-    std::wstring relParent = std::wstring(L"../") + meuarquivo;
+    std::wstring relParent = std::wstring(L"../") + assetFile;
     if (GetFileAttributesW(relParent.c_str()) != INVALID_FILE_ATTRIBUTES) {
         return relParent;
     }
@@ -104,7 +104,7 @@ static std::wstring resolverCaminhoAsset(const wchar_t* meuarquivo) {
         if (!lastSlash) lastSlash = wcsrchr(exePath, L'/');
         if (lastSlash) {
             *lastSlash = L'\0';
-            std::wstring absPath = std::wstring(exePath) + L"/" + meuarquivo;
+            std::wstring absPath = std::wstring(exePath) + L"/" + assetFile;
             if (GetFileAttributesW(absPath.c_str()) != INVALID_FILE_ATTRIBUTES) {
                 return absPath;
             }
@@ -112,18 +112,18 @@ static std::wstring resolverCaminhoAsset(const wchar_t* meuarquivo) {
             if (!parentSlash) parentSlash = wcsrchr(exePath, L'/');
             if (parentSlash) {
                 *parentSlash = L'\0';
-                absPath = std::wstring(exePath) + L"/" + meuarquivo;
+                absPath = std::wstring(exePath) + L"/" + assetFile;
                 if (GetFileAttributesW(absPath.c_str()) != INVALID_FILE_ATTRIBUTES) {
                     return absPath;
                 }
             }
         }
     }
-    return meuarquivo;
+    return assetFile;
 }
 
-static HICON carregarIconeDePNG(const wchar_t* meuarquivo) {
-    std::wstring caminhoFinal = resolverCaminhoAsset(meuarquivo);
+static HICON loadIconFromPNG(const wchar_t* assetFile) {
+    std::wstring finalPath = resolveAssetPath(assetFile);
 
     ULONG_PTR token = 0;
     Gdiplus::GdiplusStartupInput input;
@@ -133,7 +133,7 @@ static HICON carregarIconeDePNG(const wchar_t* meuarquivo) {
 
     HICON hIcon = nullptr;
     {
-        Gdiplus::Bitmap bitmap(caminhoFinal.c_str());
+        Gdiplus::Bitmap bitmap(finalPath.c_str());
         if (bitmap.GetLastStatus() == Gdiplus::Ok) {
             bitmap.GetHICON(&hIcon);
         }
@@ -148,7 +148,7 @@ GameWindow::GameWindow(HINSTANCE hInstance, int nCmdShow)
 {
     const char CLASS_NAME[] = "CodeQuestPlusPlus_Window";
 
-    m_hIcon = carregarIconeDePNG(L"assets/icons/icon.png");
+    m_hIcon = loadIconFromPNG(L"assets/icons/icon.png");
     if (!m_hIcon) {
         m_hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(1));
     }
@@ -167,8 +167,8 @@ GameWindow::GameWindow(HINSTANCE hInstance, int nCmdShow)
 
     RegisterClassEx(&wc);
 
-    m_largura = GetSystemMetrics(SM_CXSCREEN);
-    m_altura = GetSystemMetrics(SM_CYSCREEN);
+    m_width = GetSystemMetrics(SM_CXSCREEN);
+    m_height = GetSystemMetrics(SM_CYSCREEN);
     
     int posX = 0;
     int posY = 0;
@@ -178,7 +178,7 @@ GameWindow::GameWindow(HINSTANCE hInstance, int nCmdShow)
         CLASS_NAME,
         "CodeQuestPlusPlus",
         WS_POPUP,
-        posX, posY, m_largura, m_altura,
+        posX, posY, m_width, m_height,
         nullptr, nullptr, hInstance, nullptr
     );
 
@@ -205,7 +205,7 @@ GameWindow::~GameWindow() {
     }
 }
 
-bool GameWindow::processarMensagens() {
+bool GameWindow::processMessages() {
     MSG msg = {};
     while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
         if (msg.message == WM_QUIT) {
@@ -219,17 +219,17 @@ bool GameWindow::processarMensagens() {
 
 #include "../input/InputSystem.h"
 
-bool GameWindow::teclaPressionada(int vk) {
+bool GameWindow::isKeyPressed(int vk) {
     if (vk < 0 || vk >= 256) return false;
-    return s_teclas.test(vk) || InputSystem::IsKeyPressed(vk);
+    return s_keys.test(vk) || InputSystem::IsKeyPressed(vk);
 }
 
-void GameWindow::limparTeclas() {
-    s_teclas.reset();
+void GameWindow::clearKeys() {
+    s_keys.reset();
 }
 
-int GameWindow::obterMouseX() { return s_mouseX; }
-int GameWindow::obterMouseY() { return s_mouseY; }
-bool GameWindow::mouseClicado() { return s_mouseClicado; }
-void GameWindow::limparMouse() { s_mouseClicado = false; }
+int GameWindow::getMouseX() { return s_mouseX; }
+int GameWindow::getMouseY() { return s_mouseY; }
+bool GameWindow::isMouseClicked() { return s_mouseClicked; }
+void GameWindow::clearMouse() { s_mouseClicked = false; }
 

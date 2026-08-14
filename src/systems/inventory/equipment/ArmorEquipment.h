@@ -6,38 +6,45 @@
 #include "BaseEquipment.h"
 #include "../../../entities/character/Character.h"
 
-class EquipamentoArmadura : public BaseEquipment 
+class ArmorEquipment : public BaseEquipment 
 {
 private:
-    std::string nome;
-    int reducaoFixa;
-    int reqResistencia;
-    int reqConstituicao;
-    int penalidadeDestreza;
+    std::string name;
+    int fixedReduction;
+    int reqResistance;
+    int reqConstitution;
+    int dexterityPenalty;
 
 public:
-    EquipamentoArmadura(const std::string& nome, int reducaoFixa, int reqResistencia, int reqConstituicao, int price = 3);
+    ArmorEquipment(const std::string& name, int fixedReduction, int reqResistance, int reqConstitution, int price = 3);
     
-    int obterReqResistencia() const;
-    int obterReqConstituicao() const;
+    int getReqResistance() const;
+    int getReqConstitution() const;
+    int obterReqResistencia() const { return getReqResistance(); }
+    int obterReqConstituicao() const { return getReqConstitution(); }
 
-    std::string getNameItem() const override;
-    TipoEquipamento obterTipo() const override;
+    std::string getItemName() const override;
+    EquipmentType getType() const override;
 
-    int obterReducaoFixa() const override;
-    void definirPenalidadeDestreza(int pen) { penalidadeDestreza = pen; }
+    int getFixedReduction() const override;
+    int getFlatReduction() const { return getFixedReduction(); }
+    void setDexterityPenalty(int penalty) { dexterityPenalty = penalty; }
+    void definirPenalidadeDestreza(int pen) { setDexterityPenalty(pen); }
 
-    std::string obterInfoStatus() const override;
+    std::string getStatusInfo() const override;
 
 protected:
-    bool checarRequisitosEspecificos(Character* character) const override;
+    bool checkSpecificRequirements(Character* character) const override;
 
 public:
-    bool podeSerEquipadoPor(Character* character) const override;
-    bool isEquipavel() const override { return true; }
-    std::vector<std::string> obterDetalhesInspecao(Character* character = nullptr) const override;
+    bool canBeEquippedBy(Character* character) const override;
+    bool isEquippable() const override { return true; }
+    std::vector<std::string> getInspectionDetails(Character* character = nullptr) const override;
 
-    std::unique_ptr<Item> gerarCopiaMelhorada() const override;
+    std::unique_ptr<Item> generateUpgradedCopy() const override;
 };
 
-std::unique_ptr<Item> fabricarEquipamentoArmadura(ItemID id);
+using EquipamentoArmadura = ArmorEquipment;
+
+std::unique_ptr<Item> buildArmorEquipment(ItemID id);
+inline std::unique_ptr<Item> fabricarEquipamentoArmadura(ItemID id) { return buildArmorEquipment(id); }

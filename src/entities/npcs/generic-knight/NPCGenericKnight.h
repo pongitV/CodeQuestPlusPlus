@@ -8,14 +8,14 @@
 
 class NPCGenericKnight {
 public:
-    static std::unique_ptr<Character> criarCavaleiro(const std::string& nome);
-    static void interagir(Character* currentPlayer, bool& trollDerrotado, bool& conviteRecebido, int larguraDoTerminal, std::vector<std::string>& matrizDoMapaAtual, bool exploracaoEstaAtiva, const std::function<void()>& restaurarTela, char celulaDestino, int proximaPosicaoX, int proximaPosicaoY);
+    static std::unique_ptr<Character> createKnight(const std::string& name);
+    static void interact(Character* currentPlayer, bool& trollDefeated, bool& invitationReceived, int terminalWidth, std::vector<std::string>& currentMapMatrix, bool explorationActive, const std::function<void()>& restoreScreen, char targetCell, int nextX, int nextY);
 
-    // English Aliases
-    static std::unique_ptr<Character> createKnight(const std::string& name) { return criarCavaleiro(name); }
-    static void interact(Character* currentPlayer, bool& trollDefeated, bool& invitationReceived, int terminalWidth, std::vector<std::string>& currentMapMatrix, bool explorationActive, const std::function<void()>& restoreScreen, char targetCell, int nextX, int nextY) {
-        interagir(currentPlayer, trollDefeated, invitationReceived, terminalWidth, currentMapMatrix, explorationActive, restoreScreen, targetCell, nextX, nextY);
+    // Aliases legados
+    static std::unique_ptr<Character> criarCavaleiro(const std::string& nome) { return createKnight(nome); }
+    static void interagir(Character* currentPlayer, bool& trollDerrotado, bool& conviteRecebido, int larguraDoTerminal, std::vector<std::string>& matrizDoMapaAtual, bool exploracaoEstaAtiva, const std::function<void()>& restaurarTela, char celulaDestino, int proximaPosicaoX, int proximaPosicaoY) {
+        interact(currentPlayer, trollDerrotado, conviteRecebido, larguraDoTerminal, matrizDoMapaAtual, exploracaoEstaAtiva, restaurarTela, celulaDestino, proximaPosicaoX, proximaPosicaoY);
     }
 };
 
-using NPCGenericKnight = NPCGenericKnight;
+using NPCCavaleiroGenerico = NPCGenericKnight;

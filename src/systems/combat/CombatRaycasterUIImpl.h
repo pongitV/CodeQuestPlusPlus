@@ -2,54 +2,56 @@
 
 #include "ICombatUI.h"
 
-class CombateRaycasterUIImpl : public ICombateUI {
+class CombatRaycasterUIImpl : public ICombatUI {
 public:
-    CombateRaycasterUIImpl() = default;
-    ~CombateRaycasterUIImpl() override = default;
+    CombatRaycasterUIImpl() = default;
+    ~CombatRaycasterUIImpl() override = default;
 
-    void configurarContexto3D(bool modo3D, const std::vector<std::string>& matriz, float posX, float posY, float angulo, const std::string& titulo) override;
+    void configure3DContext(bool is3D, const std::vector<std::string>& matrix, float posX, float posY, float angle, const std::string& title) override;
     
-    void animarIntroducaoCombate(const std::string& titulo, const std::vector<Character*>& enemies, Character* currentPlayer) override;
-    void atualizarTelaEstatica(const std::string& tituloCombate, const std::vector<Character*>& listaDeInimigos, Character* currentPlayer, const std::vector<Character*>& listaDeAliados, bool animarEntrada = false) override;
+    void animateCombatIntroduction(const std::string& title, const std::vector<Character*>& enemies, Character* currentPlayer) override;
+    void updateStaticScreen(const std::string& combatTitle, const std::vector<Character*>& enemyList, Character* currentPlayer, const std::vector<Character*>& allyList, bool animateEntry = false) override;
     
-    void animarDanoNoInimigo(const std::string& tituloCombate, const std::vector<Character*>& listaDeInimigos, Character* alvoAnimacao, Character* atacante, Character* currentPlayer, const std::vector<Character*>& listaDeAliados, int danoAnimacao) override;
-    void animarCuraNoInimigo(const std::string& tituloCombate, const std::vector<Character*>& listaDeInimigos, Character* alvoAnimacao, Character* currentPlayer, const std::vector<Character*>& listaDeAliados, int curaAnimacao) override;
+    void animateDamageOnEnemy(const std::string& combatTitle, const std::vector<Character*>& enemyList, Character* animationTarget, Character* attacker, Character* currentPlayer, const std::vector<Character*>& allyList, int animationDamage) override;
+    void animateHealOnEnemy(const std::string& combatTitle, const std::vector<Character*>& enemyList, Character* animationTarget, Character* currentPlayer, const std::vector<Character*>& allyList, int animationHeal) override;
     
-    void animarDanoNoJogador(const std::string& tituloCombate, const std::vector<Character*>& listaDeInimigos, Character* alvoAnimacao, Character* currentPlayer, const std::vector<Character*>& listaDeAliados, bool isParry, int danoAnimacao) override;
-    void animarCuraNoJogador(const std::string& tituloCombate, const std::vector<Character*>& listaDeInimigos, Character* alvoAnimacao, Character* currentPlayer, const std::vector<Character*>& listaDeAliados, int curaAnimacao) override;
+    void animateDamageOnPlayer(const std::string& combatTitle, const std::vector<Character*>& enemyList, Character* animationTarget, Character* currentPlayer, const std::vector<Character*>& allyList, bool isParry, int animationDamage) override;
+    void animateHealOnPlayer(const std::string& combatTitle, const std::vector<Character*>& enemyList, Character* animationTarget, Character* currentPlayer, const std::vector<Character*>& allyList, int animationHeal) override;
     
-    void animarMorteInimigo(const std::string& tituloCombate, const std::vector<Character*>& listaDeInimigos, Character* inimigoMorto, Character* currentPlayer, const std::vector<Character*>& listaDeAliados, const std::vector<std::string>& drops) override;
+    void animateEnemyDeath(const std::string& combatTitle, const std::vector<Character*>& enemyList, Character* deadEnemy, Character* currentPlayer, const std::vector<Character*>& allyList, const std::vector<std::string>& drops) override;
 
-    void limparContextoPersonagemHUD() override;
-    void limparContextoInimigoMortoEDrops() override;
+    void clearCharacterHUDContext() override;
+    void clearDeadEnemyAndDropsContext() override;
 
-    std::string margemCombate() override;
+    std::string combatMargin() override;
 
-    void adicionarMensagemFixa(const std::string& msg) override;
-    void limparMensagensFixas() override;
-    void definirMensagemBanner(const std::string& msg, CorBanner cor = CorBanner::OURO, const std::string& msgLinha2 = "") override;
-    void definirTurnoVisivel(int turno, const std::string& nome) override;
+    void addFixedMessage(const std::string& msg) override;
+    void clearFixedMessages() override;
+    void setBannerMessage(const std::string& msg, CorBanner color = CorBanner::OURO, const std::string& msgLine2 = "") override;
+    void setVisibleTurn(int turn, const std::string& name) override;
     
-    int obterAcaoDoJogador(int turnoAtual, Character* personagemAgindo, const std::vector<Character*>& enemies, Character* currentPlayer, const std::vector<Character*>& aliados) override;
-    int obterAlvoAtaque(const std::string& tituloCombate, const std::vector<Character*>& enemies, Character* currentPlayer, const std::vector<Character*>& aliados) override;
-    int obterAlvoItem(const std::string& tituloCombate, const std::vector<Character*>& enemies, Character* currentPlayer, const std::vector<Character*>& aliados) override;
-    int obterEscolhaDeEscudo(const std::string& nomePersonagem, const std::vector<Item*>& listaDeEscudos) override;
+    int getPlayerAction(int currentTurn, Character* actingCharacter, const std::vector<Character*>& enemies, Character* currentPlayer, const std::vector<Character*>& allies) override;
+    int getAttackTarget(const std::string& combatTitle, const std::vector<Character*>& enemies, Character* currentPlayer, const std::vector<Character*>& allies) override;
+    int getItemTarget(const std::string& combatTitle, const std::vector<Character*>& enemies, Character* currentPlayer, const std::vector<Character*>& allies) override;
+    int getShieldChoice(const std::string& characterName, const std::vector<Item*>& shieldList) override;
     
-    void notificarInimigosMaisAgeis() override;
-    void notificarTurnoExtra(int dexterityJogador, int maxDestrezaInimigos) override;
-    void notificarDesprevencaoInventario() override;
-    void notificarSemEscudos(const std::string& nomePersonagem) override;
-    void notificarDesequilibrioDefesa(const std::string& nomePersonagem) override;
-    void notificarPosturaDefensiva(const std::string& nomePersonagem, const std::string& nomeEscudo) override;
-    void notificarAcaoInvalida() override;
-    void notificarCancelamentoItem() override;
-    void notificarRequisitoNaoAtendido(const std::string& mensagemRequisito) override;
+    void notifyEnemiesFaster() override;
+    void notifyExtraTurn(int playerDexterity, int maxEnemyDexterity) override;
+    void notifyInventoryUnready() override;
+    void notifyNoShields(const std::string& characterName) override;
+    void notifyDefenseImbalance(const std::string& characterName) override;
+    void notifyDefensiveStance(const std::string& characterName, const std::string& shieldName) override;
+    void notifyInvalidAction() override;
+    void notifyItemCancelled() override;
+    void notifyRequirementNotMet(const std::string& requirementMessage) override;
 
-    void displayTelaVitoria(Character* currentPlayer, int amountDeOuroObtido, int amountDeXpObtido, int totalDamageDealt, int totalDamageTaken, int totalHealingReceived, int combatTurns, const std::vector<std::string>& itensObtidos, const std::vector<std::string>& inimigosDerrotados, int parriesPerfeitos, int maiorDano, int parriesTentados, int parriesEfetivos, int itensConsumidos, const std::vector<std::string>& novasDescobertas) override;
-    void displayTelaDerrota(Character* currentPlayer, int amountDeOuroObtido, int amountDeXpObtido, int totalDamageDealt, int totalDamageTaken, int totalHealingReceived, int combatTurns) override;
+    void showVictoryScreen(Character* currentPlayer, int goldEarned, int xpEarned, int totalDamageDealt, int totalDamageTaken, int totalHealingReceived, int combatTurns, const std::vector<std::string>& obtainedItems, const std::vector<std::string>& defeatedEnemies, int perfectParries, int highestDamage, int attemptedParries, int effectiveParries, int consumedItems, const std::vector<std::string>& newDiscoveries) override;
+    void showDefeatScreen(Character* currentPlayer, int goldEarned, int xpEarned, int totalDamageDealt, int totalDamageTaken, int totalHealingReceived, int combatTurns) override;
 
-    void displayTelaAtributos(Character* character) override;
-    void displayTelaDiario(Character* character) override;
+    void showAttributesScreen(Character* character) override;
+    void showDiaryScreen(Character* character) override;
 
-    void limparTela() override;
+    void clearScreen() override;
 };
+
+using CombateRaycasterUIImpl = CombatRaycasterUIImpl;

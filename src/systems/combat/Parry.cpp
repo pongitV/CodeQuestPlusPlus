@@ -26,68 +26,70 @@ int Parry::cursorPos = 0;
 int Parry::sweetSpotCenter = 0;
 int Parry::sweetSpotSize = 0;
 int Parry::barSize = 0;
-Character* Parry::inimigoAtacante = nullptr;
+Character* Parry::attackingEnemy = nullptr;
+Character*& Parry::inimigoAtacante = Parry::attackingEnemy;
 int Parry::parryStatus = 0;
-int Parry::s_ultimoDanoRefletido = 0;
+int Parry::lastReflectedDamage = 0;
+int& Parry::s_ultimoDanoRefletido = Parry::lastReflectedDamage;
 
-bool Parry::tentarParry(Character* atacante, Character* defensor, int danoMitigado, int& danoReduzido) 
+bool Parry::attemptParry(Character* attacker, Character* defender, int mitigatedDamage, int& reducedDamage) 
 {
-    int dexterityDoAtacante = atacante ? std::max(1, atacante->getDexterity()) : 1;
-    int dexterityDoDefensor = defensor ? std::max(1, defensor->getDexterity()) : 1;
+    int attackerDexterity = attacker ? std::max(1, attacker->getDexterity()) : 1;
+    int defenderDexterity = defender ? std::max(1, defender->getDexterity()) : 1;
 
-    int difficulty = std::clamp(danoMitigado / 5 + (dexterityDoAtacante / 10), 1, 20);
+    int difficulty = std::clamp(mitigatedDamage / 5 + (attackerDexterity / 10), 1, 20);
 
     int sweetSpotSizeOverride = -1;
-    if (defensor) {
-        float ratio = (float)danoMitigado / defensor->obterVidaMaxima();
+    if (defender) {
+        float ratio = (float)mitigatedDamage / defender->getMaxHealth();
         if (ratio < 0.3f) sweetSpotSizeOverride = 6;
         else if (ratio < 0.6f) sweetSpotSizeOverride = 4;
         else sweetSpotSizeOverride = 2;
     }
 
     int digitOverride = -1;
-    if (defensor) {
-        float ratio = (float)danoMitigado / defensor->obterVidaMaxima();
+    if (defender) {
+        float ratio = (float)mitigatedDamage / defender->getMaxHealth();
         if (ratio < 0.3f) digitOverride = 4;
         else if (ratio < 0.6f) digitOverride = 6;
         else digitOverride = 8;
     }
     float typingSpeedMul = 1.0f;
-    if (dexterityDoDefensor > dexterityDoAtacante) typingSpeedMul = 0.7f;
-    else if (dexterityDoDefensor == dexterityDoAtacante) typingSpeedMul = 1.0f;
+    if (defenderDexterity > attackerDexterity) typingSpeedMul = 0.7f;
+    else if (defenderDexterity == attackerDexterity) typingSpeedMul = 1.0f;
     else typingSpeedMul = 1.5f;
 
-    bool sucesso = false;
-    std::string nomeAtacante = atacante ? atacante->getName() : "Inimigo";
+    bool success = false;
+    std::string attackerName = attacker ? attacker->getName() : "Inimigo";
 
     // Notificação de aviso do Parry exigindo ENTER do jogador para iniciar
     if (Parry::onUpdateScreen) {
-        Parry::minigameMessage = "PARRY! " + nomeAtacante + " VAI ATACAR! PRESSIONE ENTER PARA INICIAR (USARA ESPACO)";
+        Parry::minigameMessage = "PARRY! " + attackerName + " VAI ATACAR! PRESSIONE ENTER PARA INICIAR (USARA ESPACO)";
         Parry::onUpdateScreen();
     }
-    InputControl::limparBuffer();
-    InputControl::aguardarEnter("PARRY! INIMIGO VAI ATACAR! PRESSIONE ENTER PARA INICIAR (USARA ESPACO)");
-    InputControl::limparBuffer();
+    InputControl::clearBuffer();
+    InputControl::waitForEnter("PARRY! INIMIGO VAI ATACAR! PRESSIONE ENTER PARA INICIAR (USARA ESPACO)");
+    InputControl::clearBuffer();
     Parry::minigameMessage = "";
 
     // Executa o minigame diretamente no Direct2D sem popups de terminal
     bool isTerminal = !GerenciadorPerspectiva::obterInstancia().isVisao3DAtiva();
     if (isTerminal) {
-        sucesso = executarMinigameDigitacao(difficulty, danoMitigado, danoReduzido, typingSpeedMul, digitOverride);
+        success = executeTypingMinigame(difficulty, mitigatedDamage, reducedDamage, typingSpeedMul, digitOverride);
     } else {
-        if (defensor && defensor->obterParryModerno()) {
+        if (defender && defender->isModernParry()) {
             float speedMul = 1.0f;
-            if (dexterityDoDefensor > dexterityDoAtacante) speedMul = 2.0f;
-            else if (dexterityDoDefensor == dexterityDoAtacante) speedMul = 1.5f;
-            sucesso = executarMinigameMovimento(difficulty, danoMitigado, danoReduzido, speedMul, sweetSpotSizeOverride);
+            if (defenderDexterity > attackerDexterity) speedMul = 2.0f;
+            else if (defenderDexterity == attackerDexterity) speedMul = 1.5f;
+            success = executeMovementMinigame(difficulty, mitigatedDamage, reducedDamage, speedMul, sweetSpotSizeOverride);
         } else {
-            sucesso = executarMinigameDigitacao(difficulty, danoMitigado, danoReduzido, typingSpeedMul, digitOverride);
+            success = executeTypingMinigame(difficulty, mitigatedDamage, reducedDamage, typingSpeedMul, digitOverride);
         }
     }
-    return sucesso;
+    return success;
 }
 
-void Parry::renderizarOverlaysD2D(D2DRenderer& d2d, int screenWidth, int screenHeight) {
+void Parry::renderD2DOverlays(D2DRenderer& d2d, int screenWidth, int screenHeight) {
     if (Parry::barSize <= 0 && Parry::minigameMessage.empty() && Parry::minigameBar.empty()) return;
 
     float cx = screenWidth / 2.0f;
@@ -122,15 +124,15 @@ void Parry::renderizarOverlaysD2D(D2DRenderer& d2d, int screenWidth, int screenH
     }
 }
 
-void Parry::executarTelegraphingFlash(const std::string& nomeInimigo) {
+void Parry::executeTelegraphingFlash(const std::string& enemyName) {
     if (!Parry::onUpdateScreen) return;
 
-    std::string msgOriginal = Parry::minigameMessage;
-    std::string nomeStr = nomeInimigo.empty() ? "INIMIGO" : nomeInimigo;
+    std::string originalMsg = Parry::minigameMessage;
+    std::string enemyStr = enemyName.empty() ? "INIMIGO" : enemyName;
 
     for (int f = 0; f < 3; ++f) {
         if (f % 2 == 0) {
-            Parry::minigameMessage = "FLASH! " + nomeStr + " VAI ATACAR!";
+            Parry::minigameMessage = "FLASH! " + enemyStr + " VAI ATACAR!";
         } else {
             Parry::minigameMessage = "PREPARE-SE PARA O PARRY!";
         }
@@ -140,69 +142,69 @@ void Parry::executarTelegraphingFlash(const std::string& nomeInimigo) {
         std::this_thread::sleep_for(std::chrono::milliseconds(40));
     }
     
-    Parry::minigameMessage = msgOriginal;
+    Parry::minigameMessage = originalMsg;
 }
 
-std::string Parry::obterMensagemFeedback(bool parrySucesso, int finalDamage) {
-    if (parrySucesso) {
+std::string Parry::getFeedbackMessage(bool parrySuccess, int finalDamage) {
+    if (parrySuccess) {
         if (finalDamage <= 0) return "Parry Perfeito! Ataque anulado.";
         else return "Parry efetivo! -" + std::to_string(finalDamage) + " HP.";
     }
     return "Parry falhou! -" + std::to_string(finalDamage) + " HP.";
 }
 
-bool Parry::executarMinigameMovimento(int difficulty, int danoMitigado, int& danoReduzido, float speedMultiplier, int sweetSpotSizeOverride) 
+bool Parry::executeMovementMinigame(int difficulty, int mitigatedDamage, int& reducedDamage, float speedMultiplier, int sweetSpotSizeOverride) 
 {
     Parry::minigameMessage = "APERTE [ESPACO] NO ALVO!";
     
     barSize = 36;
     sweetSpotSize = (sweetSpotSizeOverride >= 0) ? sweetSpotSizeOverride : std::clamp(6 - (difficulty / 4), 2, 8);
     // Garantir que a zona verde do parry apareca apenas na metade direita da barra
-    sweetSpotCenter = RandomGenerator::getInteiro(barSize / 2 + sweetSpotSize / 2, barSize - sweetSpotSize / 2 - 2);
+    sweetSpotCenter = RandomGenerator::getInt(barSize / 2 + sweetSpotSize / 2, barSize - sweetSpotSize / 2 - 2);
     
-    int posicaoAtual = 0;
-    bool espacoPressionado = false;
-    int posicaoPressionada = -1;
+    int currentPosition = 0;
+    bool spacePressed = false;
+    int pressedPosition = -1;
     
-    InputControl::limparBuffer();
+    InputControl::clearBuffer();
     
     int delayMs = std::clamp((int)(25.0f / (1.0f + (difficulty * 0.08f) * speedMultiplier)), 8, 35);
     auto minigameStart = std::chrono::steady_clock::now();
 
-    while (posicaoAtual <= barSize) {
-        cursorPos = posicaoAtual;
+    while (currentPosition <= barSize) {
+        cursorPos = currentPosition;
 
         if (auto* win = D2DContext::window) win->processarMensagens();
-        InputControl::atualizarTeclas();
+        InputControl::updateKeys();
         
-        std::string barra = "[";
+        std::string bar = "[";
         for (int i = 0; i < barSize; i++) {
-            bool noSweetSpot = (i >= sweetSpotCenter - sweetSpotSize/2 && i <= sweetSpotCenter + sweetSpotSize/2);
+            bool inSweetSpot = (i >= sweetSpotCenter - sweetSpotSize/2 && i <= sweetSpotCenter + sweetSpotSize/2);
             if (i == cursorPos) {
-                barra += "|>";
-            } else if (noSweetSpot) {
-                barra += "=";
+                bar += "|>";
+            } else if (inSweetSpot) {
+                bar += "=";
             } else {
-                barra += "-";
+                bar += "-";
             }
         }
-        barra += "]";
-        Parry::minigameBar = "REACAO: " + barra;
+        bar += "]";
+        Parry::minigameBar = "REACAO: " + bar;
 
         if (Parry::onUpdateScreen) {
             Parry::onUpdateScreen();
         }
 
-        char tecla = InputControl::lerTecla();
+        char key = InputControl::readKey();
         auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - minigameStart).count();
-        if (elapsedMs > 100 && tecla == ' ') {
-            espacoPressionado = true;
-            posicaoPressionada = posicaoAtual;
+        if (elapsedMs > 100 && key == ' ') {
+            spacePressed = true;
+            pressedPosition = currentPosition;
             break;
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
-        posicaoAtual++;
+        currentPosition++;
     }
 
     cursorPos = -1;
@@ -213,62 +215,62 @@ bool Parry::executarMinigameMovimento(int difficulty, int danoMitigado, int& dan
         Parry::onUpdateScreen();
     }
     
-    if (espacoPressionado) {
-        bool noSweetSpot = (posicaoPressionada >= sweetSpotCenter - sweetSpotSize/2 && posicaoPressionada <= sweetSpotCenter + sweetSpotSize/2);
-        if (noSweetSpot) {
-            int distancia = std::abs(posicaoPressionada - sweetSpotCenter);
-            if (distancia <= 1) {
-                danoReduzido = danoMitigado;
+    if (spacePressed) {
+        bool inSweetSpot = (pressedPosition >= sweetSpotCenter - sweetSpotSize/2 && pressedPosition <= sweetSpotCenter + sweetSpotSize/2);
+        if (inSweetSpot) {
+            int distance = std::abs(pressedPosition - sweetSpotCenter);
+            if (distance <= 1) {
+                reducedDamage = mitigatedDamage;
             } else {
-                danoReduzido = std::max(1, danoMitigado / 2);
+                reducedDamage = std::max(1, mitigatedDamage / 2);
             }
             return true;
         }
     }
     
-    danoReduzido = 0;
+    reducedDamage = 0;
     return false;
 }
 
-bool Parry::executarMinigameDigitacao(int difficulty, int danoMitigado, int& danoReduzido, float speedMultiplier, int digitOverride)
+bool Parry::executeTypingMinigame(int difficulty, int mitigatedDamage, int& reducedDamage, float speedMultiplier, int digitOverride)
 {
-    int tamanhoSequencia = (digitOverride > 0) ? digitOverride : std::clamp(4 + difficulty / 5, 4, 8);
-    std::string sequencia = "";
-    for (int i = 0; i < tamanhoSequencia; ++i) {
-        sequencia += std::to_string(RandomGenerator::getInteiro(0, 9));
+    int sequenceSize = (digitOverride > 0) ? digitOverride : std::clamp(4 + difficulty / 5, 4, 8);
+    std::string sequence = "";
+    for (int i = 0; i < sequenceSize; ++i) {
+        sequence += std::to_string(RandomGenerator::getInt(0, 9));
     }
 
-    double tempoLimite = std::max(1.5, (4.0 - difficulty / 6.0) / std::max(0.1f, speedMultiplier));
+    double timeLimit = std::max(1.5, (4.0 - difficulty / 6.0) / std::max(0.1f, speedMultiplier));
 
-    std::string instructions = "DIGITE: " + sequencia;
+    std::string instructions = "DIGITE: " + sequence;
     Parry::minigameMessage = instructions;
 
-    std::string resposta = "";
-    auto inicio = std::chrono::steady_clock::now();
-    bool tempoEsgotado = false;
-    bool concluido = false;
+    std::string answer = "";
+    auto start = std::chrono::steady_clock::now();
+    bool timeExpired = false;
+    bool completed = false;
 
-    InputControl::limparBuffer();
+    InputControl::clearBuffer();
 
     while (true) {
         if (auto* win = D2DContext::window) win->processarMensagens();
-        InputControl::atualizarTeclas();
+        InputControl::updateKeys();
 
-        auto agora = std::chrono::steady_clock::now();
-        double decorrido = std::chrono::duration<double>(agora - inicio).count();
+        auto now = std::chrono::steady_clock::now();
+        double elapsed = std::chrono::duration<double>(now - start).count();
 
-        if (decorrido >= tempoLimite) {
-            tempoEsgotado = true;
+        if (elapsed >= timeLimit) {
+            timeExpired = true;
             break;
         }
 
-        float tempoRestante = (float)std::max(0.0, tempoLimite - decorrido);
+        float remainingTime = (float)std::max(0.0, timeLimit - elapsed);
         std::ostringstream ss;
-        ss << std::fixed << std::setprecision(1) << "DIGITADO: " << resposta;
+        ss << std::fixed << std::setprecision(1) << "DIGITADO: " << answer;
         std::string barText = ss.str();
-        for (size_t k = resposta.size(); k < (size_t)tamanhoSequencia; ++k)
+        for (size_t k = answer.size(); k < (size_t)sequenceSize; ++k)
             barText += "_";
-        ss.str(""); ss << " [" << tempoRestante << "s]";
+        ss.str(""); ss << " [" << remainingTime << "s]";
         barText += ss.str();
         Parry::minigameBar = barText;
 
@@ -276,20 +278,20 @@ bool Parry::executarMinigameDigitacao(int difficulty, int danoMitigado, int& dan
             Parry::onUpdateScreen();
         }
 
-        char c = InputControl::lerTecla();
+        char c = InputControl::readKey();
         if (c != 0) {
-            auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - inicio).count();
+            auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count();
             if (c == '\r' || c == '\n') {
-                if (elapsedMs > 150 && !resposta.empty()) {
-                    concluido = true;
+                if (elapsedMs > 150 && !answer.empty()) {
+                    completed = true;
                     break;
                 }
             } else if (c == '\b' || c == 127) {
-                if (!resposta.empty()) {
-                    resposta.pop_back();
+                if (!answer.empty()) {
+                    answer.pop_back();
                 }
             } else if (std::isdigit(static_cast<unsigned char>(c))) {
-                resposta += c;
+                answer += c;
             }
         }
 
@@ -299,7 +301,7 @@ bool Parry::executarMinigameDigitacao(int difficulty, int danoMitigado, int& dan
     Parry::minigameMessage = "";
     Parry::minigameBar = "";
 
-    if (tempoEsgotado) {
+    if (timeExpired) {
         if (Parry::onUpdateScreen) {
             Parry::minigameMessage = "TEMPO ESGOTADO!";
             Parry::onUpdateScreen();
@@ -307,24 +309,24 @@ bool Parry::executarMinigameDigitacao(int difficulty, int danoMitigado, int& dan
             Parry::minigameMessage = "";
             Parry::onUpdateScreen();
         }
-        danoReduzido = 0;
+        reducedDamage = 0;
         return false;
     }
 
-    auto fim = std::chrono::steady_clock::now();
-    double tempoTotal = std::chrono::duration<double>(fim - inicio).count();
+    auto end = std::chrono::steady_clock::now();
+    double totalTime = std::chrono::duration<double>(end - start).count();
 
-    if (concluido && resposta == sequencia) {
-        if (tempoTotal <= tempoLimite * 0.5) {
+    if (completed && answer == sequence) {
+        if (totalTime <= timeLimit * 0.5) {
             // Parry Perfeito!
-            danoReduzido = danoMitigado;
+            reducedDamage = mitigatedDamage;
         } else {
             // Parry Efetivo!
-            danoReduzido = std::max(1, danoMitigado / 2);
+            reducedDamage = std::max(1, mitigatedDamage / 2);
         }
         return true;
     }
 
-    danoReduzido = 0;
+    reducedDamage = 0;
     return false;
 }

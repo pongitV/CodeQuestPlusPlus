@@ -122,42 +122,42 @@ const std::vector<std::string>& Mimic::getRaceAppearance() const
 
 
 // --- LOGICA DE ROUBO ---
-void Mimic::aoCausarDano(Character* atacante, Character* alvo, int danoCausado) {
-    if (danoCausado <= 0) return;
+void Mimic::onDealingDamage(Character* /*attacker*/, Character* target, int damageDealt) {
+    if (damageDealt <= 0) return;
     
-    int ouroAtual = alvo->obterInventario()->obterOuro();
-    if (ouroAtual <= 0) return; // Jogador já está pobre
+    int currentGold = target->getInventory()->getGold();
+    if (currentGold <= 0) return; // Jogador já está pobre
 
-    int roubo = RandomGenerator::getInteiro(30, 80);
-    if (roubo > ouroAtual) roubo = ouroAtual; // Não pode roubar mais do que o jogador tem
+    int stolenAmount = RandomGenerator::getInt(30, 80);
+    if (stolenAmount > currentGold) stolenAmount = currentGold; // Não pode roubar mais do que o jogador tem
     
-    alvo->obterInventario()->adicionarOuro(-roubo);
-    ouroRoubadoTotal += roubo;
+    target->getInventory()->addGold(-stolenAmount);
+    totalStolenGold += stolenAmount;
     
     // A mensagem na UI foi removida para priorizar o combat limpo
     // TelaCombate::adicionarMensagemFixa(msg);
 }
 
 // --- BESTIARIO E DROPS ---
-BestiaryInfo Mimic::obterBestiaryInfo() const {
+BestiaryInfo Mimic::getBestiaryInfo() const {
     return {
         "Masmorras e Cavernas", 
         "Dentro de Baus",
         "Uma criatura magica horrenda que se disfarca de baus de tesouro para devorar aventureiros gananciosos.",
         "Mimics digerem carne rapidamente, mas cospem os metais preciosos.",
-        {"Armor de bau", "Ouro", "Ouro Extra (Ouro roubado retornado)", ItemFactory::getNameDeID(ItemID::PocaoCura30)},
+        {"Armor de bau", "Ouro", "Ouro Extra (Ouro roubado retornado)", ItemFactory::getNameFromID(ItemID::PocaoCura30)},
         4
     };
 }
 
-void Mimic::realizarDrops(Character* enemy, Character* currentPlayer, std::vector<std::string>& itensObtidos, int& ouroTotal, int& xpTotal)
+void Mimic::performDrops(Character* enemy, Character* currentPlayer, std::vector<std::string>& obtainedItems, int& totalGold, int& totalXp)
 {
-    Drops::reportAndProcessXPGold(currentPlayer, 150, 120 + ouroRoubadoTotal, ouroTotal, xpTotal);
+    Drops::reportAndProcessXPGold(currentPlayer, 150, 120 + totalStolenGold, totalGold, totalXp);
 
-    if (ouroRoubadoTotal > 0) {
-         Bestiary::instancia().registrarDrop(enemy->getName(), "Ouro Extra (Ouro roubado retornado)");
+    if (totalStolenGold > 0) {
+         Bestiary::instance().registerDrop(enemy->getName(), "Ouro Extra (Ouro roubado retornado)");
     }
 
-    Drops::giveAndProcessItem(currentPlayer, ItemID::PocaoCura30, RandomGenerator::getInteiro(1, 2), itensObtidos);
-    Drops::giveAndProcessItem(currentPlayer, ItemID::ArmaduraBau, 1, itensObtidos);
+    Drops::giveAndProcessItem(currentPlayer, ItemID::PocaoCura30, RandomGenerator::getInt(1, 2), obtainedItems);
+    Drops::giveAndProcessItem(currentPlayer, ItemID::ArmaduraBau, 1, obtainedItems);
 }

@@ -1,15 +1,16 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 #include "RaceBase.h"
 
-class FabricaRacas {
+class RaceFactory {
 public:
-    static std::unique_ptr<RaceBase> createRace(RaceType tipo);
-    static std::vector<RaceType> obterRacasJogaveis();
+    static std::unique_ptr<RaceBase> createRace(RaceType type);
+    static std::vector<RaceType> getPlayableRaces();
 
-    // English Alias
-    static std::vector<RaceType> getPlayableRaces() { return obterRacasJogaveis(); }
+    // Compatibilidade legada
+    static std::vector<RaceType> obterRacasJogaveis() { return getPlayableRaces(); }
 };
 
-using RaceFactory = FabricaRacas;
+using FabricaRacas = RaceFactory;

@@ -7,66 +7,66 @@
 #include "../../../systems/inventory/ItemFactory.h"
 #include "../../../core/utils/DialogFunctions.h"
 
-// --- INFORMACOES DA CLASSE ---
-std::string Archer::getNameClasse() const 
+// --- INFORMAÇÕES DA CLASSE ---
+std::string Archer::getClassName() const 
 {
      return "Archer"; 
 }
 
-const std::vector<std::string>& Archer::obterAparenciaClasseMenu() const 
+const std::vector<std::string>& Archer::getClassMenuAppearance() const 
 {
     static const std::vector<std::string> appearance;
     return appearance;
 }
 
-Attributes Archer::obterAtributosClasse() const
+Attributes Archer::getClassAttributes() const
 {
     return { 0, 10, 20, 3, 10, 5, 5 };
 }
 
-std::vector<std::unique_ptr<Item>> Archer::obterEquipamentoClasse() const 
+std::vector<std::unique_ptr<Item>> Archer::getClassEquipment() const 
 {
-    auto equipamentos = ItemFactory::criarKitPocoes();
+    auto equipment = ItemFactory::criarKitPocoes();
 
-    equipamentos.push_back(ItemFactory::criarItem(ItemID::ArcoMadeira));
-    equipamentos.push_back(ItemFactory::criarItem(ItemID::BracedeirasPrata));
-    equipamentos.push_back(ItemFactory::criarItem(ItemID::ArmaduraCouro));
-    return equipamentos;
+    equipment.push_back(ItemFactory::criarItem(ItemID::ArcoMadeira));
+    equipment.push_back(ItemFactory::criarItem(ItemID::BracedeirasPrata));
+    equipment.push_back(ItemFactory::criarItem(ItemID::ArmaduraCouro));
+    return equipment;
 }
 
 // --- PASSIVA DA CLASSE ---
-std::string Archer::getNamePassivaClasse() const 
+std::string Archer::getClassPassiveName() const 
 { 
     return "Passos leves"; 
 }
 
-std::string Archer::obterDescricaoPassivaClasse() const 
+std::string Archer::getClassPassiveDescription() const 
 { 
     return "Penalidade de armaduras e debuffs de lentidao reduzidos pela metade."; 
 }
 
-int Archer::processarPenalidadeArmaduraPassivaArqueiro(int penalidadeBase) const 
+int Archer::processArcherPassiveArmorPenalty(int basePenalty) const 
 {
-    return penalidadeBase / 2;
+    return basePenalty / 2;
 }
 
-int Archer::aplicarPenalidadeLentidaoPassivaArqueiro(int dexterityAtual) const 
+int Archer::applyArcherPassiveSlowPenalty(int currentDexterity) const 
 {
-    return (dexterityAtual * 3) / 4;
+    return (currentDexterity * 3) / 4;
 }
 
-int Archer::reverterPenalidadeLentidaoPassivaArqueiro(int dexterityAtual) const 
+int Archer::revertArcherPassiveSlowPenalty(int currentDexterity) const 
 {
-    return (dexterityAtual * 4) / 3;
+    return (currentDexterity * 4) / 3;
 }
 
 // --- HABILIDADE DA CLASSE ---
-std::string Archer::obterRecargaHabilidadeClasse() const 
+std::string Archer::getClassAbilityCooldownDescription() const 
 { 
     return "Recarga: 1 turno."; 
 }
 
-std::string Archer::getNameHabilidadeClasse() const 
+std::string Archer::getClassAbilityName() const 
 { 
     return "Retirada com pontaria"; 
 }
@@ -76,14 +76,14 @@ std::string Archer::getClassAbilityDescription() const
     return "Se afasta durante um turno, no proximo turno causa 2x damage"; 
 }
 
-void Archer::useClassAbility(Combat* combat, Character* personagemUsuario, std::vector<Character*>& /*listaDeInimigos*/) 
+void Archer::useClassAbility(Combat* combat, Character* userCharacter, std::vector<Character*>& /*enemyList*/) 
 {
-    int turnosRestantes = personagemUsuario->obterRecargaHabilidade(AbilityID::RetiradaComPontaria);
-    if (verificarEReportarRecarga(personagemUsuario, turnosRestantes, getNameHabilidadeClasse())) return;
+    int remainingTurns = userCharacter->obterRecargaHabilidade(AbilityID::RetreatWithAim);
+    if (checkAndReportCooldown(userCharacter, remainingTurns, getClassAbilityName())) return;
 
-    personagemUsuario->adicionarEfeito(std::make_unique<EfeitoInviolavel>(1));
-    personagemUsuario->definirCooldown(AbilityID::RetiradaComPontaria, 2);
+    userCharacter->adicionarEfeito(std::make_unique<InviolableEffect>(1));
+    userCharacter->definirCooldown(AbilityID::RetreatWithAim, 2);
     
     std::string msg = DialogFunctions::formatarMsgHabilidade("Retirada com pontaria! (Afasta-se)");
-    notificarMensagemCombate(msg, msg);
+    notifyCombatMessage(msg, msg);
 }

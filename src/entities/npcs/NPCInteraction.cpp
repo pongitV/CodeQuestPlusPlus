@@ -8,109 +8,107 @@
 #include "../../core/utils/Color.h"
 
 // --- INTERACAO PRINCIPAL ---
-void NPCInteraction::interagir(Character* currentPlayer) {
-    std::string opcao;
-    
+void NPCInteraction::interact(Character* currentPlayer) {
     InputControl::executarLoopMenuPopup(
-        [this, currentPlayer]() { return this->obterDialogo(currentPlayer); },
-        [this, currentPlayer]() { return this->obterOpcoesMenu(currentPlayer, 120); },
-        [this, currentPlayer](const std::string& op) { this->processarOpcao(currentPlayer, op, 120); return true; },
-        getNameDoLugar(), obterCorDoCabecalho(), obterArteASCII()
+        [this, currentPlayer]() { return this->getDialogue(currentPlayer); },
+        [this, currentPlayer]() { return this->getMenuOptions(currentPlayer, 120); },
+        [this, currentPlayer](const std::string& op) { this->processOption(currentPlayer, op, 120); return true; },
+        getPlaceName(), getHeaderColor(), getASCIIArt()
     );
 }
 
-void NPCInteraction::processarMenuMissoesVazio(Character* currentPlayer, const std::string& tituloMenu, Color corCabecalho, const std::string& nomeNPC, const std::string& falaVazia) {
-    std::string opcaoMissao;
+void NPCInteraction::processEmptyQuestsMenu(Character* /*currentPlayer*/, const std::string& menuTitle, Color headerColor, const std::string& /*npcName*/, const std::string& /*emptyDialogue*/) {
+    std::string questOption;
     do {
-        std::vector<std::string> missoes = {
+        std::vector<std::string> quests = {
             "(Nenhuma missao disponivel)",
             "VOLTAR"
         };
         
-        int id = InputControl::lerSelecaoMenuEmPopup(tituloMenu, {"Escolha uma missao:"}, missoes, corCabecalho);
+        int id = InputControl::lerSelecaoMenuEmPopup(menuTitle, {"Escolha uma missao:"}, quests, headerColor);
         if (id == -1) break;
-        opcaoMissao = missoes[id];
+        questOption = quests[id];
 
-        if (opcaoMissao == "(Nenhuma missao disponivel)") {
+        if (questOption == "(Nenhuma missao disponivel)") {
         }
-    } while (opcaoMissao != "VOLTAR");
+    } while (questOption != "VOLTAR");
 }
 
-bool NPCInteraction::verificarMaterialNoInventario(Character* currentPlayer, const std::string& nomeMaterial, int quantidadeNecessaria, const std::string& nomeNPC, Color corNPC, const std::string& mensagemPersonalizada) {
-    int qtdAtual = currentPlayer->getInventory()->obterQuantidadeItem(nomeMaterial);
-    if (qtdAtual < quantidadeNecessaria) {
-        std::string texto = mensagemPersonalizada.empty()
-            ? "Voce precisa de " + std::to_string(quantidadeNecessaria) + "x " + nomeMaterial + " para isso!"
-            : mensagemPersonalizada;
-        InputControl::lerSelecaoMenuEmPopup(nomeNPC, {texto}, {"OK"}, corNPC);
+bool NPCInteraction::verifyMaterialInInventory(Character* currentPlayer, const std::string& materialName, int requiredAmount, const std::string& npcName, Color npcColor, const std::string& customMessage) {
+    int currentAmount = currentPlayer->getInventory()->getItemCount(materialName);
+    if (currentAmount < requiredAmount) {
+        std::string text = customMessage.empty()
+            ? "Voce precisa de " + std::to_string(requiredAmount) + "x " + materialName + " para isso!"
+            : customMessage;
+        InputControl::lerSelecaoMenuEmPopup(npcName, {text}, {"OK"}, npcColor);
         return false;
     }
     return true;
 }
 
-Item* NPCInteraction::lerItemDoInventario(Character* currentPlayer, const std::string& mensagemDialogo, const std::string& nomeNPC, Color corNPC, std::string& codigoSaida, bool displayPrecos) {
-    Item* itemSelecionado = nullptr;
+Item* NPCInteraction::readItemFromInventory(Character* currentPlayer, const std::string& /*dialogueMessage*/, const std::string& /*npcName*/, Color /*npcColor*/, std::string& exitCode, bool displayPrices) {
+    Item* selectedItem = nullptr;
 
     TelaBase::executarLoop(
         [](bool animar) { TelaInventario::displayCabecalhoInventario(animar); },
         [&]() {
         },
-        [currentPlayer, displayPrecos]() {
-            std::vector<std::string> opcoes;
-            opcoes.push_back("Arsenal de Equipamentos");
-            opcoes.push_back("Itens Consumiveis");
-            opcoes.push_back("Estoque e Materiais");
-            opcoes.push_back("Itens de Missao");
-            opcoes.push_back("VOLTAR");
-            return opcoes;
+        [currentPlayer, displayPrices]() {
+            std::vector<std::string> options;
+            options.push_back("Arsenal de Equipamentos");
+            options.push_back("Itens Consumiveis");
+            options.push_back("Estoque e Materiais");
+            options.push_back("Itens de Missao");
+            options.push_back("VOLTAR");
+            return options;
         },
-        [&](int escolhaCat) {
-            if (escolhaCat < 0 || escolhaCat == 4) {
-                codigoSaida = "0";
+        [&](int categoryChoice) {
+            if (categoryChoice < 0 || categoryChoice == 4) {
+                exitCode = "0";
                 return false;
             }
             
-            auto itensCategoria = TelaInventario::obterListaCategoria(currentPlayer, escolhaCat, displayPrecos);
+            auto categoryItems = TelaInventario::obterListaCategoria(currentPlayer, categoryChoice, displayPrices);
             
             TelaBase::executarLoop(
                 [](bool animar) { TelaInventario::displayCabecalhoInventario(animar); },
                 [&]() {},
-                [&itensCategoria]() {
-                    std::vector<std::string> opcoes;
-                    for (auto& par : itensCategoria) opcoes.push_back(par.first);
-                    opcoes.push_back("VOLTAR");
-                    return opcoes;
+                [&categoryItems]() {
+                    std::vector<std::string> options;
+                    for (auto& pair : categoryItems) options.push_back(pair.first);
+                    options.push_back("VOLTAR");
+                    return options;
                 },
-                [&](int escolhaItem) {
-                    if (escolhaItem < 0 || escolhaItem >= static_cast<int>(itensCategoria.size())) {
+                [&](int itemChoice) {
+                    if (itemChoice < 0 || itemChoice >= static_cast<int>(categoryItems.size())) {
                         return false;
                     }
-                    itemSelecionado = itensCategoria[escolhaItem].second;
-                    codigoSaida = "selecionado";
+                    selectedItem = categoryItems[itemChoice].second;
+                    exitCode = "selecionado";
                     return false;
                 }
             );
 
-            if (itemSelecionado) return false;
+            if (selectedItem) return false;
             return true;
         }
     );
     
-    return itemSelecionado;
+    return selectedItem;
 }
 
-void NPCInteraction::displayTelaDeSucesso(const std::string& tituloCabecalho, Color corCabecalho, const std::string& equacao, const std::vector<std::string>& arteAscii, const std::string& nomeNPC, const std::string& falaNPC) {
-    InputControl::lerSelecaoMenuEmPopup(tituloCabecalho, {falaNPC}, {"OK"}, corCabecalho, arteAscii);
+void NPCInteraction::displaySuccessScreen(const std::string& headerTitle, Color headerColor, const std::string& /*equation*/, const std::vector<std::string>& asciiArt, const std::string& /*npcName*/, const std::string& npcDialogue) {
+    InputControl::lerSelecaoMenuEmPopup(headerTitle, {npcDialogue}, {"OK"}, headerColor, asciiArt);
 }
 
-std::string NPCInteraction::obterFormatadorStatusItem(ItemID id) {
-    std::unique_ptr<Item> tempItem = ItemFactory::criarItem(id);
-    return tempItem ? tempItem->obterInfoStatus() : "";
+std::string NPCInteraction::getItemStatusFormatter(ItemID id) {
+    std::unique_ptr<Item> tempItem = ItemFactory::createItem(id);
+    return tempItem ? tempItem->getStatusInfo() : "";
 }
 
-bool NPCInteraction::verificarItemNaoEquipado(Character* currentPlayer, Item* itemAvaliado, const std::string& nomeNPC, Color corNPC, const std::string& msgErro) {
-    if (currentPlayer->isItemEquipado(itemAvaliado)) {
-        InputControl::lerSelecaoMenuEmPopup(nomeNPC, {msgErro}, {"OK"}, corNPC);
+bool NPCInteraction::verifyItemNotEquipped(Character* currentPlayer, Item* evaluatedItem, const std::string& npcName, Color npcColor, const std::string& errorMessage) {
+    if (currentPlayer->isItemEquipped(evaluatedItem)) {
+        InputControl::lerSelecaoMenuEmPopup(npcName, {errorMessage}, {"OK"}, npcColor);
         return false;
     }
     return true;

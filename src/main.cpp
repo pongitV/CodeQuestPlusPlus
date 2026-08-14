@@ -23,11 +23,11 @@
 #include "core/state/StateManager.h"
 #include "ui/UIManager.h"
 
-static std::unique_ptr<GameWindow> g_janela;
+static std::unique_ptr<GameWindow> g_window;
 static std::unique_ptr<D2DRenderer> g_d2d;
 static std::unique_ptr<FramePipeline> g_pipeline;
-static std::unique_ptr<GridEmulator2D> g_grade;
-static std::unique_ptr<ContextoDoJogo> g_contexto;
+static std::unique_ptr<GridEmulator2D> g_grid;
+static std::unique_ptr<GameContext> g_context;
 
 /**
  * @brief Função principal (Entrypoint do Windows).
@@ -43,38 +43,38 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine,
     (void)pCmdLine;
 
     // Inicializa o contexto global compartilhado por todos os estados do jogo.
-    g_contexto = std::make_unique<ContextoDoJogo>();
+    g_context = std::make_unique<GameContext>();
 
     // Inicialização do sistema de janelas do SO
-    g_janela = std::make_unique<GameWindow>(hInstance, nCmdShow);
-    if (!g_janela->obterHWND()) return -1;
-    g_contexto->definirJanela(g_janela.get());
+    g_window = std::make_unique<GameWindow>(hInstance, nCmdShow);
+    if (!g_window->getHWND()) return -1;
+    g_context->setWindow(g_window.get());
 
     g_d2d = std::make_unique<D2DRenderer>();
-    if (!g_d2d->initialize(g_janela->obterHWND())) return -1;
-    g_contexto->definirRenderizador(g_d2d.get());
+    if (!g_d2d->initialize(g_window->getHWND())) return -1;
+    g_context->setRenderer(g_d2d.get());
 
-    g_grade = std::make_unique<GridEmulator2D>(*g_d2d);
+    g_grid = std::make_unique<GridEmulator2D>(*g_d2d);
     g_pipeline = std::make_unique<FramePipeline>();
-    g_contexto->definirGrade(g_grade.get());
-    g_contexto->definirPipeline(g_pipeline.get());
+    g_context->setGrid(g_grid.get());
+    g_context->setPipeline(g_pipeline.get());
 
-    g_grade->definirCelulaTamanho(14.0f);
-    g_grade->definirGridDimensoes(80, 40);
+    g_grid->setCellSize(14.0f);
+    g_grid->setGridDimensions(80, 40);
 
-    InputSystem::Initialize(g_janela->obterHWND());
+    InputSystem::Initialize(g_window->getHWND());
 
     D2DContext::renderer = g_d2d.get();
-    D2DContext::grid = g_grade.get();
+    D2DContext::grid = g_grid.get();
     D2DContext::pipeline = g_pipeline.get();
-    D2DContext::window = g_janela.get();
+    D2DContext::window = g_window.get();
 
-    GerenciadorPerspectiva::obterInstancia().initialize();
+    PerspectiveManager::getInstance().initialize();
 
     // Renderiza um primeiro quadro limpo (fundo escuro) para evitar "flicker" branco
     // da janela do Windows antes que o loop principal do jogo assuma o controle.
     {
-        auto* renderTarget = g_d2d->obterRenderTarget();
+        auto* renderTarget = g_d2d->getRenderTarget();
         if (renderTarget) {
             renderTarget->BeginDraw();
             renderTarget->Clear(D2D1::ColorF(0.05f, 0.05f, 0.08f));
@@ -83,8 +83,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine,
     }
 
     // Instancia a Máquina de Estados Finita (FSM) começando no Menu Principal e dispara o loop de atualização.
-    Jogo jogo(std::make_unique<EstadoMenu>());
-    jogo.executarLoop();
+    Game game(std::make_unique<MenuState>());
+    game.runLoop();
 
     return 0;
 }

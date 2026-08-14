@@ -6,13 +6,14 @@
 
 class MaterialItem : public Item {
 private:
-    std::string nome;
+    std::string name;
 public:
-    MaterialItem(const std::string& nome, int price = 3);
+    MaterialItem(const std::string& name, int price = 3);
 
-    std::string getNameItem() const override;
-    TipoEquipamento obterTipo() const override;
-    std::vector<std::string> obterDetalhesInspecao(Character* character = nullptr) const override;
+    std::string getItemName() const override;
+    EquipmentType getType() const override;
+    std::vector<std::string> getInspectionDetails(Character* character = nullptr) const override;
 };
 
-std::unique_ptr<Item> fabricarMaterialItem(ItemID id);
+std::unique_ptr<Item> buildMaterialItem(ItemID id);
+inline std::unique_ptr<Item> fabricarMaterialItem(ItemID id) { return buildMaterialItem(id); }

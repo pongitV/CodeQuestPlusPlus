@@ -4,22 +4,23 @@
 class IAttacker;
 class IDamageable;
 
-// CalculadoraDeDano fornece funcoes estaticas para o calculo de dano em combate e mitigacao por armadura.
-class CalculadoraDano {
+// Calculadora de dano em combate e mitigacao por armadura.
+class DamageCalculator {
 public:
     // Calcula o dano base ofensivo e perfurante de um atacante
-    static std::pair<int, int> calcularDanoOfensivoBase(IAttacker* atacante);
+    static std::pair<int, int> calculateOffensiveBaseDamage(IAttacker* attacker);
     
     // Calcula a mitigacao defensiva basica por armadura excluindo modificadores de parry
-    static int calcularMitigacaoDefensiva(IDamageable* alvo, int danoBruto, int danoPerfurante);
+    static int calculateDefensiveMitigation(IDamageable* target, int rawDamage, int piercingDamage);
 
-    static std::pair<int, int> calculateOffensiveBaseDamage(IAttacker* attacker) {
-        return calcularDanoOfensivoBase(attacker);
+    // Compatibilidade legada
+    static std::pair<int, int> calcularDanoOfensivoBase(IAttacker* atacante) {
+        return calculateOffensiveBaseDamage(atacante);
     }
-    static int calculateDefensiveMitigation(IDamageable* target, int rawDamage, int piercingDamage) {
-        return calcularMitigacaoDefensiva(target, rawDamage, piercingDamage);
+    static int calcularMitigacaoDefensiva(IDamageable* alvo, int danoBruto, int danoPerfurante) {
+        return calculateDefensiveMitigation(alvo, danoBruto, danoPerfurante);
     }
 };
 
-using CalculadoraDeDano = CalculadoraDano;
-using DamageCalculator = CalculadoraDano;
+using CalculadoraDano = DamageCalculator;
+using CalculadoraDeDano = DamageCalculator;

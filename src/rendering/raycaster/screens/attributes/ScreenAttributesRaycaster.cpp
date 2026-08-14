@@ -17,7 +17,7 @@
 #include "../../../../core/utils/Color.h"
 
 struct EfeitoInfo {
-    EfeitoID efeitoId;
+    EffectID efeitoId;
     Color corId;
     const char* displayNome;
     bool mostrarTurnos;
@@ -147,9 +147,9 @@ void TelaAtributosRaycaster::gerenciarFichaDoJogador(Character* currentPlayer) {
                 std::wstring difStr = L"Normal";
                 D2D1_COLOR_F difColor = D2D1::ColorF(1.0f, 1.0f, 0.2f);
                 switch (currentPlayer->obterDificuldade()) {
-                    case DificuldadeJogo::Facil: difStr = L"Facil"; difColor = D2D1::ColorF(0.2f, 1.0f, 0.2f); break;
-                    case DificuldadeJogo::Normal: difStr = L"Normal"; difColor = D2D1::ColorF(1.0f, 1.0f, 0.2f); break;
-                    case DificuldadeJogo::Dificil: difStr = L"Dificil"; difColor = D2D1::ColorF(1.0f, 0.2f, 0.2f); break;
+                    case GameDifficulty::Easy: difStr = L"Facil"; difColor = D2D1::ColorF(0.2f, 1.0f, 0.2f); break;
+                    case GameDifficulty::Normal: difStr = L"Normal"; difColor = D2D1::ColorF(1.0f, 1.0f, 0.2f); break;
+                    case GameDifficulty::Hard: difStr = L"Dificil"; difColor = D2D1::ColorF(1.0f, 0.2f, 0.2f); break;
                 }
                 box.AddText(L"DIFICULDADE:", startX, currentY, 16.0f, D2D1::ColorF(0.8f, 0.8f, 0.8f));
                 box.AddText(difStr, startX + 120, currentY, 16.0f, difColor);

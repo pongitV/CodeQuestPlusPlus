@@ -57,15 +57,15 @@ std::unique_ptr<Character> GameMenu::mainMenu()
     TelaAbertura::display();
 
     while (true) {
-        int selecao = TelaMenu::displayOpcoesMenuPrincipal();
+        int selection = TelaMenu::displayOpcoesMenuPrincipal();
         
-        std::string opcaoSelecionada;
-        if (selecao == 0) opcaoSelecionada = "Novo Game";
-        else opcaoSelecionada = "Sair";
+        std::string selectedOption;
+        if (selection == 0) selectedOption = "Novo Game";
+        else selectedOption = "Sair";
         
-        if (opcaoSelecionada == "Novo Game") {
-            auto novoJogador = startCharacterCreationSystem();
-            if (novoJogador) return novoJogador;
+        if (selectedOption == "Novo Game") {
+            auto newPlayer = startCharacterCreationSystem();
+            if (newPlayer) return newPlayer;
         } else {
             if (RegistroTelas::modoRaycasterAtivo()) {
                 return nullptr;
@@ -80,64 +80,64 @@ std::unique_ptr<Character> GameMenu::mainMenu()
 
 std::unique_ptr<Character> GameMenu::startCharacterCreationSystem() 
 {
-    std::string nomeDoPersonagem;
-    std::unique_ptr<RaceBase> racaEscolhida;
-    std::unique_ptr<ClassBase> classeEscolhida;
-    bool sistemaDeParryAtivado = false;
-    TelaParry::Resultado::Modo modoParry = TelaParry::Resultado::Modo::Desligado;
-    int nivelDeDificuldadeEscolhido = 2;
+    std::string characterName;
+    std::unique_ptr<RaceBase> chosenRace;
+    std::unique_ptr<ClassBase> chosenClass;
+    bool parrySystemEnabled = false;
+    TelaParry::Resultado::Modo parryMode = TelaParry::Resultado::Modo::Desligado;
+    int chosenDifficultyLevel = 2;
 
     for (;;) {
         {
-            auto resultado = TelaNome::display();
-            if (resultado.voltou) return nullptr;
-            nomeDoPersonagem = resultado.nome;
+            auto result = TelaNome::display();
+            if (result.voltou) return nullptr;
+            characterName = result.nome;
         }
 
-        std::string nomeRaca;
+        std::string raceName;
         {
-            auto resultado = TelaRaca::display(nomeDoPersonagem);
-            if (resultado.voltou) continue;
+            auto result = TelaRaca::display(characterName);
+            if (result.voltou) continue;
 
-            nomeRaca = resultado.nome;
-            racaEscolhida = FabricaRacas::createRace(resultado.racaSelecionada);
+            raceName = result.nome;
+            chosenRace = FabricaRacas::createRace(result.racaSelecionada);
         }
 
-        std::string nomeClasse;
+        std::string className;
         {
-            auto resultado = TelaClasse::display(nomeDoPersonagem, nomeRaca);
-            if (resultado.voltou) continue;
+            auto result = TelaClasse::display(characterName, raceName);
+            if (result.voltou) continue;
 
-            nomeClasse = resultado.nome;
-            classeEscolhida = ClassFactory::createClass(resultado.classeSelecionada);
-        }
-
-        {
-            auto resultado = TelaDificuldade::display(nomeDoPersonagem, nomeRaca, nomeClasse);
-            if (resultado.voltou) continue;
-            nivelDeDificuldadeEscolhido = resultado.indice + 1;
+            className = result.nome;
+            chosenClass = ClassFactory::createClass(result.classeSelecionada);
         }
 
         {
-            auto resultado = TelaParry::display(nomeDoPersonagem, nomeRaca, nomeClasse);
-            if (resultado.voltou) continue;
-            modoParry = resultado.modo;
-            sistemaDeParryAtivado = resultado.modo != TelaParry::Resultado::Modo::Desligado;
+            auto result = TelaDificuldade::display(characterName, raceName, className);
+            if (result.voltou) continue;
+            chosenDifficultyLevel = result.indice + 1;
         }
 
-        auto personagemCriado = std::make_unique<Character>(nomeDoPersonagem, std::move(racaEscolhida), std::move(classeEscolhida));
-        personagemCriado->definirParryAtivado(sistemaDeParryAtivado);
-        personagemCriado->definirParryModerno(modoParry == TelaParry::Resultado::Modo::Movimento);
-        personagemCriado->definirDificuldade(static_cast<DificuldadeJogo>(nivelDeDificuldadeEscolhido));
+        {
+            auto result = TelaParry::display(characterName, raceName, className);
+            if (result.voltou) continue;
+            parryMode = result.modo;
+            parrySystemEnabled = result.modo != TelaParry::Resultado::Modo::Desligado;
+        }
 
-        Diary::instancia().registrarRaca(personagemCriado->obterRaca()->getRaceName());
-        Diary::instancia().registrarClasse(personagemCriado->getNameClasse());
+        auto createdCharacter = std::make_unique<Character>(characterName, std::move(chosenRace), std::move(chosenClass));
+        createdCharacter->definirParryAtivado(parrySystemEnabled);
+        createdCharacter->definirParryModerno(parryMode == TelaParry::Resultado::Modo::Movimento);
+        createdCharacter->definirDificuldade(static_cast<DificuldadeJogo>(chosenDifficultyLevel));
 
-        for (Item* item : personagemCriado->obterInventario()->obterTodosOsItens()) {
-            Diary::instancia().registrarItem(item->getNameItem());
+        Diary::instance().registerRace(createdCharacter->obterRaca()->getRaceName());
+        Diary::instance().registerClass(createdCharacter->getNameClasse());
+
+        for (Item* item : createdCharacter->obterInventario()->obterTodosOsItens()) {
+            Diary::instance().registerItem(item->getNameItem());
         }
 
         TelaIntroducao::display();
-        return personagemCriado;
+        return createdCharacter;
     }
 }

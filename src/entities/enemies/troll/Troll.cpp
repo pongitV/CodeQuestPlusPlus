@@ -131,22 +131,22 @@ const std::vector<std::string>& Troll::getRaceAppearance() const
 
 
 // --- BESTIARIO E DROPS ---
-BestiaryInfo Troll::obterBestiaryInfo() const {
+BestiaryInfo Troll::getBestiaryInfo() const {
     return {
         "Montanhas", 
         "Caverna Profunda",
         "Uma criatura gigantesca, incrivelmente forte e resistente, capaz de empunhar arvores inteiras como clavas.",
         "A lenda diz que as feridas de um Troll se fecham por completo enquanto ele dorme.",
-        {ItemFactory::getNameDeID(ItemID::TroncoAmarrotado), ItemFactory::getNameDeID(ItemID::OrgaoRegenerador), "Ouro"},
+        {ItemFactory::getNameFromID(ItemID::TroncoAmarrotado), ItemFactory::getNameFromID(ItemID::OrgaoRegenerador), "Ouro"},
         6
     };
 }
 
-void Troll::realizarDrops(Character* enemy, Character* currentPlayer, std::vector<std::string>& itensObtidos, int& ouroTotal, int& xpTotal)
+void Troll::performDrops(Character* enemy, Character* currentPlayer, std::vector<std::string>& obtainedItems, int& totalGold, int& totalXp)
 {
-    Drops::reportAndProcessXPGold(currentPlayer, 400, 350, ouroTotal, xpTotal);
-    Drops::giveAndProcessItem(currentPlayer, ItemID::TroncoAmarrotado, 1, itensObtidos);
-    Drops::giveAndProcessItem(currentPlayer, ItemID::OrgaoRegenerador, 1, itensObtidos);
+    Drops::reportAndProcessXPGold(currentPlayer, 400, 350, totalGold, totalXp);
+    Drops::giveAndProcessItem(currentPlayer, ItemID::TroncoAmarrotado, 1, obtainedItems);
+    Drops::giveAndProcessItem(currentPlayer, ItemID::OrgaoRegenerador, 1, obtainedItems);
 }
 
 

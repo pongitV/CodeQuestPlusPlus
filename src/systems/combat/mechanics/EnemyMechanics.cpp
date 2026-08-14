@@ -2,26 +2,26 @@
 #include "../../../entities/character/Character.h"
 #include "../../../core/utils/RandomGenerator.h"
 
-Character* MecanicasInimigo::escolherAlvo(const std::vector<Character*>& aliadosVivos, Character* currentPlayer) {
-    std::vector<Character*> alvosPossiveis;
-    std::vector<Character*> minionsVivos;
-    std::vector<Character*> aliadosNormaisVivos;
+Character* EnemyMechanics::selectTarget(const std::vector<Character*>& livingAllies, Character* currentPlayer) {
+    std::vector<Character*> candidateTargets;
+    std::vector<Character*> livingMinions;
+    std::vector<Character*> livingNormalAllies;
 
-    for (auto* aliado : aliadosVivos) {
-        if (aliado->isMinion()) {
-            minionsVivos.push_back(aliado);
+    for (auto* ally : livingAllies) {
+        if (ally->isMinion()) {
+            livingMinions.push_back(ally);
         } else {
-            aliadosNormaisVivos.push_back(aliado);
+            livingNormalAllies.push_back(ally);
         }
     }
 
-    if (!minionsVivos.empty()) {
-        alvosPossiveis = minionsVivos;
-    } else if (!aliadosNormaisVivos.empty()) {
-        alvosPossiveis = aliadosNormaisVivos;
+    if (!livingMinions.empty()) {
+        candidateTargets = livingMinions;
+    } else if (!livingNormalAllies.empty()) {
+        candidateTargets = livingNormalAllies;
     } else {
-        alvosPossiveis.push_back(currentPlayer);
+        candidateTargets.push_back(currentPlayer);
     }
 
-    return alvosPossiveis[RandomGenerator::getInteiro(0, static_cast<int>(alvosPossiveis.size()) - 1)];
+    return candidateTargets[RandomGenerator::getInt(0, static_cast<int>(candidateTargets.size()) - 1)];
 }

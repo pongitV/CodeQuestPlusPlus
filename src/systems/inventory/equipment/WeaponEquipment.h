@@ -5,55 +5,63 @@
 #include <set>
 #include <memory>
 
-class EquipamentoArma : public BaseEquipment 
+class WeaponEquipment : public BaseEquipment 
 {
 private:
-    std::string nome;
-    int danoFisico;
-    int danoMagico;
-    int reqForca;
-    int reqDestreza;
-    int reqInteligencia;
-    int reqSabedoria;
-    bool efeitoSangramento;
-    bool efeitoLentidao;
+    std::string name;
+    int physicalDamage;
+    int magicalDamage;
+    int reqStrength;
+    int reqDexterity;
+    int reqIntelligence;
+    int reqWisdom;
+    bool bleedEffect;
+    bool slowEffect;
 
 public:
-    EquipamentoArma(const std::string& nome, int danoFisico, int danoMagico, int reqForca, int reqDestreza, int reqInteligencia, int reqSabedoria, int price = 3);
+    WeaponEquipment(const std::string& name, int physicalDamage, int magicalDamage, int reqStrength, int reqDexterity, int reqIntelligence, int reqWisdom, int price = 3);
     
-    int obterReqForca() const;
-    int obterReqDestreza() const;
-    int obterReqInteligencia() const;
-    int obterReqSabedoria() const;
+    int getReqStrength() const;
+    int getReqDexterity() const;
+    int getReqIntelligence() const;
+    int getReqWisdom() const;
 
-    std::string getNameItem() const override;
-    void alterarNome(const std::string& n) override;
-    TipoEquipamento obterTipo() const override;
+    int obterReqForca() const { return getReqStrength(); }
+    int obterReqDestreza() const { return getReqDexterity(); }
+    int obterReqInteligencia() const { return getReqIntelligence(); }
+    int obterReqSabedoria() const { return getReqWisdom(); }
 
-    int obterDanoFisico() const override;
-    int obterDanoMagico() const override;
+    std::string getItemName() const override;
+    void changeName(const std::string& n) override;
+    EquipmentType getType() const override;
+
+    int getPhysicalDamage() const override;
+    int getMagicalDamage() const override;
     
-    bool possuiEfeitoSangramento() const override;
-    bool possuiEfeitoLentidao() const override;
+    bool hasBleedEffect() const override;
+    bool hasSlowEffect() const override;
 
-    std::string obterInfoStatus() const override;
+    std::string getStatusInfo() const override;
 
 protected:
-    bool checarRequisitosEspecificos(Character* character) const override;
+    bool checkSpecificRequirements(Character* character) const override;
 
 public:
-    bool podeSerEquipadoPor(Character* character) const override;
-    bool isEquipavel() const override { return true; }
-    std::vector<std::string> obterDetalhesInspecao(Character* character = nullptr) const override;
+    bool canBeEquippedBy(Character* character) const override;
+    bool isEquippable() const override { return true; }
+    std::vector<std::string> getInspectionDetails(Character* character = nullptr) const override;
 
-    void aplicarEfeitoSangramento() override;
-    void aplicarEfeitoLentidao() override;
+    void applyBleedEffect() override;
+    void applySlowEffect() override;
     
-    void antesDeCausarDano(Character* atacante, Character* alvo) override;
-    void aoCausarDano(Character* atacante, Character* alvo, int danoCausado) override;
-    int garantirDanoMinimo(int finalDamage) override;
+    void beforeDealingDamage(Character* attacker, Character* target) override;
+    void onDealingDamage(Character* attacker, Character* target, int damageDealt) override;
+    int ensureMinimumDamage(int finalDamage) override;
 
-    std::unique_ptr<Item> gerarCopiaMelhorada() const override;
+    std::unique_ptr<Item> generateUpgradedCopy() const override;
 };
 
-std::unique_ptr<Item> fabricarEquipamentoArma(ItemID id);
+using EquipamentoArma = WeaponEquipment;
+
+std::unique_ptr<Item> buildWeaponEquipment(ItemID id);
+inline std::unique_ptr<Item> fabricarEquipamentoArma(ItemID id) { return buildWeaponEquipment(id); }

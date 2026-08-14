@@ -8,158 +8,159 @@
 #include "../../ui/screens/combat/ScreenCombat.h"
 #include "../../core/utils/Color.h"
 
-void EfeitoSugaSangue::aplicarInicioTurno(Character* alvo) {
-    if (!Character::isValido(atacante) || atacante->obterVida() <= 0) return;
-    int danoRaizes = alvo->obterVida() / 5;
-    if (danoRaizes > 0) 
+void LifeStealEffect::applyTurnStart(Character* target) {
+    if (!Character::isValid(attacker) || attacker->getHealth() <= 0) return;
+    int rootDamage = target->getHealth() / 5;
+    if (rootDamage > 0) 
     {
-        alvo->modificarVida(-danoRaizes);
-        atacante->modificarVida(danoRaizes);
-        TelaCombate::adicionarMensagemFixa(alvo->getName() + " sofreu " + std::to_string(danoRaizes) + " de dano de Suga Sangue!");
+        target->modifyHealth(-rootDamage);
+        attacker->modifyHealth(rootDamage);
+        TelaCombate::adicionarMensagemFixa(target->getName() + " sofreu " + std::to_string(rootDamage) + " de dano de Suga Sangue!");
     }
 }
 
-void EfeitoNecrose::aplicarInicioTurno(Character* alvo) {
-    if (alvo->obterVida() <= 0) return;
-    alvo->modificarVida(-danoPorTurno);
-    TelaCombate::adicionarMensagemFixa(alvo->getName() + " sofreu " + std::to_string(danoPorTurno) + " de dano de Necrose!");
+void NecrosisEffect::applyTurnStart(Character* target) {
+    if (target->getHealth() <= 0) return;
+    target->modifyHealth(-damagePerTurn);
+    TelaCombate::adicionarMensagemFixa(target->getName() + " sofreu " + std::to_string(damagePerTurn) + " de dano de Necrose!");
 }
 
-void EfeitoLentidao::aoEntrar(Character* alvo) {
-    if (alvo->obterClasse()) alvo->obterAtributosFinais().dexterity = alvo->obterClasse()->aplicarPenalidadeLentidaoPassivaArqueiro(alvo->obterAtributosFinais().dexterity);
-    else alvo->obterAtributosFinais().dexterity /= 2;
+void SlowEffect::onEnter(Character* target) {
+    if (target->getClass()) target->getFinalStats().dexterity = target->getClass()->applyArcherPassiveSlowPenalty(target->getFinalStats().dexterity);
+    else target->getFinalStats().dexterity /= 2;
 }
 
-void EfeitoLentidao::aoSair(Character* alvo) {
-    if (alvo->obterClasse()) alvo->obterAtributosFinais().dexterity = alvo->obterClasse()->reverterPenalidadeLentidaoPassivaArqueiro(alvo->obterAtributosFinais().dexterity);
-    else alvo->obterAtributosFinais().dexterity *= 2;
+void SlowEffect::onExit(Character* target) {
+    if (target->getClass()) target->getFinalStats().dexterity = target->getClass()->revertArcherPassiveSlowPenalty(target->getFinalStats().dexterity);
+    else target->getFinalStats().dexterity *= 2;
 }
 
-void EfeitoFraqueza::aoEntrar(Character* alvo) {
-    strengthPerdida = alvo->obterAtributosFinais().strength / 4;
-    alvo->obterAtributosFinais().strength -= strengthPerdida;
+void WeaknessEffect::onEnter(Character* target) {
+    lostStrength = target->getFinalStats().strength / 4;
+    target->getFinalStats().strength -= lostStrength;
 }
 
-void EfeitoFraqueza::aoSair(Character* alvo) {
-    alvo->obterAtributosFinais().strength += strengthPerdida;
+void WeaknessEffect::onExit(Character* target) {
+    target->getFinalStats().strength += lostStrength;
 }
 
-void EfeitoQuebraResistencia::aoEntrar(Character* alvo) {
-    resistancePerdida = static_cast<int>(alvo->obterAtributosFinais().resistance * 0.20);
-    constitutionPerdida = static_cast<int>(alvo->obterAtributosFinais().constitution * 0.10);
-    alvo->obterAtributosFinais().resistance -= resistancePerdida;
-    alvo->obterAtributosFinais().constitution -= constitutionPerdida;
+void ArmorBreakEffect::onEnter(Character* target) {
+    lostResistance = static_cast<int>(target->getFinalStats().resistance * 0.20);
+    lostConstitution = static_cast<int>(target->getFinalStats().constitution * 0.10);
+    target->getFinalStats().resistance -= lostResistance;
+    target->getFinalStats().constitution -= lostConstitution;
 }
 
-void EfeitoQuebraResistencia::aoSair(Character* alvo) {
-    alvo->obterAtributosFinais().resistance += resistancePerdida;
-    alvo->obterAtributosFinais().constitution += constitutionPerdida;
+void ArmorBreakEffect::onExit(Character* target) {
+    target->getFinalStats().resistance += lostResistance;
+    target->getFinalStats().constitution += lostConstitution;
 }
 
-void EfeitoQuebraResistencia::aplicarInicioTurno(Character* alvo) {
+void ArmorBreakEffect::applyTurnStart(Character* /*target*/) {
 }
 
-void EfeitoSangramento::aplicarInicioTurno(Character* alvo) {
-    if (alvo->obterVida() <= 0) return;
-    alvo->modificarVida(-danoPorTurno);
-    TelaCombate::adicionarMensagemFixa(alvo->getName() + " sofreu " + std::to_string(danoPorTurno) + " de dano por Sangramento!");
+void BleedingEffect::applyTurnStart(Character* target) {
+    if (target->getHealth() <= 0) return;
+    target->modifyHealth(-damagePerTurn);
+    TelaCombate::adicionarMensagemFixa(target->getName() + " sofreu " + std::to_string(damagePerTurn) + " de dano por Sangramento!");
 }
 
-int EfeitoMetadeDano::processarDanoRecebido(int damage) {
-    int danoReduzido = damage / 2;
-    return danoReduzido;
+int HalfDamageEffect::processIncomingDamage(int damage) {
+    int reducedDamage = damage / 2;
+    return reducedDamage;
 }
 
-void EfeitoGritoGuerra::aoEntrar(Character* alvo) {
-    alvo->obterAtributosFinais().strength += bonusForca;
-    alvo->obterAtributosFinais().dexterity += bonusDestreza;
+void WarCryEffect::onEnter(Character* target) {
+    target->getFinalStats().strength += strengthBonus;
+    target->getFinalStats().dexterity += dexterityBonus;
 }
 
-void EfeitoGritoGuerra::aoSair(Character* alvo) {
-    alvo->obterAtributosFinais().strength -= bonusForca;
-    alvo->obterAtributosFinais().dexterity -= bonusDestreza;
+void WarCryEffect::onExit(Character* target) {
+    target->getFinalStats().strength -= strengthBonus;
+    target->getFinalStats().dexterity -= dexterityBonus;
 }
 
-void EfeitoBuffAtributos::aoSair(Character* alvo) {
-    if (alvo->obterMultiplicador() != 1.0) {
-        alvo->definirMultiplicador(1.0);
+void AttributeBuffEffect::onExit(Character* target) {
+    if (target->getMultiplier() != 1.0) {
+        target->setMultiplier(1.0);
     }
 }
 
-void EfeitoRodaAdaptacao::aplicarInicioTurno(Character* alvo) {
-    if (alvo->obterVida() <= 0) return;
-    if (!alvo->obterArmadura() || !alvo->obterArmadura()->temPropriedade(Propriedade::ArmaduraAdaptacao)) return;
+void AdaptationWheelEffect::applyTurnStart(Character* target) {
+    if (target->getHealth() <= 0) return;
+    if (!target->getArmor() || !target->getArmor()->hasProperty(Property::AdaptationArmor)) return;
     
-    int cura = alvo->obterVidaMaxima() * 0.05;
-    if (cura > 0) {
+    int healAmount = target->getMaxHealth() * 0.05;
+    if (healAmount > 0) {
         std::string msg;
         msg.reserve(64);
         msg = TelaCombate::margemCombate();
         msg += ">> A Roda gira... Regenerou ";
-        msg += std::to_string(cura);
+        msg += std::to_string(healAmount);
         msg += " HP!\n";
         TelaCombate::adicionarMensagemFixa(msg);
     }
 }
 
-void EfeitoRodaAdaptacao::aoSair(Character* alvo) {
-    alvo->obterAtributosFinais().strength -= bForca;
-    alvo->obterAtributosFinais().dexterity -= bDestreza;
-    alvo->obterAtributosFinais().resistance -= bResistencia;
-    alvo->obterAtributosFinais().constitution -= bConstituicao;
-    alvo->obterAtributosFinais().intelligence -= bInteligencia;
-    alvo->obterAtributosFinais().wisdom -= bSabedoria;
-    alvo->strengthrRecalculoCache();
+void AdaptationWheelEffect::onExit(Character* target) {
+    target->getFinalStats().strength -= bonusStrength;
+    target->getFinalStats().dexterity -= bonusDexterity;
+    target->getFinalStats().resistance -= bonusResistance;
+    target->getFinalStats().constitution -= bonusConstitution;
+    target->getFinalStats().intelligence -= bonusIntelligence;
+    target->getFinalStats().wisdom -= bonusWisdom;
+    target->forceCacheRecalculation();
 }
 
-void EfeitoRodaAdaptacao::adaptar(Character* alvo, Character* enemy) {
+void AdaptationWheelEffect::adapt(Character* target, Character* enemy) {
     if (!enemy) return;
     
-    // --- 1. Adaptacao Defensiva (Baseada no enemy) ---
-    int strengthFisicaInimigo = enemy->getStrength() + enemy->getDexterity();
-    int strengthMagicaInimigo = enemy->getInteligencia() + enemy->getWisdom();
+    // --- 1. Adaptação Defensiva (Baseada no inimigo) ---
+    int enemyPhysicalPower = enemy->getStrength() + enemy->getDexterity();
+    int enemyMagicalPower = enemy->getIntelligence() + enemy->getWisdom();
     
     std::string msgDefesa;
-    if (strengthFisicaInimigo >= strengthMagicaInimigo) {
-        alvo->alterarAtributoEstatico(TipoAtributo::Resistencia, 2); 
-        alvo->alterarAtributoEstatico(TipoAtributo::Constituicao, 2);
-        bResistencia += 2; bConstituicao += 2;
+    if (enemyPhysicalPower >= enemyMagicalPower) {
+        target->alterStaticAttribute(AttributeType::Resistance, 2); 
+        target->alterStaticAttribute(AttributeType::Constitution, 2);
+        bonusResistance += 2; bonusConstitution += 2;
         msgDefesa = "defesa fisica";
     } else {
-        alvo->alterarAtributoEstatico(TipoAtributo::Sabedoria, 2); 
-        alvo->alterarAtributoEstatico(TipoAtributo::Constituicao, 2);
-        bSabedoria += 2; bConstituicao += 2;
+        target->alterStaticAttribute(AttributeType::Wisdom, 2); 
+        target->alterStaticAttribute(AttributeType::Constitution, 2);
+        bonusWisdom += 2; bonusConstitution += 2;
         msgDefesa = "defesa magica";
     }
 
-    // --- 2. Adaptacao Ofensiva (Baseada na arma do jogador) ---
-    int danoFisicoArma = 1;
-    int danoMagicoArma = 0;
-    if (alvo->obterArma()) {
-        danoFisicoArma = alvo->obterArma()->obterDanoFisico();
-        danoMagicoArma = alvo->obterArma()->obterDanoMagico();
+    // --- 2. Adaptação Ofensiva (Baseada na arma do jogador) ---
+    int weaponPhysicalDamage = 1;
+    int weaponMagicalDamage = 0;
+    if (target->getWeapon()) {
+        weaponPhysicalDamage = target->getWeapon()->obterDanoFisico();
+        weaponMagicalDamage = target->getWeapon()->obterDanoMagico();
     }
 
     std::string msgAtaque;
-    if (danoMagicoArma > danoFisicoArma) {
-        alvo->alterarAtributoEstatico(TipoAtributo::Inteligencia, 2); 
-        alvo->alterarAtributoEstatico(TipoAtributo::Sabedoria, 2);
-        bInteligencia += 2; bSabedoria += 2;
+    if (weaponMagicalDamage > weaponPhysicalDamage) {
+        target->alterStaticAttribute(AttributeType::Intelligence, 2); 
+        target->alterStaticAttribute(AttributeType::Wisdom, 2);
+        bonusIntelligence += 2; bonusWisdom += 2;
         msgAtaque = "poder magico";
-    } else if (danoFisicoArma > danoMagicoArma) {
-        alvo->alterarAtributoEstatico(TipoAtributo::Forca, 2); 
-        alvo->alterarAtributoEstatico(TipoAtributo::Destreza, 2);
-        bForca += 2; bDestreza += 2;
+    } else if (weaponPhysicalDamage > weaponMagicalDamage) {
+        target->alterStaticAttribute(AttributeType::Strength, 2); 
+        target->alterStaticAttribute(AttributeType::Dexterity, 2);
+        bonusStrength += 2; bonusDexterity += 2;
         msgAtaque = "poder fisico";
     } else {
-        // Armas hibridas (ex: Espada de Exterminio)
-        alvo->alterarAtributoEstatico(TipoAtributo::Forca, 2); 
-        alvo->alterarAtributoEstatico(TipoAtributo::Destreza, 2);
-        alvo->alterarAtributoEstatico(TipoAtributo::Inteligencia, 2);
-        bForca += 2; bDestreza += 2; bInteligencia += 2;
+        // Armas híbridas (ex: Espada de Extermínio)
+        target->alterStaticAttribute(AttributeType::Strength, 2); 
+        target->alterStaticAttribute(AttributeType::Dexterity, 2);
+        target->alterStaticAttribute(AttributeType::Intelligence, 2);
+        bonusStrength += 2; bonusDexterity += 2; bonusIntelligence += 2;
         msgAtaque = "poder hibrido";
     }
 
     TelaCombate::adicionarMensagemFixa(TelaCombate::margemCombate() + "* KLINK! * A Roda adapta " + msgDefesa + " e " + msgAtaque + " (+2)!\n");
 }
-void EfeitoInviolavel::aoSair(Character* alvo) { alvo->adicionarEfeito(std::make_unique<EfeitoMiraCerteira>(99)); }
+
+void InviolableEffect::onExit(Character* target) { target->addEffect(std::make_unique<TrueAimEffect>(99)); }

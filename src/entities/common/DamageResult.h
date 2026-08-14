@@ -1,9 +1,16 @@
 #pragma once
 #include <string>
 
-struct ResultadoDano {
+struct DamageResult {
     int finalDamage = 0;
-    int danoBloqueado = 0;
-    bool escudoQuebrou = false;
-    std::string nomeEscudoQuebrado = "";
+    int blockedDamage = 0;
+    bool shieldBroke = false;
+    std::string brokenShieldName = "";
+
+    // Aliases para compatibilidade legada
+    int& danoBloqueado = blockedDamage;
+    bool& escudoQuebrou = shieldBroke;
+    std::string& nomeEscudoQuebrado = brokenShieldName;
 };
+
+using ResultadoDano = DamageResult;

@@ -2,7 +2,11 @@
 
 class RandomGenerator {
 public:
-    static int getInteiro(int min, int max);
-    
-    static bool rolarChance(int porcentagemSucesso);
+    static int getInt(int min, int max);
+    static int getInteger(int min, int max) { return getInt(min, max); }
+    static bool rollChance(int successPercentage);
+
+    // Métodos legados para compatibilidade retroativa
+    static int getInteiro(int min, int max) { return getInt(min, max); }
+    static bool rolarChance(int porcentagemSucesso) { return rollChance(porcentagemSucesso); }
 };

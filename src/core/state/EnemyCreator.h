@@ -19,6 +19,6 @@ public:
     static std::vector<std::unique_ptr<Character>> createMahoragaEnemy(int amount = 1);
 
 private:
-    template<typename RacaType, typename ClasseType>
+    template<typename RaceType, typename ClassType>
     static std::vector<std::unique_ptr<Character>> createGenericEnemies(int amount, int maxVariation = 10);
 };

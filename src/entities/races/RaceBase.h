@@ -9,19 +9,25 @@
 
 enum class RaceType 
 {
-    Nenhum,
+    None,
     Dwarf,
     Elf,
     Human,
-    Ork,
-    OrkExilado,
+    Orc,
+    ExiledOrc,
     Goblin,
     Fairy,
     Slime,
-    AbominacaoFloresta,
+    ForestAbomination,
     Mimic,
     Troll,
-    Mahoraga
+    Mahoraga,
+
+    // Aliases para compatibilidade legada
+    Nenhum = None,
+    Ork = Orc,
+    OrkExilado = ExiledOrc,
+    AbominacaoFloresta = ForestAbomination
 };
 
 struct BestiaryInfo {
@@ -38,10 +44,12 @@ public:
     virtual ~RaceBase() = default;
 
     virtual std::string getRaceName() const = 0;
-    virtual RaceType obterRaceType() const = 0;
+    virtual RaceType getRaceType() const = 0;
+    virtual RaceType obterRaceType() const { return getRaceType(); }
+
     virtual const std::vector<std::string>& getRaceAppearance() const {
-        static const std::vector<std::string> vazia;
-        return vazia;
+        static const std::vector<std::string> emptyList;
+        return emptyList;
     }
     virtual std::string getRaceSpritePath() const { return ""; }
 
@@ -50,30 +58,53 @@ public:
     virtual std::string getRaceAbilityName() const = 0;
     virtual std::string getRaceAbilityDescription() const = 0;
 
-    virtual BestiaryInfo obterBestiaryInfo() const { return {"Desconhecido", "Desconhecido", "", "", {}, 1}; }
+    virtual BestiaryInfo getBestiaryInfo() const { return {"Desconhecido", "Desconhecido", "", "", {}, 1}; }
+    virtual BestiaryInfo obterBestiaryInfo() const { return getBestiaryInfo(); }
 
     virtual std::vector<std::unique_ptr<Item>> getRaceEquipment() const { return {}; }
 
-    virtual int processOffensiveDamage(int baseDamage, Character* /*atacante*/) {
+    virtual int processOffensiveDamage(int baseDamage, Character* /*attacker*/) {
         return baseDamage;
     }
 
-    virtual int processDefensiveDamage(int finalDamage, Character* /*defensor*/) {
+    virtual int processDefensiveDamage(int finalDamage, Character* /*defender*/) {
         return finalDamage;
     }
     
-    virtual void aoSofrerParryPerfeito() {}
-    virtual bool ignoraParry() const { return false; }
-    virtual bool ignoraEscudo() const { return false; }
+    virtual void onSufferingPerfectParry() {}
+    virtual void onPerfectParrySuffered() { onSufferingPerfectParry(); }
+    virtual void aoSofrerParryPerfeito() { onSufferingPerfectParry(); }
 
-    virtual void realizarDrops(Character* /*enemy*/, Character* /*currentPlayer*/, std::vector<std::string>& /*itensObtidos*/, int& /*ouroTotal*/, int& /*xpTotal*/) {
-        // Implementação padrão vazia (sem drops)
+    virtual bool ignoresParry() const { return false; }
+    virtual bool ignoraParry() const { return ignoresParry(); }
+
+    virtual bool ignoresShield() const { return false; }
+    virtual bool ignoraEscudo() const { return ignoresShield(); }
+
+    virtual void performDrops(Character* /*enemy*/, Character* /*currentPlayer*/, std::vector<std::string>& /*obtainedItems*/, int& /*totalGold*/, int& /*totalXp*/) {}
+    virtual void dropLoot(Character* enemy, Character* currentPlayer, std::vector<std::string>& items, int& gold, int& xp) {
+        performDrops(enemy, currentPlayer, items, gold, xp);
+    }
+    virtual void realizarDrops(Character* enemy, Character* currentPlayer, std::vector<std::string>& items, int& gold, int& xp) {
+        performDrops(enemy, currentPlayer, items, gold, xp);
+    }
+    virtual void executeDrops(Character* enemy, Character* currentPlayer, std::vector<std::string>& items, int& gold, int& xp) {
+        performDrops(enemy, currentPlayer, items, gold, xp);
     }
 
-    virtual void aoCausarDano(Character* /*atacante*/, Character* /*alvo*/, int /*danoCausado*/) {}
+    virtual void onDealingDamage(Character* /*attacker*/, Character* /*target*/, int /*damageDealt*/) {}
+    virtual void onDamageDealt(Character* attacker, Character* target, int damage) {
+        onDealingDamage(attacker, target, damage);
+    }
+    virtual void aoCausarDano(Character* attacker, Character* target, int damage) {
+        onDealingDamage(attacker, target, damage);
+    }
 
-    virtual bool tentarUsarHabilidadeAtiva(Character* /*esteInimigo*/, Character* /*alvo*/, int /*difficulty*/) {
-        return false; // Por padrao, enemies nao possuem habilidades ativas que consomem o turno
+    virtual bool tryUseActiveAbility(Character* /*thisEnemy*/, Character* /*target*/, int /*difficulty*/) {
+        return false; // Por padrão, inimigos não possuem habilidades ativas que consomem o turno
+    }
+    virtual bool tentarUsarHabilidadeAtiva(Character* thisEnemy, Character* target, int diff) {
+        return tryUseActiveAbility(thisEnemy, target, diff);
     }
 };
 

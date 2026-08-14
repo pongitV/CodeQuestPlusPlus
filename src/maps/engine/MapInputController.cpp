@@ -9,42 +9,42 @@
 #include "../../ui/screens/attributes/ScreenAttributes.h"
 #include "../../ui/screens/diary/ScreenDiary.h"
 
-bool MapInputControllera::processarInputEComandos(char tecla, Character* jogador, int& proximaPosicaoX, int& proximaPosicaoY, const std::function<void()>& restaurarTela)
+bool MapInputController::processInputAndCommands(char key, Character* player, int& nextX, int& nextY, const std::function<void()>& restoreScreen)
 {
-    if (tecla == 27) { 
-        TelaPause::display(jogador); 
-        restaurarTela(); 
+    if (key == 27) { 
+        TelaPause::display(player); 
+        restoreScreen(); 
         return true; 
     }
-    if (Debug::isDebugKey(tecla)) { 
-        Debug::displayDebugMenu(jogador); 
-        restaurarTela(); 
+    if (Debug::isDebugKey(key)) { 
+        Debug::displayDebugMenu(player); 
+        restoreScreen(); 
         return true; 
     }
 
-    ComandoMapa comando = InputControl::traduzirTeclaParaComando(tecla);
+    MapCommand cmd = InputControl::translateKeyToCommand(key);
 
-    if (comando == ComandoMapa::Cima) { proximaPosicaoY--; return false; }
-    if (comando == ComandoMapa::Baixo) { proximaPosicaoY++; return false; }
-    if (comando == ComandoMapa::Esquerda) { proximaPosicaoX--; return false; }
-    if (comando == ComandoMapa::Direita) { proximaPosicaoX++; return false; }
+    if (cmd == MapCommand::Up) { nextY--; return false; }
+    if (cmd == MapCommand::Down) { nextY++; return false; }
+    if (cmd == MapCommand::Left) { nextX--; return false; }
+    if (cmd == MapCommand::Right) { nextX++; return false; }
 
-    if (comando == ComandoMapa::Inventory)
+    if (cmd == MapCommand::Inventory)
     {
-        InventarioCombate::gerenciarInventario(jogador);
-        restaurarTela();
+        InventarioCombate::gerenciarInventario(player);
+        restoreScreen();
         return true;
     }
-    if (comando == ComandoMapa::Ficha)
+    if (cmd == MapCommand::CharacterSheet)
     {
-        TelaAtributos::gerenciarFichaDoJogador(jogador);
-        restaurarTela();
+        TelaAtributos::gerenciarFichaDoJogador(player);
+        restoreScreen();
         return true;
     }
-    if (comando == ComandoMapa::Bestiary)
+    if (cmd == MapCommand::Bestiary)
     {
-        TelaDiario::display(jogador);
-        restaurarTela();
+        TelaDiario::display(player);
+        restoreScreen();
         return true;
     }
     return false;

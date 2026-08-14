@@ -102,5 +102,10 @@ namespace NPCMageNPCLayouts {
         "â €â €â €â €â ˆâ ›â ‹â €â €â €â €â €â €â €â €â €â €â €â €â €â €â €â €   â ™â ›â â €â €â €â €",
         ""
     )");
+    inline const auto& mageArt = arteMageNPC;
+    inline const auto& arteMago = arteMageNPC;
+    inline const auto& cauldronArt = arteCaldeirao;
 }
+
+namespace NPCMagoLayouts = NPCMageNPCLayouts;
 

@@ -133,5 +133,8 @@ namespace NPCPriestLayouts {
       +++++++++++++========-==+#######=--------------::::::::::::::::::::::::::::::::::----*#######:            
     ###############################*...:-------------------------------------------::.                          
 )");
+    inline const auto& priestArt = artePriest;
 }
+
+namespace NPCClerigoLayouts = NPCPriestLayouts;
 

@@ -1,3 +1,3 @@
 #include "Config.h"
 
-// Config implementation file for potential non-inline methods or serialization
+// Arquivo de implementação de Config para métodos não-inline potenciais ou serialização

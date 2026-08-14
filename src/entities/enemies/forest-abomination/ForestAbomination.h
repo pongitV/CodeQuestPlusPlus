@@ -5,22 +5,24 @@
 
 #include "../../races/RaceBase.h"
 
-class AbominacaoFloresta : public RaceBase
+class ForestAbomination : public RaceBase
 {
 private:
-    bool curandoAtivamente = false;
+    bool activelyHealing = false;
 
 public:
     std::string getRaceName() const override;
-    RaceType obterRaceType() const override { return RaceType::AbominacaoFloresta; }
+    RaceType getRaceType() const override { return RaceType::ForestAbomination; }
     Attributes getRaceAttributes() const override;
     std::string getRaceAbilityName() const override;
     std::string getRaceAbilityDescription() const override;
     const std::vector<std::string>& getRaceAppearance() const override;
 
-    BestiaryInfo obterBestiaryInfo() const override;
+    BestiaryInfo getBestiaryInfo() const override;
 
-    void aoCausarDano(Character* atacante, Character* alvo, int danoCausado) override;
+    void onDealingDamage(Character* attacker, Character* target, int damageDealt) override;
 
-    void realizarDrops(Character* enemy, Character* currentPlayer, std::vector<std::string>& itensObtidos, int& ouroTotal, int& xpTotal) override;
+    void performDrops(Character* enemy, Character* currentPlayer, std::vector<std::string>& obtainedItems, int& totalGold, int& totalXp) override;
 };
+
+using AbominacaoFloresta = ForestAbomination;

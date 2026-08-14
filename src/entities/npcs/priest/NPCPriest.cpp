@@ -5,9 +5,8 @@
 #include <iostream>
 #include "../../../core/utils/Color.h"
 
-void NPCPriest::interagir(Character* jogador) {
-    
-    std::vector<std::string> linhas = {
+void NPCPriest::interact(Character* player) {
+    std::vector<std::string> lines = {
         "Que a paz e a luz dos deuses guiem seus passos, meu filho.",
         "Nesta sagrada igreja do reino, oferecemos refugio e cura para as almas fatigadas.",
         "Sinto uma aura extremamente sombria emanando do palacio real no norte...",
@@ -15,42 +14,42 @@ void NPCPriest::interagir(Character* jogador) {
     };
 
     while (true) {
-        std::vector<std::string> opcoes = obterOpcoesMenu(jogador, 80);
-        int escolha = InputControl::lerSelecaoMenuEmPopup("PADRE BENEDITO", {"O que deseja fazer?"}, opcoes, Color::CYAN);
+        std::vector<std::string> options = getMenuOptions(player, 80);
+        int choice = InputControl::lerSelecaoMenuEmPopup("PADRE BENEDITO", {"O que deseja fazer?"}, options, Color::CYAN);
         
-        if (escolha >= 0 && escolha < (int)opcoes.size()) {
-            std::string opcao = opcoes[escolha];
-            if (opcao == "Voltar") {
+        if (choice >= 0 && choice < (int)options.size()) {
+            std::string option = options[choice];
+            if (option == "Voltar") {
                 break;
             }
-            processarOpcao(jogador, opcao, 80);
+            processOption(player, option, 80);
         } else {
             break;
         }
     }
 }
 
-std::string NPCPriest::getNameDoLugar() const {
+std::string NPCPriest::getPlaceName() const {
     return "ALTAR DA IGREJA";
 }
 
-Color NPCPriest::obterCorDoCabecalho() const {
+Color NPCPriest::getHeaderColor() const {
     return Color::CYAN;
 }
 
-Color NPCPriest::obterCorDaArte() const {
+Color NPCPriest::getArtColor() const {
     return Color::CYAN;
 }
 
-const std::vector<std::string>& NPCPriest::obterArteASCII() const {
-    return NPCPriestLayouts::artePriest;
+const std::vector<std::string>& NPCPriest::getASCIIArt() const {
+    return NPCPriestLayouts::priestArt;
 }
 
-std::vector<std::string> NPCPriest::obterDialogo(Character* /*jogador*/) {
+std::vector<std::string> NPCPriest::getDialogue(Character* /*player*/) {
     return { "Que os Deuses iluminem seu caminho, filho." };
 }
 
-std::vector<std::string> NPCPriest::obterOpcoesMenu(Character* jogador, int /*larguraDoTerminal*/) {
+std::vector<std::string> NPCPriest::getMenuOptions(Character* /*player*/, int /*terminalWidth*/) {
     return {
         "Pedir Bencao (Restaurar HP)",
         "Conversar sobre o Palacio",
@@ -58,14 +57,14 @@ std::vector<std::string> NPCPriest::obterOpcoesMenu(Character* jogador, int /*la
     };
 }
 
-void NPCPriest::processarOpcao(Character* jogador, const std::string& opcao, int /*larguraDoTerminal*/) {
-    if (opcao == "Pedir Bencao (Restaurar HP)") {
-        if (jogador->obterVida() >= jogador->obterVidaMaxima()) {
+void NPCPriest::processOption(Character* player, const std::string& option, int /*terminalWidth*/) {
+    if (option == "Pedir Bencao (Restaurar HP)") {
+        if (player->getHealth() >= player->getMaxHealth()) {
         } else {
-            jogador->modificarVida(jogador->obterVidaMaxima());
+            player->modifyHealth(player->getMaxHealth());
         }
     }
-    else if (opcao == "Conversar sobre o Palacio") {
+    else if (option == "Conversar sobre o Palacio") {
         std::vector<std::string> lore = {
             "O palácio real costumava ser o farol de esperança do Kingdom.",
             "Contudo, há algumas semanas, o rei trancou-se em seus aposentos",

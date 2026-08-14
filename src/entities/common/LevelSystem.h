@@ -1,14 +1,14 @@
 #pragma once
 
-// LevelSystem handles character leveling, XP accumulation, and level threshold calculations.
-class SistemaDeNivel {
+// LevelSystem gerencia o nível do personagem, acúmulo de XP e cálculo de progressão.
+class LevelSystem {
 private:
     int level;
     int currentXp;
     int xpToLevelUp;
 
 public:
-    SistemaDeNivel(int initialLevel = 1, int initialXp = 0, int initialXpToLevelUp = 100) 
+    LevelSystem(int initialLevel = 1, int initialXp = 0, int initialXpToLevelUp = 100) 
         : level(initialLevel), currentXp(initialXp), xpToLevelUp(initialXpToLevelUp) {}
 
     int getLevel() const { return level; }
@@ -22,7 +22,7 @@ public:
     void addXp(int amount) { currentXp += amount; }
     bool canLevelUp() const { return currentXp >= xpToLevelUp; }
 
-    // Legacy method delegates
+    // Métodos legados para compatibilidade retroativa
     int getXpAtual() const { return getCurrentXp(); }
     int getXpParaSubir() const { return getXpToLevelUp(); }
     void definirNivel(int l) { setLevel(l); }
@@ -32,4 +32,4 @@ public:
     bool podeSubirDeNivel() const { return canLevelUp(); }
 };
 
-using LevelSystem = SistemaDeNivel;
+using SistemaDeNivel = LevelSystem;

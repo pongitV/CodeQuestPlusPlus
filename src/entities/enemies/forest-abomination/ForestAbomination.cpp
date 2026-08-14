@@ -7,71 +7,71 @@
 #include "../../../ui/screens/combat/ScreenCombat.h"
 
 // --- INFORMACOES DA RACA ---
-std::string AbominacaoFloresta::getRaceName() const 
+std::string ForestAbomination::getRaceName() const 
 { 
     return "Abominacao da Forest"; 
 }
 
-Attributes AbominacaoFloresta::getRaceAttributes() const
+Attributes ForestAbomination::getRaceAttributes() const
 { 
     return { 300, 30, 5, 20, 25, 0, 20 };
 }
 
 // --- HABILIDADE DA RACA ---
-std::string AbominacaoFloresta::getRaceAbilityName() const 
+std::string ForestAbomination::getRaceAbilityName() const 
 { 
     return "Raizes Parasitas"; 
 }
 
-std::string AbominacaoFloresta::getRaceAbilityDescription() const 
+std::string ForestAbomination::getRaceAbilityDescription() const 
 { 
     return "Abaixo de 40% de HP, recupera HP igual a 100% do damage causado ate 60% de HP"; 
 }
 
 // --- PROCESSAMENTO DE DANO  ---
-void AbominacaoFloresta::aoCausarDano(Character* atacante, Character* alvo, int danoCausado) 
+void ForestAbomination::onDealingDamage(Character* attacker, Character* /*target*/, int damageDealt) 
 {
-    int vidaMax = atacante->obterVidaMaxima();
-    int vidaAtual = atacante->obterVida();
+    int maxHealth = attacker->getMaxHealth();
+    int currentHealth = attacker->getHealth();
 
-    if (vidaAtual < (vidaMax * 0.40))
+    if (currentHealth < (maxHealth * 0.40))
     {
-        curandoAtivamente = true;
+        activelyHealing = true;
     }
     else
     {
-        curandoAtivamente = false;
+        activelyHealing = false;
     }
 
-    if (curandoAtivamente)
+    if (activelyHealing)
     {
-        int cura = danoCausado;
-        if (cura > 0)
+        int healAmount = damageDealt;
+        if (healAmount > 0)
         {
-            int vidaFaltantePara60 = static_cast<int>(vidaMax * 0.60) - vidaAtual;
-            if (vidaFaltantePara60 < 0) vidaFaltantePara60 = 0;
+            int remainingTo60 = static_cast<int>(maxHealth * 0.60) - currentHealth;
+            if (remainingTo60 < 0) remainingTo60 = 0;
 
-            if (cura > vidaFaltantePara60)
+            if (healAmount > remainingTo60)
             {
-                cura = vidaFaltantePara60;
+                healAmount = remainingTo60;
             }
 
-            if (cura > 0)
+            if (healAmount > 0)
             {
-                atacante->modificarVida(cura);
+                attacker->modifyHealth(healAmount);
                 // A mensagem na UI foi removida para priorizar o combat limpo
                 // TelaCombate::adicionarMensagemFixa(msg);
             }
         }
-        if (atacante->obterVida() >= (vidaMax * 0.60))
+        if (attacker->getHealth() >= (maxHealth * 0.60))
         {
-            curandoAtivamente = false;
+            activelyHealing = false;
         }
     }
 }
 
 // --- APARENCIA ---
-const std::vector<std::string>& AbominacaoFloresta::getRaceAppearance() const
+const std::vector<std::string>& ForestAbomination::getRaceAppearance() const
 {
     static const std::vector<std::string> appearance =
     {
@@ -155,20 +155,20 @@ const std::vector<std::string>& AbominacaoFloresta::getRaceAppearance() const
 
 
 // --- BESTIARIO E DROPS ---
-BestiaryInfo AbominacaoFloresta::obterBestiaryInfo() const {
+BestiaryInfo ForestAbomination::getBestiaryInfo() const {
     return {
         "Forest", 
         "Coracao da Arvore",
         "A essencia corrompida da propria floresta, manifestada em uma criatura horripilante.",
         "Sua presenca apodrece a health ao seu redor.",
-        {ItemFactory::getNameDeID(ItemID::CoracaoFloresta), ItemFactory::getNameDeID(ItemID::MadeiraEnfeiticada), "Ouro"},
+        {ItemFactory::getNameFromID(ItemID::CoracaoFloresta), ItemFactory::getNameFromID(ItemID::MadeiraEnfeiticada), "Ouro"},
         5
     };
 }
 
-void AbominacaoFloresta::realizarDrops(Character* enemy, Character* currentPlayer, std::vector<std::string>& itensObtidos, int& ouroTotal, int& xpTotal)
+void ForestAbomination::performDrops(Character* enemy, Character* currentPlayer, std::vector<std::string>& obtainedItems, int& totalGold, int& totalXp)
 {
-    Drops::reportAndProcessXPGold(currentPlayer, 250, 200, ouroTotal, xpTotal);
-    Drops::giveAndProcessItem(currentPlayer, ItemID::MadeiraEnfeiticada, 1, itensObtidos);
-    Drops::giveAndProcessItem(currentPlayer, ItemID::CoracaoFloresta, 1, itensObtidos);
+    Drops::reportAndProcessXPGold(currentPlayer, 250, 200, totalGold, totalXp);
+    Drops::giveAndProcessItem(currentPlayer, ItemID::MadeiraEnfeiticada, 1, obtainedItems);
+    Drops::giveAndProcessItem(currentPlayer, ItemID::CoracaoFloresta, 1, obtainedItems);
 }

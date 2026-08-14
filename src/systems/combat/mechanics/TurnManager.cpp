@@ -2,24 +2,24 @@
 #include "../../../entities/character/Character.h"
 #include <algorithm>
 
-int GerenciadorTurnos::calcularMaxDestrezaInimigos(const std::vector<std::unique_ptr<Character>>& enemies) {
-    int maxDestreza = 0;
-    for (const auto& inimigoPtr : enemies) {
-        if (inimigoPtr->getDexterity() > maxDestreza) {
-            maxDestreza = inimigoPtr->getDexterity();
+int TurnManager::calculateMaxEnemyDexterity(const std::vector<std::unique_ptr<Character>>& enemies) {
+    int maxDexterity = 0;
+    for (const auto& enemyPtr : enemies) {
+        if (enemyPtr->getDexterity() > maxDexterity) {
+            maxDexterity = enemyPtr->getDexterity();
         }
     }
-    return maxDestreza;
+    return maxDexterity;
 }
 
-bool GerenciadorTurnos::inimigosSaoMaisAgeis(Character* jogador, int maxDestrezaInimigos) {
-    return maxDestrezaInimigos > jogador->getDexterity();
+bool TurnManager::areEnemiesFaster(Character* player, int maxEnemyDexterity) {
+    return maxEnemyDexterity > player->getDexterity();
 }
 
-bool GerenciadorTurnos::inimigosTemDobroDeAgilidade(Character* jogador, int maxDestrezaInimigos) {
-    return maxDestrezaInimigos > (jogador->getDexterity() * 2);
+bool TurnManager::doEnemiesHaveDoubleAgility(Character* player, int maxEnemyDexterity) {
+    return maxEnemyDexterity > (player->getDexterity() * 2);
 }
 
-bool GerenciadorTurnos::jogadorTemTurnoExtraNoInicio(Character* jogador, int maxDestrezaInimigos) {
-    return jogador->getDexterity() > (maxDestrezaInimigos * 2);
+bool TurnManager::doesPlayerHaveExtraTurnAtStart(Character* player, int maxEnemyDexterity) {
+    return player->getDexterity() > (maxEnemyDexterity * 2);
 }

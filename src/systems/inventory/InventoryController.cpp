@@ -6,56 +6,56 @@
 #include "../../entities/character/Character.h"
 #include <string>
 
-UsoItemInfo ControleInventario::usarOuEquipar(Character* jogador, Item* item, bool turnoJaFoiConsumido) {
-    if (turnoJaFoiConsumido) {
-        return {ResultadoItem::Erro_TurnoJaUsado, "", "", false};
+ItemUsageInfo InventoryController::useOrEquip(Character* player, Item* item, bool turnAlreadyConsumed) {
+    if (turnAlreadyConsumed) {
+        return {ItemResult::Error_TurnAlreadyUsed, "", "", false};
     }
 
-    if (item->isEquipavel()) {
-        if (item->obterTipo() == TipoEquipamento::ESCUDO && item->obterDurabilidadeAtualEscudo() <= 0) {
-            return {ResultadoItem::Erro_EscudoQuebrado, item->getNameItem(), "", false};
+    if (item->isEquippable()) {
+        if (item->getType() == EquipmentType::Shield && item->getShieldCurrentDurability() <= 0) {
+            return {ItemResult::Error_BrokenShield, item->getItemName(), "", false};
         }
 
-        bool desequipou = false;
-        if (item == jogador->obterArma()) {
-            jogador->desequiparArma();
-            desequipou = true;
-        } else if (item == jogador->obterEscudo()) {
-            jogador->desequiparEscudo();
-            desequipou = true;
-        } else if (item == jogador->obterArmadura()) {
-            jogador->desequiparArmadura();
-            desequipou = true;
+        bool unequipped = false;
+        if (item == player->getWeapon()) {
+            player->unequipWeapon();
+            unequipped = true;
+        } else if (item == player->getShield()) {
+            player->unequipShield();
+            unequipped = true;
+        } else if (item == player->getArmor()) {
+            player->unequipArmor();
+            unequipped = true;
         }
 
-        if (desequipou) {
-            return {ResultadoItem::Desequipou, item->getNameItem(), "", true};
+        if (unequipped) {
+            return {ItemResult::Unequipped, item->getItemName(), "", true};
         }
 
-        if (!item->podeSerEquipadoPor(jogador)) {
-            return {ResultadoItem::Erro_Requisitos, item->getNameItem(), item->obterMensagemRequisito(), false};
+        if (!item->canBeEquippedBy(player)) {
+            return {ItemResult::Error_Requirements, item->getItemName(), item->getRequirementMessage(), false};
         }
 
-        jogador->equiparItem(item);
-        return {ResultadoItem::Equipou, item->getNameItem(), "", true};
+        player->equipItem(item);
+        return {ItemResult::Equipped, item->getItemName(), "", true};
     }
 
-    bool consumiu = false;
-    if (item->usarDoInventario(jogador, &consumiu)) {
-        return {ResultadoItem::Usou_Turno, item->getNameItem(), "", consumiu};
+    bool consumed = false;
+    if (item->useFromInventory(player, &consumed)) {
+        return {ItemResult::Used_Turn, item->getItemName(), "", consumed};
     }
 
-    return {ResultadoItem::Erro_NaoPodeUsar, item->getNameItem(), "", false};
+    return {ItemResult::Error_CannotUse, item->getItemName(), "", false};
 }
 
-std::string ControleInventario::obterMensagemErro(Item* item, bool emCombate) {
-    switch (item->obterTipo()) {
-        case TipoEquipamento::MATERIAL:
+std::string InventoryController::getErrorMessage(Item* item, bool inCombat) {
+    switch (item->getType()) {
+        case EquipmentType::Material:
             return "Materiais sao utilizados para NPCs especializados.";
-        case TipoEquipamento::MISSAO:
+        case EquipmentType::Quest:
             return "Itens de missao sao ativados automaticamente.";
-        case TipoEquipamento::CONSUMIVEL:
-            return "Este consumivel nao pode ser usado " + std::string(emCombate ? "no combat!" : "fora de combat!");
+        case EquipmentType::Consumable:
+            return "Este consumivel nao pode ser usado " + std::string(inCombat ? "no combat!" : "fora de combat!");
         default:
             return "Este item nao possui uso direto no inventory.";
     }

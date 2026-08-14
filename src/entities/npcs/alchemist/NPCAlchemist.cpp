@@ -6,42 +6,42 @@
 #include <iostream>
 #include "../../../core/utils/Color.h"
 
-void NPCAlchemist::interagir(Character* jogador) {
+void NPCAlchemist::interact(Character* player) {
     InputControl::executarLoopMenuPopup(
-        [this, jogador]() { return this->obterDialogo(jogador); },
-        [this, jogador]() { return this->obterOpcoesMenu(jogador, 120); },
-        [this, jogador](const std::string& op) { this->processarOpcao(jogador, op, 120); return true; },
-        getNameDoLugar(), obterCorDoCabecalho(), obterArteASCII()
+        [this, player]() { return this->getDialogue(player); },
+        [this, player]() { return this->getMenuOptions(player, 120); },
+        [this, player](const std::string& op) { this->processOption(player, op, 120); return true; },
+        getPlaceName(), getHeaderColor(), getASCIIArt()
     );
 }
 
-std::string NPCAlchemist::getNameDoLugar() const {
+std::string NPCAlchemist::getPlaceName() const {
     return "LABORATORIO DE ALQUIMIA";
 }
 
-Color NPCAlchemist::obterCorDoCabecalho() const {
+Color NPCAlchemist::getHeaderColor() const {
     return Color::GREEN;
 }
 
-Color NPCAlchemist::obterCorDaArte() const {
+Color NPCAlchemist::getArtColor() const {
     return Color::GREEN;
 }
 
-const std::vector<std::string>& NPCAlchemist::obterArteASCII() const {
-    return NPCAlchemistLayouts::arteAlchemist;
+const std::vector<std::string>& NPCAlchemist::getASCIIArt() const {
+    return NPCAlquimistaLayouts::arteAlquimista;
 }
 
-std::vector<std::string> NPCAlchemist::obterDialogo(Character* /*jogador*/) {
-    std::vector<std::string> linhas = {
+std::vector<std::string> NPCAlchemist::getDialogue(Character* /*player*/) {
+    std::vector<std::string> lines = {
         "Seja bem-vindo ao laboratorio de transmutacao!",
         "Eu sou Quintus, o Alchemist Real. Se voce me trouxer ingredientes de monstros",
         "e alimentos terrestres, posso transmutar elixires poderosos!",
         "Minhas criacoes podem heal sua alma ou devastar as defesas inimigas."
     };
-    return linhas;
+    return lines;
 }
 
-std::vector<std::string> NPCAlchemist::obterOpcoesMenu(Character* jogador, int /*larguraDoTerminal*/) {
+std::vector<std::string> NPCAlchemist::getMenuOptions(Character* /*player*/, int /*terminalWidth*/) {
     return {
         "Pocao de Cura Grande (50%VM) [1x Maca + 1x Po magico]",
         "Pocao de Forca Alquimica [1x Pao + 1x Dente de goblin]",
@@ -51,59 +51,56 @@ std::vector<std::string> NPCAlchemist::obterOpcoesMenu(Character* jogador, int /
     };
 }
 
-void NPCAlchemist::processarOpcao(Character* jogador, const std::string& opcao, int /*larguraDoTerminal*/) {
-    std::string comidaReq = "";
+void NPCAlchemist::processOption(Character* player, const std::string& option, int /*terminalWidth*/) {
+    std::string foodReq = "";
     std::string dropReq = "";
-    ItemID produtoId = ItemID::Nenhum;
+    ItemID productId = ItemID::None;
 
-    if (opcao.find("Cura Grande") != std::string::npos) {
-        comidaReq = "Maca";
+    if (option.find("Cura Grande") != std::string::npos) {
+        foodReq = "Maca";
         dropReq = "Po magico";
-        produtoId = ItemID::PocaoCuraGrande;
+        productId = ItemID::PocaoCuraGrande;
     }
-    else if (opcao.find("Forca Alquimica") != std::string::npos) {
-        comidaReq = "Pao";
+    else if (option.find("Forca Alquimica") != std::string::npos) {
+        foodReq = "Pao";
         dropReq = "Dente de goblin";
-        produtoId = ItemID::PocaoForcaAlquimica;
+        productId = ItemID::PocaoForcaAlquimica;
     }
-    else if (opcao.find("Veneno Alquimica") != std::string::npos) {
-        comidaReq = "Carne Seca";
+    else if (option.find("Veneno Alquimica") != std::string::npos) {
+        foodReq = "Carne Seca";
         dropReq = "Gosma acida";
-        produtoId = ItemID::PocaoVenenoAlquimica;
+        productId = ItemID::PocaoVenenoAlquimica;
     }
-    else if (opcao.find("Lentidao Alquimica") != std::string::npos) {
-        comidaReq = "Queijo";
+    else if (option.find("Lentidao Alquimica") != std::string::npos) {
+        foodReq = "Queijo";
         dropReq = "Nucleo pegajoso";
-        produtoId = ItemID::PocaoLentidaoAlquimica;
+        productId = ItemID::PocaoLentidaoAlquimica;
     }
 
-    if (produtoId != ItemID::Nenhum) {
-        auto* mochila = jogador->obterInventario();
-        int qtdFoodMerchant = mochila->contarItem(comidaReq);
-        int qtdDrop = mochila->contarItem(dropReq);
+    if (productId != ItemID::None) {
+        auto* inventory = player->getInventory();
+        int foodCount = inventory->getItemCount(foodReq);
+        int dropCount = inventory->getItemCount(dropReq);
 
-        if (qtdFoodMerchant >= 1 && qtdDrop >= 1) {
-            mochila->removerItem(comidaReq);
-            mochila->removerItem(dropReq);
+        if (foodCount >= 1 && dropCount >= 1) {
+            inventory->removeItem(foodReq);
+            inventory->removeItem(dropReq);
 
-            auto itemNovo = ItemFactory::criarItem(produtoId);
-            if (itemNovo) {
-                std::string nomeProduto = itemNovo->getNameItem();
-                mochila->adicionarItem(std::move(itemNovo));
+            auto newItem = ItemFactory::createItem(productId);
+            if (newItem) {
+                std::string productName = newItem->getItemName();
+                inventory->addItem(std::move(newItem));
 
-                std::vector<std::string> msgSucesso = {
+                std::vector<std::string> successMsg = {
                     "Mistura fervilhando... Vapor borbulhando...",
-                    "Sucesso! VocÃª obteve: " + nomeProduto
+                    "Sucesso! VocÃª obteve: " + productName
                 };
             }
         } else {
-            std::vector<std::string> msgErro = {
+            std::vector<std::string> errorMsg = {
                 "Ingredientes insuficientes!",
-                "VocÃª precisa de:",
-                " -> 1x " + comidaReq + " (Possui: " + std::to_string(qtdFoodMerchant) + ")",
-                " -> 1x " + dropReq + " (Possui: " + std::to_string(qtdDrop) + ")"
+                "Voce precisa de 1x " + foodReq + " e 1x " + dropReq + " para esta pocao."
             };
         }
     }
 }
-

@@ -55,9 +55,9 @@ int TelaPauseRaycaster::renderizarMenuPause() {
 int TelaPauseRaycaster::renderizarMenuConfiguracoes(Character* jogador) {
     std::string difStr;
     switch (jogador->obterDificuldade()) {
-        case DificuldadeJogo::Facil: difStr = "FACIL"; break;
-        case DificuldadeJogo::Normal: difStr = "NORMAL"; break;
-        case DificuldadeJogo::Dificil: difStr = "DIFICIL"; break;
+        case GameDifficulty::Easy: difStr = "FACIL"; break;
+        case GameDifficulty::Normal: difStr = "NORMAL"; break;
+        case GameDifficulty::Hard: difStr = "DIFICIL"; break;
     }
 
     std::string parryState = jogador->obterParryAtivado() ? "LIGADO" : "DESLIGADO"; 

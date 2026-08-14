@@ -95,17 +95,17 @@ ItensCategorizados TelaDiarioLogic::categorizarItens(Character* jogador) {
     for (const auto& itemNome : itens) {
         auto tempItem = ItemFactory::criarItem(itemNome);
         if (tempItem) {
-            TipoEquipamento tipo = tempItem->obterTipo();
+            EquipmentType tipo = tempItem->getType();
             std::string prefixo;
             prefixo.reserve(3 + itemNome.size());
             prefixo = " - ";
             prefixo += itemNome;
-            if (tipo == TipoEquipamento::ARMA) resultado.armas.push_back(prefixo);
-            else if (tipo == TipoEquipamento::ESCUDO) resultado.escudos.push_back(prefixo);
-            else if (tipo == TipoEquipamento::ARMADURA) resultado.armaduras.push_back(prefixo);
-            else if (tipo == TipoEquipamento::CONSUMIVEL) resultado.consumiveis.push_back(prefixo);
-            else if (tipo == TipoEquipamento::MATERIAL) resultado.materiais.push_back(prefixo);
-            else if (tipo == TipoEquipamento::MISSAO) resultado.missoes.push_back(prefixo);
+            if (tipo == EquipmentType::Weapon) resultado.armas.push_back(prefixo);
+            else if (tipo == EquipmentType::Shield) resultado.escudos.push_back(prefixo);
+            else if (tipo == EquipmentType::Armor) resultado.armaduras.push_back(prefixo);
+            else if (tipo == EquipmentType::Consumable) resultado.consumiveis.push_back(prefixo);
+            else if (tipo == EquipmentType::Material) resultado.materiais.push_back(prefixo);
+            else if (tipo == EquipmentType::Quest) resultado.missoes.push_back(prefixo);
             else resultado.outros.push_back(prefixo);
         } else {
             std::string prefixo;

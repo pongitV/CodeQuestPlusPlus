@@ -6,25 +6,23 @@
 
 class ItemFactory {
 public:
-
     // Cria um item de forma type-safe baseada num Enum.
-    static std::unique_ptr<Item> criarItem(ItemID id);
+    static std::unique_ptr<Item> createItem(ItemID id);
 
-    // Mantido para retrocompatibilidade com system de Saves e Encantamentos (+).
-    static std::unique_ptr<Item> criarItem(const std::string& nome);
+    // Mantido para retrocompatibilidade com sistema de Saves e Encantamentos (+).
+    static std::unique_ptr<Item> createItem(const std::string& name);
     
-    static std::vector<std::unique_ptr<Item>> criarVariosItens(ItemID id, int amount);
-    static std::vector<std::unique_ptr<Item>> criarKitPocoes(int amount = 3);
+    static std::vector<std::unique_ptr<Item>> createMultipleItems(ItemID id, int amount);
+    static std::vector<std::unique_ptr<Item>> createPotionKit(int amount = 3);
 
-    static std::string getNameDeID(ItemID id);
-    static ItemID obterIDDeNome(const std::string& nome);
+    static std::string getNameFromID(ItemID id);
+    static ItemID getIDFromName(const std::string& name);
 
-    // English Aliases
-    static std::unique_ptr<Item> createItem(ItemID id) { return criarItem(id); }
-    static std::unique_ptr<Item> createItem(const std::string& name) { return criarItem(name); }
-    static std::vector<std::unique_ptr<Item>> createMultipleItems(ItemID id, int amount) { return criarVariosItens(id, amount); }
-    static std::string getNameFromID(ItemID id) { return getNameDeID(id); }
-    static ItemID getIDFromName(const std::string& name) { return obterIDDeNome(name); }
+    // Metodos legados em portugues
+    static std::unique_ptr<Item> criarItem(ItemID id) { return createItem(id); }
+    static std::unique_ptr<Item> criarItem(const std::string& nome) { return createItem(nome); }
+    static std::vector<std::unique_ptr<Item>> criarVariosItens(ItemID id, int amount) { return createMultipleItems(id, amount); }
+    static std::vector<std::unique_ptr<Item>> criarKitPocoes(int amount = 3) { return createPotionKit(amount); }
+    static std::string getNameDeID(ItemID id) { return getNameFromID(id); }
+    static ItemID obterIDDeNome(const std::string& nome) { return getIDFromName(nome); }
 };
-
-using ItemFactory = ItemFactory;

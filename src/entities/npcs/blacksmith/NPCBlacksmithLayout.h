@@ -112,7 +112,11 @@ namespace NPCBlacksmithLayouts {
         "â €â €â €â €â €â €â €â €â €â €â¢€â£¾â£¿â£¿â£¿â£¿â£¿â£¿â£¿â£¿â£·â¡€â €â €â €â €â €â €â €â €",
         "â €â €â €â €â €â €â €â €â €â£ â£¿â£¿â£¿â£¿â£¿â£¿â£¿â£¿â£¿â£¿â£¿â£¿â£„â €â €â €â €â €â €â €",
         "â €â €â €â €â €â €â£€â£€â£ˆâ£‰â£‰â£‰â£‰â£‰â£‰â£‰â£‰â£‰â£‰â£‰â£‰â£‰â£‰â£â£€â£€â €â €â €â €",
-        "â €â €â €â €â €â €â£¿â£¿â£¿â£¿â£¿â£¿â£¿â£¿â£¿â£¿â£¿â£¿â£¿â£¿â£¿â£¿â£¿â£¿â£¿â¡¿â €â €â €â €"
     )");
+    inline const auto& blacksmithArt = arteBlacksmith;
+    inline const auto& anvilArt = arteBigorna;
+    inline const auto& arteFerreiro = arteBlacksmith;
 }
+
+namespace NPCFerreiroLayouts = NPCBlacksmithLayouts;
 

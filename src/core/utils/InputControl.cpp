@@ -15,24 +15,24 @@
 
 #include "../input/InputSystem.h"
 
-void InputControl::atualizarTeclas() {
+void InputControl::updateKeys() {
     InputSystem::Update();
 }
 
-static bool teclaAgora(int vk) {
+static bool isKeyJustPressed(int vk) {
     return InputSystem::WasKeyPressed(vk);
 }
 
-static void processarMsgED2D() {
+static void processMessagesAndD2D() {
     if (auto* win = D2DContext::window) {
-        win->processarMensagens();
+        win->processMessages();
     }
-    InputControl::atualizarTeclas();
-    // NOTE: Do NOT call apresentarBackbuffer here — it would overwrite
-    // whatever the current screen just drew with the black backbuffer bitmap.
+    InputControl::updateKeys();
+    // NOTA: NÃO chamar apresentarBackbuffer aqui — sobrescreveria
+    // o que a tela atual acabou de desenhar com o bitmap preto do backbuffer.
 }
 
-bool InputControl::teclaPressionada() {
+bool InputControl::isKeyPressed() {
     for (int vk = 32; vk <= 126; ++vk) {
         if (InputSystem::IsKeyPressed(vk)) return true;
     }
@@ -43,7 +43,7 @@ bool InputControl::teclaPressionada() {
            InputSystem::IsKeyPressed(VK_BACK);
 }
 
-char InputControl::lerTecla() {
+char InputControl::readKey() {
     if (InputSystem::WasKeyPressed(VK_RETURN)) return '\r';
     if (InputSystem::WasKeyPressed(VK_ESCAPE)) return 27;
     if (InputSystem::WasKeyPressed(VK_UP)) return 'w';
@@ -55,48 +55,48 @@ char InputControl::lerTecla() {
     return 0;
 }
 
-ComandoMapa InputControl::traduzirTeclaParaComando(char tecla) {
-    switch (tecla) {
-        case 'w': case 'W': return ComandoMapa::Cima;
-        case 's': case 'S': return ComandoMapa::Baixo;
-        case 'a': case 'A': return ComandoMapa::Esquerda;
-        case 'd': case 'D': return ComandoMapa::Direita;
-        case 'i': case 'I': return ComandoMapa::Inventory;
+MapCommand InputControl::translateKeyToCommand(char key) {
+    switch (key) {
+        case 'w': case 'W': return MapCommand::Up;
+        case 's': case 'S': return MapCommand::Down;
+        case 'a': case 'A': return MapCommand::Left;
+        case 'd': case 'D': return MapCommand::Right;
+        case 'i': case 'I': return MapCommand::Inventory;
         case 'f': case 'F': 
-        case 'c': case 'C': return ComandoMapa::Ficha;
+        case 'c': case 'C': return MapCommand::Sheet;
         case 'b': case 'B': 
-        case 'j': case 'J': return ComandoMapa::Bestiary;
-        default: return ComandoMapa::Nenhum;
+        case 'j': case 'J': return MapCommand::Bestiary;
+        default: return MapCommand::None;
     }
 }
 
-void InputControl::limparBuffer() {
+void InputControl::clearBuffer() {
     InputSystem::Clear();
-    GameWindow::limparTeclas();
+    GameWindow::clearKeys();
 }
 
-std::string InputControl::lerEntradaProtegida(const std::string& promptMensagem) {
+std::string InputControl::readProtectedInput(const std::string& promptMessage) {
     return "";
 }
 
-int InputControl::lerInteiroComLimites(const std::string& promptMensagem, int minimo, int maximo, bool centralizarPrompt, const std::string& margemPersonalizada) {
-    int valorAtual = minimo;
-    limparBuffer();
+int InputControl::readIntegerWithBounds(const std::string& promptMessage, int minimum, int maximum, bool centerPrompt, const std::string& customMargin) {
+    int valorAtual = minimum;
+    clearBuffer();
     
     auto handler = [&](char tecla, int& selecaoAtual) -> bool {
-        if (teclaAgora(VK_LEFT) || teclaAgora('A')) {
-            if (valorAtual > minimo) valorAtual--;
+        if (isKeyJustPressed(VK_LEFT) || isKeyJustPressed('A')) {
+            if (valorAtual > minimum) valorAtual--;
             return true;
         }
-        if (teclaAgora(VK_RIGHT) || teclaAgora('D')) {
-            if (valorAtual < maximo) valorAtual++;
+        if (isKeyJustPressed(VK_RIGHT) || isKeyJustPressed('D')) {
+            if (valorAtual < maximum) valorAtual++;
             return true;
         }
         return false;
     };
     
     auto construtor = [&](UIDynamicBox& box, int sel, float logicalW, float startCol, float startY) {
-        std::wstring prompt = MenuRaycasterUtils::utf8_to_wstring(promptMensagem);
+        std::wstring prompt = MenuRaycasterUtils::utf8_to_wstring(promptMessage);
         box.AddText(prompt, logicalW / 2.0f, startY, 18.0f, D2D1::ColorF(D2D1::ColorF::White), true);
         
         std::wstring valorStr = L"<  " + std::to_wstring(valorAtual) + L"  >";
@@ -113,28 +113,28 @@ int InputControl::lerInteiroComLimites(const std::string& promptMensagem, int mi
     );
     
     if (escolha == 0) return valorAtual;
-    return minimo;
+    return minimum;
 }
 
-int InputControl::lerSelecaoMenuComSetas(const std::vector<std::string>& opcoes, bool centralizar, const std::string& margemPersonalizada, const std::vector<std::string>& painelDireito) {
-    processarMsgED2D();
-    if (opcoes.empty()) return 0;
+int InputControl::readMenuSelectionWithArrows(const std::vector<std::string>& options, bool center, const std::string& customMargin, const std::vector<std::string>& rightPanel) {
+    processMessagesAndD2D();
+    if (options.empty()) return 0;
     static int ultimaSelecao = 0;
     static auto ultimoUpdate = std::chrono::steady_clock::now();
     auto agora = std::chrono::steady_clock::now();
 
     if (agora - ultimoUpdate > std::chrono::milliseconds(100)) {
-        if (teclaAgora(VK_UP) && ultimaSelecao > 0) {
+        if (isKeyJustPressed(VK_UP) && ultimaSelecao > 0) {
             ultimaSelecao--;
             ultimoUpdate = agora;
         }
-        else if (teclaAgora(VK_DOWN) && ultimaSelecao < (int)opcoes.size() - 1) {
+        else if (isKeyJustPressed(VK_DOWN) && ultimaSelecao < (int)options.size() - 1) {
             ultimaSelecao++;
             ultimoUpdate = agora;
         }
     }
 
-    if (teclaAgora(VK_RETURN)) {
+    if (isKeyJustPressed(VK_RETURN)) {
         int escolha = ultimaSelecao;
         ultimaSelecao = 0;
         return escolha;
@@ -142,12 +142,12 @@ int InputControl::lerSelecaoMenuComSetas(const std::vector<std::string>& opcoes,
     return -1;
 }
 
-int InputControl::lerSelecaoMenuEmPopup(const std::string& titulo, const std::vector<std::string>& texto, const std::vector<std::string>& opcoes, Color corTema, const std::vector<std::string>& arteAscii, bool animarEntrada) {
-    limparBuffer();
+int InputControl::readMenuSelectionInPopup(const std::string& title, const std::vector<std::string>& text, const std::vector<std::string>& options, Color themeColor, const std::vector<std::string>& asciiArt, bool animateEntrance) {
+    clearBuffer();
     
-    D2D1_COLOR_F corD2D = MenuRaycasterUtils::converterCorParaD2D(corTema);
+    D2D1_COLOR_F corD2D = MenuRaycasterUtils::converterCorParaD2D(themeColor);
     
-    MenuRaycasterUtils::PosicaoArte pos = arteAscii.empty() ? MenuRaycasterUtils::PosicaoArte::NENHUMA : MenuRaycasterUtils::PosicaoArte::ESQUERDA;
+    MenuRaycasterUtils::PosicaoArte pos = asciiArt.empty() ? MenuRaycasterUtils::PosicaoArte::NENHUMA : MenuRaycasterUtils::PosicaoArte::ESQUERDA;
     
     std::vector<GrupoCorUI> paletaDinamica = {
         {"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-=_+[]{}|;':\",./<>?\\~` ", 
@@ -155,10 +155,10 @@ int InputControl::lerSelecaoMenuEmPopup(const std::string& titulo, const std::ve
     };
 
     return MenuRaycasterUtils::renderizarMenuPadrao(
-        MenuRaycasterUtils::utf8_to_wstring(titulo),
+        MenuRaycasterUtils::utf8_to_wstring(title),
         corD2D,
-        opcoes,
-        arteAscii, // Arte fica na esquerda
+        options,
+        asciiArt, // Arte fica na esquerda
         paletaDinamica, 
         pos,
         5.0f, // Escala adequada para os NPCs
@@ -166,24 +166,24 @@ int InputControl::lerSelecaoMenuEmPopup(const std::string& titulo, const std::ve
         nullptr,
         {}, // Sem titulo gigante
         {},
-        texto // Texto renderizado como contexto
+        text // Texto renderizado como contexto
     );
 }
 
-void InputControl::aguardarEnter(const std::string& /*mensagem*/) {
-    limparBuffer();
-    GameWindow::limparMouse();
+void InputControl::waitForEnter(const std::string& /*message*/) {
+    clearBuffer();
+    GameWindow::clearMouse();
 
     while (true) {
-        processarMsgED2D();
+        processMessagesAndD2D();
 
         if (Parry::onUpdateScreen) {
             Parry::onUpdateScreen();
         }
 
-        if (teclaAgora(VK_RETURN) || teclaAgora(VK_SPACE) || GameWindow::mouseClicado()) {
-            limparBuffer();
-            GameWindow::limparMouse();
+        if (isKeyJustPressed(VK_RETURN) || isKeyJustPressed(VK_SPACE) || GameWindow::isMouseClicked()) {
+            clearBuffer();
+            GameWindow::clearMouse();
             break;
         }
 
@@ -191,24 +191,24 @@ void InputControl::aguardarEnter(const std::string& /*mensagem*/) {
     }
 }
 
-void InputControl::executarLoopMenuPopup(
-    const std::function<std::vector<std::string>()>& obterDialogo,
-    const std::function<std::vector<std::string>()>& obterOpcoes,
-    const std::function<bool(const std::string&)>& processarOpcao,
-    const std::string& titulo,
-    Color corTema,
-    const std::vector<std::string>& arteAscii
+void InputControl::executePopupMenuLoop(
+    const std::function<std::vector<std::string>()>& getDialog,
+    const std::function<std::vector<std::string>()>& getOptions,
+    const std::function<bool(const std::string&)>& processOption,
+    const std::string& title,
+    Color themeColor,
+    const std::vector<std::string>& asciiArt
 ) {
     bool emMenu = true;
     while (emMenu) {
-        std::vector<std::string> opcoes = obterOpcoes();
-        std::vector<std::string> dialogo = obterDialogo();
+        std::vector<std::string> opcoes = getOptions();
+        std::vector<std::string> dialogo = getDialog();
         
-        D2D1_COLOR_F corD2D = MenuRaycasterUtils::converterCorParaD2D(corTema);
+        D2D1_COLOR_F corD2D = MenuRaycasterUtils::converterCorParaD2D(themeColor);
 
         std::vector<GrupoCorUI> paletaDinamica = {
             {"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-=_+[]{}|;':\",./<>?\\~` ", 
-             (int)(corD2D.r * 255), (int)(corD2D.g * 255), (int)(corD2D.b * 255)}
+              (int)(corD2D.r * 255), (int)(corD2D.g * 255), (int)(corD2D.b * 255)}
         };
 
         auto construtorAdicional = [&](UIDynamicBox& box, int selecaoAtual, float logicalW, float startCol, float startY) {
@@ -227,10 +227,10 @@ void InputControl::executarLoopMenuPopup(
         };
 
         int escolha = MenuRaycasterUtils::renderizarMenuPadrao(
-            MenuRaycasterUtils::utf8_to_wstring(titulo),
+            MenuRaycasterUtils::utf8_to_wstring(title),
             corD2D,
             opcoes,
-            arteAscii, // arte (esquerda)
+            asciiArt, // arte (esquerda)
             paletaDinamica, // paletaArte
             MenuRaycasterUtils::PosicaoArte::ESQUERDA,
             5.0f, // escalaArte
@@ -248,7 +248,7 @@ void InputControl::executarLoopMenuPopup(
             if (opcUpper == "VOLTAR" || opcUpper == "SAIR" || opcUpper == "IR EMBORA" || opcUpper == "CANCELAR") {
                 emMenu = false;
             } else {
-                emMenu = processarOpcao(opcStr);
+                emMenu = processOption(opcStr);
             }
         } else {
             emMenu = false;

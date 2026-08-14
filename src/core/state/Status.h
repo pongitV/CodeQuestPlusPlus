@@ -2,7 +2,7 @@
 
 #include <string>
 
-// Enum representing active status effect identifiers
+// Enum que representa os identificadores de efeitos de status ativos
 enum class EffectID {
     None,
     Bleeding,
@@ -19,7 +19,7 @@ enum class EffectID {
     Necrosis,
     TrueAim,
 
-    // Backward-compatibility enum constants
+    // Constantes de enum para compatibilidade retroativa
     Nenhum = None,
     Sangramento = Bleeding,
     Lentidao = Slow,
@@ -36,12 +36,12 @@ enum class EffectID {
     MiraCerteira = TrueAim
 };
 
-// Legacy compatibility alias
+// Alias de compatibilidade legada
 using EfeitoID = EffectID;
 
 class Character;
 
-// BaseStatus: Abstract base class representing status effects applied to characters.
+// BaseStatus: Classe base abstrata que representa efeitos de status aplicados a personagens.
 class BaseStatus {
 protected:
     EffectID id;
@@ -58,24 +58,24 @@ public:
     void decrementTurn() { if (remainingTurns > 0) remainingTurns--; }
     bool hasExpired() const { return remainingTurns <= 0; }
 
-    virtual void onEnter(Character* target) { aoEntrar(target); }
-    virtual void applyTurnStart(Character* target) { aplicarInicioTurno(target); }
-    virtual void onExit(Character* target) { aoSair(target); }
+    virtual void onEnter(Character* target) {}
+    virtual void applyTurnStart(Character* target) {}
+    virtual void onExit(Character* target) {}
 
-    virtual int processIncomingDamage(int damage) { return processarDanoRecebido(damage); }
-    virtual bool preventsAction() const { return impedeAcao(); }
+    virtual int processIncomingDamage(int damage) { return damage; }
+    virtual bool preventsAction() const { return false; }
 
-    // Legacy method delegates
+    // Métodos legados para compatibilidade retroativa
     EffectID obterID() const { return getId(); }
     int obterTurnosRestantes() const { return getRemainingTurns(); }
     void decrementarTurno() { decrementTurn(); }
     bool expirou() const { return hasExpired(); }
 
-    virtual void aoEntrar(Character* /*target*/) {}
-    virtual void aplicarInicioTurno(Character* /*target*/) {}
-    virtual void aoSair(Character* /*target*/) {}
-    virtual int processarDanoRecebido(int damage) { return damage; }
-    virtual bool impedeAcao() const { return false; }
+    virtual void aoEntrar(Character* target) { onEnter(target); }
+    virtual void aplicarInicioTurno(Character* target) { applyTurnStart(target); }
+    virtual void aoSair(Character* target) { onExit(target); }
+    virtual int processarDanoRecebido(int damage) { return processIncomingDamage(damage); }
+    virtual bool impedeAcao() const { return preventsAction(); }
 
     void DecrementTurn() { decrementTurn(); }
     bool HasExpired() const { return hasExpired(); }
@@ -84,136 +84,145 @@ public:
     virtual int ApplyDamage(int damage) { return processIncomingDamage(damage); }
 };
 
-class EfeitoStatus : public BaseStatus {
+class StatusEffect : public BaseStatus {
 public:
-    EfeitoStatus(EffectID id, const std::string& effectName, int durationTurns)
+    StatusEffect(EffectID id, const std::string& effectName, int durationTurns)
         : BaseStatus(id, effectName, durationTurns) {}
 };
 
-using StatusEffect = EfeitoStatus;
+using EfeitoStatus = StatusEffect;
 
-class EfeitoAtordoamento : public EfeitoStatus {
+class StunEffect : public StatusEffect {
 public:
-    EfeitoAtordoamento(int durationTurns) : EfeitoStatus(EffectID::Stun, "Stun", durationTurns) {}
+    StunEffect(int durationTurns) : StatusEffect(EffectID::Stun, "Stun", durationTurns) {}
     bool preventsAction() const override { return true; }
-    bool impedeAcao() const override { return preventsAction(); }
 };
 
-class EfeitoSugaSangue : public EfeitoStatus {
+using EfeitoAtordoamento = StunEffect;
+
+class LifeStealEffect : public StatusEffect {
 private:
-    Character* atacante;
+    Character* attacker;
 public:
-    EfeitoSugaSangue(int durationTurns, Character* personagemAtacante) : EfeitoStatus(EffectID::LifeSteal, "LifeSteal", durationTurns), atacante(personagemAtacante) {}
-    void applyTurnStart(Character* target) override { aplicarInicioTurno(target); }
-    void aplicarInicioTurno(Character* target) override;
+    LifeStealEffect(int durationTurns, Character* attackingCharacter) 
+        : StatusEffect(EffectID::LifeSteal, "LifeSteal", durationTurns), attacker(attackingCharacter) {}
+    void applyTurnStart(Character* target) override;
 };
 
-class EfeitoLentidao : public EfeitoStatus {
+using EfeitoSugaSangue = LifeStealEffect;
+
+class SlowEffect : public StatusEffect {
 public:
-    EfeitoLentidao(int durationTurns) : EfeitoStatus(EffectID::Slow, "Slow", durationTurns) {}
-    void onEnter(Character* target) override { aoEntrar(target); }
-    void onExit(Character* target) override { aoSair(target); }
-    void aoEntrar(Character* target) override;
-    void aoSair(Character* target) override;
+    SlowEffect(int durationTurns) : StatusEffect(EffectID::Slow, "Slow", durationTurns) {}
+    void onEnter(Character* target) override;
+    void onExit(Character* target) override;
 };
 
-class EfeitoFraqueza : public EfeitoStatus {
+using EfeitoLentidao = SlowEffect;
+
+class WeaknessEffect : public StatusEffect {
 private:
-    int strengthPerdida;
+    int lostStrength;
 public:
-    EfeitoFraqueza(int durationTurns) : EfeitoStatus(EffectID::Weakness, "Weakness", durationTurns), strengthPerdida(0) {}
-    void onEnter(Character* target) override { aoEntrar(target); }
-    void onExit(Character* target) override { aoSair(target); }
-    void aoEntrar(Character* target) override;
-    void aoSair(Character* target) override;
+    WeaknessEffect(int durationTurns) : StatusEffect(EffectID::Weakness, "Weakness", durationTurns), lostStrength(0) {}
+    void onEnter(Character* target) override;
+    void onExit(Character* target) override;
 };
 
-class EfeitoQuebraResistencia : public EfeitoStatus {
+using EfeitoFraqueza = WeaknessEffect;
+
+class ArmorBreakEffect : public StatusEffect {
 private:
-    int resistancePerdida;
-    int constitutionPerdida;
+    int lostResistance;
+    int lostConstitution;
 public:
-    EfeitoQuebraResistencia() : EfeitoStatus(EffectID::ArmorBreak, "ArmorBreak", 9999), resistancePerdida(0), constitutionPerdida(0) {}
-    void onEnter(Character* target) override { aoEntrar(target); }
-    void onExit(Character* target) override { aoSair(target); }
-    void applyTurnStart(Character* target) override { aplicarInicioTurno(target); }
-    void aoEntrar(Character* target) override;
-    void aoSair(Character* target) override;
-    void aplicarInicioTurno(Character* target) override;
+    ArmorBreakEffect() : StatusEffect(EffectID::ArmorBreak, "ArmorBreak", 9999), lostResistance(0), lostConstitution(0) {}
+    void onEnter(Character* target) override;
+    void onExit(Character* target) override;
+    void applyTurnStart(Character* target) override;
 };
 
-class EfeitoSangramento : public EfeitoStatus {
+using EfeitoQuebraResistencia = ArmorBreakEffect;
+
+class BleedingEffect : public StatusEffect {
 private:
-    int danoPorTurno;
+    int damagePerTurn;
 public:
-    EfeitoSangramento(int durationTurns, int damage) : EfeitoStatus(EffectID::Bleeding, "Bleeding", durationTurns), danoPorTurno(damage) {}
-    void applyTurnStart(Character* target) override { aplicarInicioTurno(target); }
-    void aplicarInicioTurno(Character* target) override;
+    BleedingEffect(int durationTurns, int damage) : StatusEffect(EffectID::Bleeding, "Bleeding", durationTurns), damagePerTurn(damage) {}
+    void applyTurnStart(Character* target) override;
 };
 
-class EfeitoNecrose : public EfeitoStatus {
+using EfeitoSangramento = BleedingEffect;
+
+class NecrosisEffect : public StatusEffect {
 private:
-    int danoPorTurno;
+    int damagePerTurn;
 public:
-    EfeitoNecrose(int durationTurns, int damage) : EfeitoStatus(EffectID::Necrosis, "Necrosis", durationTurns), danoPorTurno(damage) {}
-    void applyTurnStart(Character* target) override { aplicarInicioTurno(target); }
-    void aplicarInicioTurno(Character* target) override;
+    NecrosisEffect(int durationTurns, int damage) : StatusEffect(EffectID::Necrosis, "Necrosis", durationTurns), damagePerTurn(damage) {}
+    void applyTurnStart(Character* target) override;
 };
 
-class EfeitoMetadeDano : public EfeitoStatus {
+using EfeitoNecrose = NecrosisEffect;
+
+class HalfDamageEffect : public StatusEffect {
 public:
-    EfeitoMetadeDano(int durationTurns) : EfeitoStatus(EffectID::HalfDamage, "HalfDamage", durationTurns) {}
-    int processIncomingDamage(int damage) override { return processarDanoRecebido(damage); }
-    int processarDanoRecebido(int damage) override;
+    HalfDamageEffect(int durationTurns) : StatusEffect(EffectID::HalfDamage, "HalfDamage", durationTurns) {}
+    int processIncomingDamage(int damage) override;
 };
 
-class EfeitoBuffAtributos : public EfeitoStatus {
+using EfeitoMetadeDano = HalfDamageEffect;
+
+class AttributeBuffEffect : public StatusEffect {
 public:
-    EfeitoBuffAtributos(int durationTurns) : EfeitoStatus(EffectID::AttributeBuff, "AttributeBuff", durationTurns) {}
-    void onExit(Character* target) override { aoSair(target); }
-    void aoSair(Character* target) override;
+    AttributeBuffEffect(int durationTurns) : StatusEffect(EffectID::AttributeBuff, "AttributeBuff", durationTurns) {}
+    void onExit(Character* target) override;
 };
 
-class EfeitoInviolavel : public EfeitoStatus {
+using EfeitoBuffAtributos = AttributeBuffEffect;
+
+class InviolableEffect : public StatusEffect {
 public:
-    EfeitoInviolavel(int durationTurns) : EfeitoStatus(EffectID::Inviolable, "Inviolable", durationTurns) {}
-    void onExit(Character* target) override { aoSair(target); }
-    void aoSair(Character* target) override;
+    InviolableEffect(int durationTurns) : StatusEffect(EffectID::Inviolable, "Inviolable", durationTurns) {}
+    void onExit(Character* target) override;
 };
 
-class EfeitoMiraCerteira : public EfeitoStatus {
+using EfeitoInviolavel = InviolableEffect;
+
+class TrueAimEffect : public StatusEffect {
 public:
-    EfeitoMiraCerteira(int durationTurns) : EfeitoStatus(EffectID::TrueAim, "TrueAim", durationTurns) {}
+    TrueAimEffect(int durationTurns) : StatusEffect(EffectID::TrueAim, "TrueAim", durationTurns) {}
 };
 
-class EfeitoGritoGuerra : public EfeitoStatus {
+using EfeitoMiraCerteira = TrueAimEffect;
+
+class WarCryEffect : public StatusEffect {
 private:
-    int bonusForca;
-    int bonusDestreza;
+    int strengthBonus;
+    int dexterityBonus;
 public:
-    EfeitoGritoGuerra(int durationTurns, int strengthBonus, int dexterityBonus) : EfeitoStatus(EffectID::WarCry, "WarCry", durationTurns), bonusForca(strengthBonus), bonusDestreza(dexterityBonus) {}
-    void onEnter(Character* target) override { aoEntrar(target); }
-    void onExit(Character* target) override { aoSair(target); }
-    void aoEntrar(Character* target) override;
-    void aoSair(Character* target) override;
+    WarCryEffect(int durationTurns, int strBonus, int dexBonus) 
+        : StatusEffect(EffectID::WarCry, "WarCry", durationTurns), strengthBonus(strBonus), dexterityBonus(dexBonus) {}
+    void onEnter(Character* target) override;
+    void onExit(Character* target) override;
 };
 
-class EfeitoRodaAdaptacao : public EfeitoStatus {
+using EfeitoGritoGuerra = WarCryEffect;
+
+class AdaptationWheelEffect : public StatusEffect {
 private:
-    int bForca = 0;
-    int bDestreza = 0;
-    int bResistencia = 0;
-    int bConstituicao = 0;
-    int bInteligencia = 0;
-    int bSabedoria = 0;
+    int bonusStrength = 0;
+    int bonusDexterity = 0;
+    int bonusResistance = 0;
+    int bonusConstitution = 0;
+    int bonusIntelligence = 0;
+    int bonusWisdom = 0;
 public:
-    EfeitoRodaAdaptacao() : EfeitoStatus(EffectID::AdaptationWheel, "Divine Adaptation", 9999) {}
+    AdaptationWheelEffect() : StatusEffect(EffectID::AdaptationWheel, "Divine Adaptation", 9999) {}
     bool preventsAction() const override { return false; }
-    bool impedeAcao() const override { return preventsAction(); }
-    void applyTurnStart(Character* target) override { aplicarInicioTurno(target); }
-    void aplicarInicioTurno(Character* target) override;
-    void onExit(Character* target) override { aoSair(target); }
-    void aoSair(Character* target) override;
-    void adapt(Character* target, Character* enemy) { adaptar(target, enemy); }
-    void adaptar(Character* target, Character* enemy);
+    void applyTurnStart(Character* target) override;
+    void onExit(Character* target) override;
+    void adapt(Character* target, Character* enemy);
+    void adaptar(Character* target, Character* enemy) { adapt(target, enemy); }
 };
+
+using EfeitoRodaAdaptacao = AdaptationWheelEffect;

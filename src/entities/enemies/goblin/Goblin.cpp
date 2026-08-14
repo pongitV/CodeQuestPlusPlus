@@ -116,26 +116,26 @@ const std::vector<std::string>& Goblin::getRaceAppearance() const
 
 
 // --- BESTIARIO E DROPS ---
-BestiaryInfo Goblin::obterBestiaryInfo() const {
+BestiaryInfo Goblin::getBestiaryInfo() const {
     return {
         "Village Inicial", 
         "Arredores",
         "Pequenas criaturas verdes e astutas que costumam viver em bandos perto de vilarejos.",
         "Goblins adoram itens brilhantes e guardam dentes como trofeus.",
-        {ItemFactory::getNameDeID(ItemID::DenteGoblin), ItemFactory::getNameDeID(ItemID::AdagaPedra), "Ouro"},
+        {ItemFactory::getNameFromID(ItemID::DenteGoblin), ItemFactory::getNameFromID(ItemID::AdagaPedra), "Ouro"},
         1
     };
 }
 
-void Goblin::realizarDrops(Character* enemy, Character* currentPlayer, std::vector<std::string>& itensObtidos, int& ouroTotal, int& xpTotal)
+void Goblin::performDrops(Character* enemy, Character* currentPlayer, std::vector<std::string>& obtainedItems, int& totalGold, int& totalXp)
 {
-    Drops::reportAndProcessXPGold(currentPlayer, 40, 20, ouroTotal, xpTotal);
+    Drops::reportAndProcessXPGold(currentPlayer, 40, 20, totalGold, totalXp);
 
-    if (enemy->obterArma() && enemy->obterArma()->getNameItem() == "Adaga artesanal de pedra") {
-        Drops::giveAndProcessItem(currentPlayer, ItemID::AdagaPedra, 1, itensObtidos, 65);
+    if (enemy->getWeapon() && enemy->getWeapon()->getItemName() == "Adaga artesanal de pedra") {
+        Drops::giveAndProcessItem(currentPlayer, ItemID::AdagaPedra, 1, obtainedItems, 65);
     }
     
-    Drops::giveAndProcessItem(currentPlayer, ItemID::DenteGoblin, RandomGenerator::getInteiro(4, 8), itensObtidos);
+    Drops::giveAndProcessItem(currentPlayer, ItemID::DenteGoblin, RandomGenerator::getInt(4, 8), obtainedItems);
 }
 
 

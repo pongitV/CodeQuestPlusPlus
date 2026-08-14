@@ -17,70 +17,67 @@
 #include "../../../core/utils/Color.h"
 
 namespace {
-    std::map<int, StoreProduct> estoquePocoes = {
+    std::map<int, StoreProduct> potionsStock = {
         {1, {ItemID::PocaoCura30, 10, -1}}
     };
 
-    std::map<int, StoreProduct> estoqueTalismas = {
+    std::map<int, StoreProduct> talismansStock = {
         {1, {ItemID::TalismaUrso, 200, 1}},
         {2, {ItemID::TalismaCorvo, 200, 1}},
         {3, {ItemID::TalismaLeopardo, 200, 1}},
         {4, {ItemID::TalismaCoruja, 200, 1}}
     };
 
-    std::map<int, StoreProduct> estoqueIguarias = {
+    std::map<int, StoreProduct> delicaciesStock = {
         {1, {ItemID::DispositivoLinguagem, 1000, 1}}
     };
 
     // --- APARENCIA E DIALOGOS ---
-    void processPurchasePocoes(Character* currentPlayer);
-    void processPurchaseTalismas(Character* currentPlayer);
-    void processPurchaseIguarias(Character* currentPlayer);
-    void processarVendaDeItens(Character* currentPlayer);
+    void processPotionsPurchase(Character* currentPlayer);
+    void processTalismansPurchase(Character* currentPlayer);
+    void processDelicaciesPurchase(Character* currentPlayer);
+    void processItemSales(Character* currentPlayer);
 
-    void dialogoFranchesco(const std::vector<std::string>& linhas) {
-    }
-    
-    void dialogoFranchescoUnico(const std::string& msg) {
-        InputControl::lerSelecaoMenuEmPopup("Franchesco", {msg}, {"OK"}, Color::CYAN, NPCMerchantLayouts::arteMerchant);
+    void franchescoSingleDialogue(const std::string& msg) {
+        InputControl::lerSelecaoMenuEmPopup("Franchesco", {msg}, {"OK"}, Color::CYAN, NPCMerchantLayouts::merchantArt);
     }
 }
 
 // --- INFORMACOES DO LUGAR ---
-std::string NPCMerchant::getNameDoLugar() const {
+std::string NPCMerchant::getPlaceName() const {
     return "MERCADOR AMBULANTE";
 }
 
-Color NPCMerchant::obterCorDoCabecalho() const {
+Color NPCMerchant::getHeaderColor() const {
     return Color::YELLOW;
 }
 
-Color NPCMerchant::obterCorDaArte() const {
+Color NPCMerchant::getArtColor() const {
     return Color::YELLOW;
 }
 
-const std::vector<std::string>& NPCMerchant::obterArteASCII() const {
-    return NPCMerchantLayouts::arteMerchant;
+const std::vector<std::string>& NPCMerchant::getASCIIArt() const {
+    return NPCMerchantLayouts::merchantArt;
 }
 
 // --- INTERACAO E MENU ---
-void NPCMerchant::interagir(Character* jogador) {
+void NPCMerchant::interact(Character* player) {
     InputControl::executarLoopMenuPopup(
-        [this, jogador]() { return this->obterDialogo(jogador); },
-        [this, jogador]() { return this->obterOpcoesMenu(jogador, 120); },
-        [this, jogador](const std::string& op) { this->processarOpcao(jogador, op, 120); return true; },
-        getNameDoLugar(), obterCorDoCabecalho(), obterArteASCII()
+        [this, player]() { return this->getDialogue(player); },
+        [this, player]() { return this->getMenuOptions(player, 120); },
+        [this, player](const std::string& op) { this->processOption(player, op, 120); return true; },
+        getPlaceName(), getHeaderColor(), getASCIIArt()
     );
 }
 
-std::vector<std::string> NPCMerchant::obterDialogo(Character* /*jogador*/) {
+std::vector<std::string> NPCMerchant::getDialogue(Character* /*player*/) {
     return std::vector<std::string>{
         "Bem-vindo! De uma olhada nas",
         "minhas mercadorias."
     };
 }
 
-std::vector<std::string> NPCMerchant::obterOpcoesMenu(Character* jogador, int larguraDoTerminal) {
+std::vector<std::string> NPCMerchant::getMenuOptions(Character* /*player*/, int /*terminalWidth*/) {
     return {
         "COMPRAR Pocoes",
         "COMPRAR Talismas",
@@ -91,139 +88,138 @@ std::vector<std::string> NPCMerchant::obterOpcoesMenu(Character* jogador, int la
     };
 }
 
-void NPCMerchant::processarOpcao(Character* jogador, const std::string& opcao, int larguraDoTerminal) {
-    if (opcao == "COMPRAR Pocoes") {
-        processPurchasePocoes(jogador);
+void NPCMerchant::processOption(Character* player, const std::string& option, int /*terminalWidth*/) {
+    if (option == "COMPRAR Pocoes") {
+        processPotionsPurchase(player);
     }
-    else if (opcao == "COMPRAR Talismas") {
-        processPurchaseTalismas(jogador);
+    else if (option == "COMPRAR Talismas") {
+        processTalismansPurchase(player);
     }
-    else if (opcao == "COMPRAR Iguarias") {
-        processPurchaseIguarias(jogador);
+    else if (option == "COMPRAR Iguarias") {
+        processDelicaciesPurchase(player);
     }
-    else if (opcao == "VENDER Itens do Inventory") {
-        processarVendaDeItens(jogador);
+    else if (option == "VENDER Itens do Inventory") {
+        processItemSales(player);
     }
-    else if (opcao == "Missoes de Franchesco") {
-        NPCInteraction::processarMenuMissoesVazio(jogador, "MISSOES DE FRANCHESCO", Color::YELLOW, "Franchesco", "Ah, meu amigo! Nao tenho nenhum pedido especial para voce agora.");
+    else if (option == "Missoes de Franchesco") {
+        NPCInteraction::processEmptyQuestsMenu(player, "MISSOES DE FRANCHESCO", Color::YELLOW, "Franchesco", "Ah, meu amigo! Nao tenho nenhum pedido especial para voce agora.");
     }
 }
 
 namespace {
     // --- PROCESSAMENTO DE OPCOES ---
-    void processPurchasePocoes(Character* currentPlayer) {
-        Store::processPurchase(currentPlayer, "LOJA - POCOES", Color::YELLOW, estoquePocoes, 
-            [](const std::string& msg) { dialogoFranchescoUnico(msg); }, NPCInteraction::obterFormatadorStatusItem, NPCMerchantLayouts::arteMerchant);
+    void processPotionsPurchase(Character* currentPlayer) {
+        Store::processPurchase(currentPlayer, "LOJA - POCOES", Color::YELLOW, potionsStock, 
+            [](const std::string& msg) { franchescoSingleDialogue(msg); }, NPCInteraction::getItemStatusFormatter, NPCMerchantLayouts::merchantArt);
     }
 
-    void processPurchaseTalismas(Character* currentPlayer) {
-        Store::processPurchase(currentPlayer, "LOJA - TALISMAS", Color::YELLOW, estoqueTalismas, 
-            [](const std::string& msg) { dialogoFranchescoUnico(msg); }, NPCInteraction::obterFormatadorStatusItem, NPCMerchantLayouts::arteMerchant);
+    void processTalismansPurchase(Character* currentPlayer) {
+        Store::processPurchase(currentPlayer, "LOJA - TALISMAS", Color::YELLOW, talismansStock, 
+            [](const std::string& msg) { franchescoSingleDialogue(msg); }, NPCInteraction::getItemStatusFormatter, NPCMerchantLayouts::merchantArt);
     }
 
-    void processPurchaseIguarias(Character* currentPlayer) {
-        Store::processPurchase(currentPlayer, "LOJA - IGUARIAS", Color::YELLOW, estoqueIguarias, 
-            [](const std::string& msg) { dialogoFranchescoUnico(msg); }, NPCInteraction::obterFormatadorStatusItem, NPCMerchantLayouts::arteMerchant);
+    void processDelicaciesPurchase(Character* currentPlayer) {
+        Store::processPurchase(currentPlayer, "LOJA - IGUARIAS", Color::YELLOW, delicaciesStock, 
+            [](const std::string& msg) { franchescoSingleDialogue(msg); }, NPCInteraction::getItemStatusFormatter, NPCMerchantLayouts::merchantArt);
     }
 
-    void processarVendaDeItens(Character* currentPlayer) {
+    void processItemSales(Character* currentPlayer) {
         do {
-            std::vector<std::pair<std::string, std::vector<Item*>>> gruposItens;
+            std::vector<std::pair<std::string, std::vector<Item*>>> itemGroups;
             std::map<std::string, int> indexMap;
             
-            for (auto* item : currentPlayer->obterInventario()->obterTodosOsItens()) {
-                if (item->obterTipo() != TipoEquipamento::MISSAO) {
-                    std::string nomeItem = item->getNameItem();
-                    bool equipado = currentPlayer->isItemEquipado(item);
-                    std::string chave = nomeItem;
-                    if (equipado) {
-                        chave += " [Equipado]";
+            for (auto* item : currentPlayer->getInventory()->getAllItems()) {
+                if (item->getType() != EquipmentType::Quest) {
+                    std::string itemName = item->getItemName();
+                    bool equipped = currentPlayer->isItemEquipped(item);
+                    std::string key = itemName;
+                    if (equipped) {
+                        key += " [Equipado]";
                     }
                     
-                    if (indexMap.find(chave) == indexMap.end()) {
-                        indexMap[chave] = gruposItens.size();
-                        gruposItens.push_back({chave, {item}});
+                    if (indexMap.find(key) == indexMap.end()) {
+                        indexMap[key] = itemGroups.size();
+                        itemGroups.push_back({key, {item}});
                     } else {
-                        gruposItens[indexMap[chave]].second.push_back(item);
+                        itemGroups[indexMap[key]].second.push_back(item);
                     }
                 }
             }
 
-            std::vector<std::vector<Item*>> itensValidos;
-            std::vector<std::string> opcoesItem;
+            std::vector<std::vector<Item*>> validItems;
+            std::vector<std::string> itemOptions;
             
-            for (const auto& grupo : gruposItens) {
-                int qtd = grupo.second.size();
-                Item* itemExemplo = grupo.second.front();
-                int priceVenda = itemExemplo->obterPrecoVenda();
+            for (const auto& group : itemGroups) {
+                int count = group.second.size();
+                Item* exampleItem = group.second.front();
+                int sellPrice = exampleItem->getSellPrice();
                 
-                std::string textoOpcao = grupo.first + " (" + std::to_string(priceVenda) + "G)";
-                if (qtd > 1) {
-                    textoOpcao += " x" + std::to_string(qtd);
+                std::string optionText = group.first + " (" + std::to_string(sellPrice) + "G)";
+                if (count > 1) {
+                    optionText += " x" + std::to_string(count);
                 }
                 
-                itensValidos.push_back(grupo.second);
-                opcoesItem.push_back(textoOpcao);
+                validItems.push_back(group.second);
+                itemOptions.push_back(optionText);
             }
 
-            if (opcoesItem.empty()) { dialogoFranchescoUnico("Voce nao tem nada que me interesse!"); break; }
-            opcoesItem.push_back("VOLTAR");
+            if (itemOptions.empty()) { franchescoSingleDialogue("Voce nao tem nada que me interesse!"); break; }
+            itemOptions.push_back("VOLTAR");
             
-            int escolha = InputControl::lerSelecaoMenuEmPopup("VENDER ITENS", {"Seu Ouro: " + std::to_string(currentPlayer->obterInventario()->obterOuro()) + "G", "Escolha um item para vender:"}, opcoesItem, Color::YELLOW, NPCMerchantLayouts::arteMerchant);
-            if (escolha == -1 || escolha == static_cast<int>(opcoesItem.size()) - 1) break;
+            int choice = InputControl::lerSelecaoMenuEmPopup("VENDER ITENS", {"Seu Ouro: " + std::to_string(currentPlayer->getInventory()->getGold()) + "G", "Escolha um item para vender:"}, itemOptions, Color::YELLOW, NPCMerchantLayouts::merchantArt);
+            if (choice == -1 || choice == static_cast<int>(itemOptions.size()) - 1) break;
             
-            std::vector<Item*> itensEscolhidos = itensValidos[escolha];
-            Item* itemParaVenda = itensEscolhidos.front();
+            std::vector<Item*> chosenItems = validItems[choice];
+            Item* itemToSell = chosenItems.front();
 
-            if (currentPlayer->isItemEquipado(itemParaVenda)) {
-                dialogoFranchescoUnico("Nao e possivel vender itens que estao equipados!");
+            if (currentPlayer->isItemEquipped(itemToSell)) {
+                franchescoSingleDialogue("Nao e possivel vender itens que estao equipados!");
                 continue;
             }
             
-            int qtdParaVender = 1;
-            if (itensEscolhidos.size() > 1) {
-                std::vector<std::string> opcoesQtd = {
+            int amountToSell = 1;
+            if (chosenItems.size() > 1) {
+                std::vector<std::string> qtyOptions = {
                     "Vender 1 unidade",
-                    "Vender Todos (" + std::to_string(itensEscolhidos.size()) + " unidades)",
+                    "Vender Todos (" + std::to_string(chosenItems.size()) + " unidades)",
                     "Digitar amount...",
                     "Cancelar"
                 };
                 
-                int escolhaQtd = InputControl::lerSelecaoMenuEmPopup(
-                    "QUANTIDADE: " + itemParaVenda->getNameItem(),
-                    {"Voce possui " + std::to_string(itensEscolhidos.size()) + " unidades deste item."},
-                    opcoesQtd, 
+                int qtyChoice = InputControl::lerSelecaoMenuEmPopup(
+                    "QUANTIDADE: " + itemToSell->getItemName(),
+                    {"Voce possui " + std::to_string(chosenItems.size()) + " unidades deste item."},
+                    qtyOptions, 
                     Color::YELLOW, 
-                    NPCMerchantLayouts::arteMerchant
+                    NPCMerchantLayouts::merchantArt
                 );
                 
-                if (escolhaQtd == 0) {
-                    qtdParaVender = 1;
-                } else if (escolhaQtd == 1) {
-                    qtdParaVender = itensEscolhidos.size();
-                } else if (escolhaQtd == 2) {
-                    std::string msgQtd = "Quantidade (1 a " + std::to_string(itensEscolhidos.size()) + ", 0 cancelar): ";
-                    qtdParaVender = 0; // Not supported anymore
+                if (qtyChoice == 0) {
+                    amountToSell = 1;
+                } else if (qtyChoice == 1) {
+                    amountToSell = chosenItems.size();
+                } else if (qtyChoice == 2) {
+                    amountToSell = 0; // Not supported anymore
                 } else {
                     continue; // Cancelar
                 }
             }
             
-            if (qtdParaVender == 0) continue;
+            if (amountToSell == 0) continue;
 
-            std::string nomeItemVenda = itemParaVenda->getNameItem();
-            int priceVendaUnitario = itemParaVenda->obterPrecoVenda();
-            int ganhoTotal = priceVendaUnitario * qtdParaVender;
+            std::string itemName = itemToSell->getItemName();
+            int unitSellPrice = itemToSell->getSellPrice();
+            int totalGain = unitSellPrice * amountToSell;
             
-            currentPlayer->obterInventario()->adicionarOuro(ganhoTotal);
-            for (int i = 0; i < qtdParaVender; ++i) {
-                currentPlayer->obterInventario()->removerItem(itensEscolhidos[i]);
+            currentPlayer->getInventory()->addGold(totalGain);
+            for (int i = 0; i < amountToSell; ++i) {
+                currentPlayer->getInventory()->removeItem(chosenItems[i]);
             }
             
-            if (qtdParaVender > 1) {
-                dialogoFranchescoUnico("Voce vendeu " + std::to_string(qtdParaVender) + "x " + nomeItemVenda + " por " + std::to_string(ganhoTotal) + "G!");
+            if (amountToSell > 1) {
+                franchescoSingleDialogue("Voce vendeu " + std::to_string(amountToSell) + "x " + itemName + " por " + std::to_string(totalGain) + "G!");
             } else {
-                dialogoFranchescoUnico("Voce vendeu " + nomeItemVenda + " por " + std::to_string(ganhoTotal) + "G!");
+                franchescoSingleDialogue("Voce vendeu " + itemName + " por " + std::to_string(totalGain) + "G!");
             }
         } while (true);
     }

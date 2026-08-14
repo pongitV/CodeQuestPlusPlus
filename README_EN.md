@@ -39,10 +39,11 @@ CodeQuestPlusPlus/
 ├── build_incremental.bat / compilar_mudancas.bat
 ├── README.md               # Portuguese Documentation
 ├── README_EN.md            # English Documentation
-├── resource.rc
 ├── docs/                   # Translation & Architecture Documentation
+├── scripts/                # Build and automation scripts (.bat)
 └── src/
     ├── main.cpp            # Main WinMain Entrypoint & lifecycle loop
+    ├── resources/          # Win32 Application Resources (resource.rc, icons)
     ├── core/               # Engine initialization, Win32 window, State management, Input & Logger
     │   ├── config/
     │   ├── d2d-context/

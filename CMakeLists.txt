@@ -8,8 +8,8 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -st
 
 file(GLOB_RECURSE SRC_FILES "src/*.cpp")
 
-add_executable(${PROJECT_NAME} WIN32 ${SRC_FILES} resource.rc)
+add_executable(${PROJECT_NAME} WIN32 ${SRC_FILES} src/resources/resource.rc)
 set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
-target_include_directories(${PROJECT_NAME} PRIVATE src)
+target_include_directories(${PROJECT_NAME} PRIVATE src ${CMAKE_SOURCE_DIR})
 target_link_libraries(${PROJECT_NAME} PRIVATE d2d1 dwrite gdiplus windowscodecs)
 

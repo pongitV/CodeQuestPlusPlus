@@ -148,9 +148,9 @@ GameWindow::GameWindow(HINSTANCE hInstance, int nCmdShow)
 {
     const char CLASS_NAME[] = "CodeQuestPlusPlus_Window";
 
-    m_hIcon = loadIconFromPNG(L"assets/icons/icon.png");
+    m_hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(1));
     if (!m_hIcon) {
-        m_hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(1));
+        m_hIcon = loadIconFromPNG(L"assets/icons/icon.png");
     }
     if (!m_hIcon) {
         m_hIcon = LoadIcon(nullptr, IDI_APPLICATION);

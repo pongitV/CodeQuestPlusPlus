@@ -19,7 +19,7 @@
 
 <p align="center">
   <strong>Idiomas / Languages:</strong><br>
-  <a href="README.md"><strong>Português</strong></a> &nbsp;|&nbsp; <a href="README_EN.md"><strong>English</strong></a>
+  <strong>Português</strong> &nbsp;|&nbsp; <a href="README_EN.md"><strong>English</strong></a>
 </p>
 
 ---

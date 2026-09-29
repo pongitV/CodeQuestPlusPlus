@@ -28,7 +28,7 @@ static void processMessagesAndD2D() {
         win->processMessages();
     }
     InputControl::updateKeys();
-    // NOTA: NÃO chamar apresentarBackbuffer aqui — sobrescreveria
+    // NOTA: NAO chamar apresentarBackbuffer aqui — sobrescreveria
     // o que a tela atual acabou de desenhar com o bitmap preto do backbuffer.
 }
 

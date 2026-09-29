@@ -8,7 +8,7 @@
 
 class RaycasterRendererCombate {
 public:
-    // Renderiza o fundo 3D estatico e sobrepoe a arte do enemy
+    // Renderiza o fundo 3D estatico e sobrepoe a arte do inimigo
     static std::vector<std::string> renderizarQuadro(
         const std::string& tituloMapa, 
         Character* jogador, 
@@ -48,7 +48,7 @@ public:
 
     static std::tuple<int,int,int> obterCorSpriteInimigo(Character* enemy);
 
-    // Pinta uma string de texto sobre o buffer 1D da screen 3D (overlay)
+    // Pinta uma string de texto sobre o buffer 1D da tela 3D (sobreposicao)
     static void pintarTextoNoBuffer(std::vector<std::string>& screen, int larguraTela, int alturaMax, int posX, int posY, const std::string& texto, const std::string& corFg, const std::string& corBgOverride = "");
 
 private:

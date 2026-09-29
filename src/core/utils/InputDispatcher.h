@@ -25,7 +25,7 @@ public:
     }
     bool executar(int tecla) const { return execute(tecla); }
 
-    // Consulta todas as teclas registradas via GetAsyncKeyState; executa a primeira correspondência encontrada.
+    // Consulta todas as teclas registradas via GetAsyncKeyState; executa a primeira correspondencia encontrada.
     using ActionWithReturn = std::function<char()>;
     using AcaoComRetorno = ActionWithReturn;
     struct PollEntry {

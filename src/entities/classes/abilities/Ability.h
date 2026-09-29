@@ -16,7 +16,7 @@ public:
     virtual bool consumesTurn() const { return true; }
     virtual void use(Combat* combat, Character* user, std::vector<Character*>& enemies) = 0;
 
-    // Métodos legados para compatibilidade
+    // Metodos legados para compatibilidade
     virtual std::string obterDescricao() const { return getDescription(); }
     virtual int obterRecargaTurnos() const { return getCooldownTurns(); }
     virtual bool consomeTurno() const { return consumesTurn(); }

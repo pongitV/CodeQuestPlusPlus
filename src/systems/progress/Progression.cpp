@@ -66,7 +66,7 @@ void Progression::load(std::ifstream& in) {
         for (size_t i = 0; i < size; ++i) { std::string key; std::getline(in, key); int val; in >> val; std::getline(in, trash); flags[key] = (val == 1); }
     }
 
-    // --- RETROCOMPATIBILIDADE DE SAVES ANTIGOS ---
+    // Retrocompatibilidade de saves antigos
     // Evita que saves antigos (anteriores a atualizacao) percam o acesso a Viagem Rapida
     auto itForest = flags.find("Visitou_Floresta");
     auto itKingdomBridge = flags.find("Visitou_PonteReino");

@@ -173,7 +173,7 @@ bool Combat::executePlayerOrAllyTurn(Character* character, bool& firstRender, bo
                 }
             }
         }
-        // Remove definitivamente da memória os aliados que morreram pelo dreno
+        // Remove definitivamente da memoria os aliados que morreram pelo dreno
         if (cleanedAlly) {
             allyList.erase(std::remove_if(allyList.begin(), allyList.end(), [](const auto& a) { return a->getHealth() <= 0; }), allyList.end());
         }
@@ -390,7 +390,7 @@ void Combat::processAbilityAction(Character* actingCharacter, bool& turnConsumed
 
     if (actingCharacter->classAbilityConsumesTurn()) turnConsumed = true;
     else {
-        // Não bloqueia thread - deixa o game loop continuar
+        // Nao bloqueia thread - deixa o game loop continuar
         InputControl::clearBuffer();
     }
 }
@@ -509,7 +509,7 @@ void Combat::executeAllEnemiesTurn()
     ui->clearFixedMessages();
     if (currentPlayer->getSkipEnemyTurn()) 
     {
-        // A mensagem na UI foi removida para priorizar o combat limpo
+        // A mensagem na interface foi removida para priorizar o combate limpo
         registrarLog(DialogFunctions::formatarMsgStatus("Os inimigos estao atordoados e nao podem agir!", Color::GREEN));
         currentPlayer->setSkipEnemyTurn(false); 
     }
@@ -544,7 +544,7 @@ void Combat::executeAllEnemiesTurn()
             std::string incapacitationReason;
             if (currentEnemy->canAct(incapacitationReason)) 
             {
-                // Logica de escolha de alvo do enemy
+                // Logica de escolha de alvo do inimigo
                 Character* target = EnemyMechanics::selectTarget(getLivingAlliesRaw(), currentPlayer);
 
                 bool turnConsumedByAbility = currentEnemy->getRace()->tryUseActiveAbility(currentEnemy, target, static_cast<int>(currentPlayer->getDifficulty()));
@@ -555,7 +555,7 @@ void Combat::executeAllEnemiesTurn()
             }
             else
             {
-                // A mensagem na UI foi removida para priorizar o combat limpo
+                // A mensagem na interface foi removida para priorizar o combate limpo
                 registrarLog(DialogFunctions::formatarMsgStatus(currentEnemy->getName() + " esta sob efeito de " + incapacitationReason + " e nao pode agir!", Color::GREEN));
             }
             Parry::setAttackingEnemy(nullptr);
@@ -650,7 +650,7 @@ void Combat::processPostDamage(Character* attacker, Character* target, int final
             ui->animateDamageOnPlayer(getCombatTitle(), getRawEnemies(), target, currentPlayer, livingAllies, false, finalDamage);
         }
 
-        // Aplicação dos efeitos no acerto
+        // Aplicacao dos efeitos no acerto
         int attackerHealthBefore = attacker->getHealth();
         
         if (attacker->getWeapon()) {
@@ -682,7 +682,7 @@ void Combat::processPostDamage(Character* attacker, Character* target, int final
         ui->animateDamageOnPlayer(getCombatTitle(), getRawEnemies(), target, currentPlayer, livingAllies, true, finalDamage);
     } else {
         ui->updateStaticScreen(getCombatTitle(), getRawEnemies(), currentPlayer, livingAllies);
-        // Não bloqueia thread - deixa o game loop continuar
+        // Nao bloqueia thread - deixa o game loop continuar
         InputControl::clearBuffer();
     }
 
@@ -691,7 +691,7 @@ void Combat::processPostDamage(Character* attacker, Character* target, int final
     clearDeadEnemies();
 }
 
-void Combat::applyDamageToTarget(Character* attackingCharacter, Character* targetCharacter, int rawDamage, int piercingDamage, int /*currentCombatTurn*/) 
+void Combat::applyDamageToTarget(Character* attackingCharacter, Character* targetCharacter, int rawDamage, int piercingDamage, int /*turnoCombateAtual*/) 
 {
     if (Debug::isOneHitKillActive && attackingCharacter == currentPlayer) {
         rawDamage = MAX_DEBUG_DAMAGE;
@@ -707,12 +707,12 @@ void Combat::applyDamageToTarget(Character* attackingCharacter, Character* targe
         
         std::vector<Character*> livingAllies = getLivingAlliesRaw();
         ui->updateStaticScreen(getCombatTitle(), getRawEnemies(), currentPlayer, livingAllies);
-        // Não bloqueia thread - deixa o game loop continuar
+        // Nao bloqueia thread - deixa o game loop continuar
         InputControl::clearBuffer();
         return;
     }
 
-    // Logica da Quebra de Resistencia (Pó Mágico)
+    // Logica da Quebra de Resistencia (Po Magico)
     if (attackingCharacter->getWeapon()) attackingCharacter->getWeapon()->beforeDealingDamage(attackingCharacter, targetCharacter);
 
     int mitigatedBaseDamage = DamageCalculator::calculateDefensiveMitigation(targetCharacter, rawDamage, piercingDamage);
@@ -749,7 +749,7 @@ void Combat::applyDamageToTarget(Character* attackingCharacter, Character* targe
         }
     }
 
-    // Burlar o limite de "minimo de 1 de damage" do system base caso o Parry absorva todo o impacto
+    // Contorna o limite de dano minimo caso o aparo absorva todo o impacto
     if (attemptedParry && parryWasSuccessful && parryReducedDamage >= mitigatedBaseDamage) 
     {
         if (targetCharacter == currentPlayer) stats_perfectParries++;

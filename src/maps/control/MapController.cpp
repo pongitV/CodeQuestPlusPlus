@@ -101,7 +101,7 @@ void MapControllera::processarCombate(
 
 // animarFlashbang movido para MapAnimatora.cpp
 
-// Funções da câmera e renderização abstraídas para RenderizadorMapa.cpp
+// Funcoes da camera e renderizacao abstraidas para RenderizadorMapa.cpp
 
 std::string MapControllera::formatarCelula(char celula, int x, int y, const std::string& tituloDoMapa, const std::vector<std::string>& matrizDoMapa, bool isMinimapa) {
     thread_local std::string ultimoTitulo = "";
@@ -126,14 +126,14 @@ std::string MapControllera::formatarCelula(char celula, int x, int y, const std:
         isInterior = (isLabirinto || isChefe || isCoracao || isCaverna);
     }
     
-    // --- ESTÉTICA ENGINE IDE (VISÃO 2D NATIVA) ---
+    // Estetica engine IDE (visao 2D nativa)
     bool isEngineIDE = !isMinimapa && !GerenciadorPerspectiva::obterInstancia().isVisao3DAtiva();
     if (isEngineIDE) {
         std::string npcs = "GOBFPMSTRCH";
         if (npcs.find(celula) == std::string::npos && celula != ' ' && !RaycasterWorld::isMapLabel(x, y, matrizDoMapa)) {
             
             if (celula == '.' && (!isInterior || isChefe || isCoracao)) {
-                return "·"; // Floor trace for IDE
+                return "·"; // Traco do chao para a IDE
             }
 
             const char syntaxChars[] = "{};/*<>&|!=";
@@ -157,10 +157,10 @@ std::string MapControllera::formatarCelula(char celula, int x, int y, const std:
     // Teleporte
     if (celula == '^') return std::string("^");
     
-    // Água
+    // Agua
     if (celula == '~') return std::string("≈");
     
-    // Árvores
+    // Arvores
     if (celula == '*') {
         bool isTrunk = false;
         if (y > 0 && matrizDoMapa[y-1][x] == '*') {
@@ -173,7 +173,7 @@ std::string MapControllera::formatarCelula(char celula, int x, int y, const std:
         return std::string("▲");
     }
     
-    // Verifica se é uma letra de placa de chão (Label) ANTES de checar as entities
+    // Verifica se e uma letra de placa de chao (Label) ANTES de checar as entities
     if (RaycasterWorld::isMapLabel(x, y, matrizDoMapa)) {
         return std::string(1, celula);
     }
@@ -280,7 +280,7 @@ std::string MapControllera::formatarCelula(char celula, int x, int y, const std:
         }
     }
     
-    // Chão / Labels
+    // Chao / Labels
     if (celula == '.' && (!isInterior || isChefe || isCoracao)) {
         if (isMinimapa) return ".";
         return "·";
@@ -293,7 +293,7 @@ std::string MapControllera::formatarCelula(char celula, int x, int y, const std:
     return std::string(1, celula);
 }
 
-// renderizarMapa abstraído para RenderizadorMapa.cpp
+// renderizarMapa abstraido para RenderizadorMapa.cpp
 
 ProximaTransicaoMapa MapControllera::executarLoopDeExploracao(
     Character* currentPlayer,
@@ -392,7 +392,7 @@ ProximaTransicaoMapa MapControllera::executarLoopDeExploracao(
                     int posXantes = posicaoXDoJogador;
                     int posYantes = posicaoYDoJogador;
                     
-                    processarInteracao(hitX, hitY, larguraDoTerminal); // Aciona o combat/NPC caso o jogador tenha parado em cima de um
+                    processarInteracao(hitX, hitY, larguraDoTerminal); // Aciona o combate ou NPC caso o jogador tenha parado sobre um
                     
                     // So empurra o jogador para tras se a posicao nao mudou (evita sobrescrever teleportes)
                     if (isTrigger && GerenciadorPerspectiva::obterInstancia().isVisao3DAtiva() && posicaoXDoJogador == posXantes && posicaoYDoJogador == posYantes) {
@@ -451,7 +451,7 @@ ProximaTransicaoMapa MapControllera::executarLoopDeExploracao(
                     exploracaoEstaAtiva = false; // Sinaliza para sair do loop e processar a viagem
                     break;
                 }
-                // Se nenhum destino foi escolhido, apenas restaura a screen e continua a exploração.
+                // Se nenhum destino foi escolhido, apenas restaura a tela e continua a exploracao.
                 if (!GerenciadorPerspectiva::obterInstancia().isVisao3DAtiva()) {
                     restaurarTela();
                     precisaRenderizar = true;

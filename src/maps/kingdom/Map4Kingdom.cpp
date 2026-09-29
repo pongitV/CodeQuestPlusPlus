@@ -36,7 +36,7 @@ Mapa4Reino::Mapa4Reino(Character* personagemJogador) :
 {
     matrizDoMapaAtual = Mapa4ReinoLayouts::obterLayoutReino();
     MapLoadera::padronizarTamanhoDoMapa(matrizDoMapaAtual);
-    matrizDoMapaPrincipalSalva = matrizDoMapaAtual; // Caso necessário
+    matrizDoMapaPrincipalSalva = matrizDoMapaAtual; // Caso necessario
 }
 
 Mapa4Reino::~Mapa4Reino() = default;
@@ -64,7 +64,7 @@ ProximaTransicaoMapa Mapa4Reino::iniciarLoopDeExploracao()
         std::vector<std::string> arteTitulo;
         int larguraArte = 0;
         
-        // Ensure title is strictly REINO for the banner
+        // Garante que o titulo seja estritamente REINO para a faixa
         if (tituloDoMapaAtual == "REINO" || tituloDoMapaAtual.find("Kingdom") != std::string::npos || tituloDoMapaAtual.find("REINO") != std::string::npos) {
             tituloDoMapaAtual = "REINO";
             arteTitulo = Mapa4ReinoLayouts::obterLogoReino();
@@ -122,7 +122,7 @@ ProximaTransicaoMapa Mapa4Reino::iniciarLoopDeExploracao()
         }
     };
 
-    // Priest da Igreja (só funciona dentro do submapa da igreja)
+    // Priest da Igreja (so funciona dentro do submapa da igreja)
     interacoes['P'] = [&](int px, int py, int larg) {
         if (jogadorEstaDentroDeUmSubMapa) {
             NPCPriest padre;

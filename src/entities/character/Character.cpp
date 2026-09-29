@@ -31,7 +31,7 @@ Character::Character(const Character& other)
     system = other.system;
     
     combat.isDefending = other.combat.isDefending;
-    // collectedSouls não são copiadas
+    // collectedSouls nao sao copiadas
     combat.defenseCooldown = other.combat.defenseCooldown;
     combat.abilityCooldown = other.combat.abilityCooldown;
     combat.skipEnemyTurn = other.combat.skipEnemyTurn;
@@ -45,7 +45,7 @@ Character::Character(const Character& other)
     cache_ = other.cache_;
     activeCharacters.insert(this);
 
-    // Cópia dos Itens (Conforme regra: "mas possui os mesmos itens")
+    // Copia dos Itens (Conforme regra: "mas possui os mesmos itens")
     for (const auto& pair : other.equipment) {
         if (pair.second) {
             auto itemCopy = ItemFactory::criarItem(pair.second->getNameItem());
@@ -414,7 +414,7 @@ void Character::processTurnStartEffects() {
 
 void Character::clearEffects() {
     for (auto& ef : activeEffects) {
-        ef->aoSair(this); // Garante que os atributos (como Força e Destreza) sejam restaurados
+        ef->aoSair(this); // Garante que os atributos (como Forca e Destreza) sejam restaurados
     }
     activeEffects.clear();
     effectAdditionQueue.clear();

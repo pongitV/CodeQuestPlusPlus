@@ -19,7 +19,7 @@
 #include "../../../core/utils/Color.h"
 
 namespace {
-    // --- DADOS DO ESTOQUE ---
+    // Dados do estoque
     std::map<int, StoreProduct> weaponStock = {
         {1, {ItemID::EspadaFerro, 40, -1}},
         {2, {ItemID::ArcoMadeira, 40, -1}},
@@ -39,13 +39,13 @@ namespace {
     void processMaterialUpgrade(Character* currentPlayer);
     void processShieldRepair(Character* currentPlayer);
 
-    // --- APARENCIA E DIALOGOS ---
+    // Aparencia e dialogos
     void bjornSingleDialogue(const std::string& msg) {
         InputControl::lerSelecaoMenuEmPopup("Bjorn", {msg}, {"OK"}, Color::CYAN, NPCBlacksmithLayouts::blacksmithArt);
     }
 }
 
-// --- INFORMACOES DO LUGAR ---
+// Informacoes do lugar
 std::string NPCBlacksmith::getPlaceName() const {
     return "FORJA DO BJORN";
 }
@@ -62,7 +62,7 @@ const std::vector<std::string>& NPCBlacksmith::getASCIIArt() const {
     return NPCBlacksmithLayouts::blacksmithArt;
 }
 
-// --- INTERACAO E MENU ---
+// Interacao e menu
 void NPCBlacksmith::interact(Character* player) {
     InputControl::executarLoopMenuPopup(
         [this, player]() { return this->getDialogue(player); },
@@ -72,14 +72,14 @@ void NPCBlacksmith::interact(Character* player) {
     );
 }
 
-std::vector<std::string> NPCBlacksmith::getDialogue(Character* /*player*/) {
+std::vector<std::string> NPCBlacksmith::getDialogue(Character* /*jogador*/) {
     return std::vector<std::string>{
         "Bem-vindo a minha forja, salvador!",
         "O que vai ser hoje?"
     };
 }
 
-std::vector<std::string> NPCBlacksmith::getMenuOptions(Character* /*player*/, int /*terminalWidth*/) {
+std::vector<std::string> NPCBlacksmith::getMenuOptions(Character* /*jogador*/, int /*larguraTerminal*/) {
     return {
         "COMPRAR Armas das Classes",
         "COMPRAR Armaduras das Classes",
@@ -90,7 +90,7 @@ std::vector<std::string> NPCBlacksmith::getMenuOptions(Character* /*player*/, in
     };
 }
 
-void NPCBlacksmith::processOption(Character* player, const std::string& option, int /*terminalWidth*/) {
+void NPCBlacksmith::processOption(Character* player, const std::string& option, int /*larguraTerminal*/) {
     if (option == "COMPRAR Armas das Classes" || option == "COMPRAR Armaduras das Classes") {
         processEquipmentPurchase(player, option == "COMPRAR Armas das Classes");
     } else if (option == "MELHORAR POR FUSAO") {
@@ -105,7 +105,7 @@ void NPCBlacksmith::processOption(Character* player, const std::string& option, 
 }
 
 namespace {
-    // --- PROCESSAMENTO DE OPCOES ---
+    // Processamento de opcoes
     void processEquipmentPurchase(Character* currentPlayer, bool buyingWeapons) {
         auto& currentStock = buyingWeapons ? weaponStock : armorStock;
         std::string storeTitle = buyingWeapons ? "FORJA - ARMAS" : "FORJA - ARMADURAS";

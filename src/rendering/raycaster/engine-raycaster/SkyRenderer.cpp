@@ -93,7 +93,7 @@ Pixel3D SkyRenderer::calcularPixelCeu(
     Pixel3D px;
     px.ch = ' '; px.hasFg = false; px.isFundo = false;
 
-    // Draw Moon
+    // Desenha a lua
     float moonAlpha = 1.0f;
     float moonGlowRadius = 0.11f;
 
@@ -132,7 +132,7 @@ Pixel3D SkyRenderer::calcularPixelCeu(
         }
     }
 
-    // Draw Sun
+    // Desenha o sol
     float sunAlpha = 1.0f;
     float angleSol = std::atan2(distYSol, diffAnguloSol * 2.449f);
     float rays = std::sin(angleSol * 12.0f + tempoAnimacao * 1.5f) * 0.5f 
@@ -195,9 +195,9 @@ Pixel3D SkyRenderer::calcularPixelCeu(
         cloudIntensity = std::min(1.0f, cloudIntensity);
         
         int cr = 255, cg = 255, cb = 255;
-        if (t > 0.4f && t < 0.6f) { // Sunset color
+        if (t > 0.4f && t < 0.6f) { // Cor do por do sol
             cr = 255; cg = 180; cb = 140;
-        } else if (t > 0.9f || t < 0.1f) { // Sunrise color
+        } else if (t > 0.9f || t < 0.1f) { // Cor do nascer do sol
             cr = 255; cg = 210; cb = 180;
         }
         
@@ -207,7 +207,7 @@ Pixel3D SkyRenderer::calcularPixelCeu(
         b = b + (int)((cb - b) * cloudIntensity);
     }
 
-    // Stars (only at night)
+    // Estrelas (apenas a noite)
     if (t > 0.5f && t < 0.95f) {
         float starAlpha = (t > 0.6f && t < 0.85f) ? 1.0f : 0.5f;
         

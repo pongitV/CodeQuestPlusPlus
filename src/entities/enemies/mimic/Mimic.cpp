@@ -8,7 +8,7 @@
 #include "../../../core/utils/DialogFunctions.h"
 #include "../../../systems/progress/Bestiary.h"
 
-// --- INFORMACOES DA RACA ---
+// Informacoes da raca
 std::string Mimic::getRaceName() const { return "Mimic"; }
 
 Attributes Mimic::getRaceAttributes() const { 
@@ -19,11 +19,11 @@ std::vector<std::unique_ptr<Item>> Mimic::getRaceEquipment() const {
     return {};
 }
 
-// --- HABILIDADE DA RACA ---
+// Habilidade da raca
 std::string Mimic::getRaceAbilityName() const { return "Bolsos Furados"; }
 std::string Mimic::getRaceAbilityDescription() const { return "Rouba de 30 a 80 de ouro do alvo a cada ataque bem-sucedido."; }
 
-// --- APARENCIA ---
+// Aparencia
 const std::vector<std::string>& Mimic::getRaceAppearance() const
 {
     static const std::vector<std::string> appearance =
@@ -121,24 +121,24 @@ const std::vector<std::string>& Mimic::getRaceAppearance() const
 }
 
 
-// --- LOGICA DE ROUBO ---
-void Mimic::onDealingDamage(Character* /*attacker*/, Character* target, int damageDealt) {
+// Logica de roubo
+void Mimic::onDealingDamage(Character* /*atacante*/, Character* target, int damageDealt) {
     if (damageDealt <= 0) return;
     
     int currentGold = target->getInventory()->getGold();
-    if (currentGold <= 0) return; // Jogador já está pobre
+    if (currentGold <= 0) return; // Jogador ja esta pobre
 
     int stolenAmount = RandomGenerator::getInt(30, 80);
-    if (stolenAmount > currentGold) stolenAmount = currentGold; // Não pode roubar mais do que o jogador tem
+    if (stolenAmount > currentGold) stolenAmount = currentGold; // Nao pode roubar mais do que o jogador tem
     
     target->getInventory()->addGold(-stolenAmount);
     totalStolenGold += stolenAmount;
     
-    // A mensagem na UI foi removida para priorizar o combat limpo
+    // A mensagem na interface foi removida para priorizar o combate limpo
     // TelaCombate::adicionarMensagemFixa(msg);
 }
 
-// --- BESTIARIO E DROPS ---
+// Bestiario e drops
 BestiaryInfo Mimic::getBestiaryInfo() const {
     return {
         "Masmorras e Cavernas", 

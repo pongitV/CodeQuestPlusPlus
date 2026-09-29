@@ -5,7 +5,7 @@
 #include "../../../core/state/Drops.h"
 #include "../../../core/utils/RandomGenerator.h"
 
-// --- INFORMACOES DA RACA ---
+// Informacoes da raca
 std::string Goblin::getRaceName() const 
 { 
     return "Goblin"; 
@@ -23,11 +23,11 @@ std::vector<std::unique_ptr<Item>> Goblin::getRaceEquipment() const
     return equipamentos;
 }
 
-// --- HABILIDADE DA RACA ---
+// Habilidade da raca
 std::string Goblin::getRaceAbilityName() const { return "Nenhuma"; }
 std::string Goblin::getRaceAbilityDescription() const { return "Monstros nao possuem passivas"; }
 
-// --- APARENCIA ---
+// Aparencia
 const std::vector<std::string>& Goblin::getRaceAppearance() const
 {
     static const std::vector<std::string> appearance =
@@ -115,7 +115,7 @@ const std::vector<std::string>& Goblin::getRaceAppearance() const
 }
 
 
-// --- BESTIARIO E DROPS ---
+// Bestiario e drops
 BestiaryInfo Goblin::getBestiaryInfo() const {
     return {
         "Village Inicial", 

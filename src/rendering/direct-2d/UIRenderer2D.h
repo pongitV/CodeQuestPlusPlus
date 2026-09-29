@@ -13,11 +13,11 @@ class UIRenderer2D {
 public:
     static void DrawBox(D2DRenderer* d2d, float x, float y, float w, float h, D2D1_COLOR_F corBase, float opacidade = 1.0f, float espessuraBorda = 0.0f, D2D1_COLOR_F corBorda = D2D1::ColorF(0,0,0));
     
-    // Scale defines how big each "pixel" of the pixel art is.
+    // Escala define o tamanho de cada pixel da arte em pixels.
     static void DrawPixelArt(D2DRenderer* d2d, const std::vector<std::string>& arte, const std::vector<GrupoCorUI>& paleta, float x, float y, float pixelScale, float opacidade = 1.0f, float pixelScaleY = -1.0f);
     static void DrawPixelArtWave(D2DRenderer* d2d, const std::vector<std::string>& arte, const std::vector<GrupoCorUI>& paleta, float x, float y, float pixelScale, float time, float amplitude = 10.0f, float frequency = 0.1f, float opacidade = 1.0f, float pixelScaleY = -1.0f);
     
-    // x and y in logical 1920x1080
+    // x e y no espaco logico 1920x1080
     static void DrawTextNative(D2DRenderer* d2d, const std::wstring& texto, float x, float y, D2D1_COLOR_F cor, float tamanhoFonte, bool centralizado = false, float maxWidth = 1920.0f);
     
     static void SetupTransform(D2DRenderer* d2d, float windowWidth, float windowHeight);

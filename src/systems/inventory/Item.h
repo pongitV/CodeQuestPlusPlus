@@ -56,7 +56,7 @@ enum class ItemID {
     // Armaduras
     ChainArmor, LeatherArmor, Tunic, NobleOutfit, RagsArmor, KnightArmor, ChestArmor, AdaptationWheel, RitualistClothes,
     
-    // Consumíveis
+    // Consumiveis
     HealPotion30, FuryPotion, ArcaneElixir, SlimeFlask, WeaknessFlask, RegeneratorOrgan,
     BearTalisman, RavenTalisman, LeopardTalisman, OwlTalisman,
     Apple, Bread, Cheese, DriedMeat,
@@ -65,7 +65,7 @@ enum class ItemID {
     // Materiais
     AcidSlime, GoblinTooth, StickyCore, MagicDust, EnchantedWood, ForestHeart, UpgradeStone, RoyalInvitation,
     
-    // Missões
+    // Missoes
     LanguageDevice,
 
     // Aliases legados
@@ -140,7 +140,7 @@ public:
         return checkShieldRequirements(character, reqResistencia, secVal, reqSecundario);
     }
 
-    virtual bool canBeEquippedBy(Character* /*character*/) const { return true; }
+    virtual bool canBeEquippedBy(Character* /*personagem*/) const { return true; }
     virtual bool podeSerEquipadoPor(Character* c) const { return canBeEquippedBy(c); }
 
     virtual bool isEquippable() const { return false; }
@@ -149,7 +149,7 @@ public:
     virtual std::string getRequirementMessage() const { return "\n[SISTEMA]: Attributes insuficientes para equipar " + getItemName() + "!\n"; }
     virtual std::string obterMensagemRequisito() const { return getRequirementMessage(); }
     
-    virtual std::vector<std::string> getInspectionDetails(Character* /*character*/ = nullptr) const {
+    virtual std::vector<std::string> getInspectionDetails(Character* /*personagem*/ = nullptr) const {
         std::vector<std::string> details;
         details.push_back(" > Tipo: Desconhecido");
         details.push_back(" > Descricao: Nenhuma informacao disponivel.");
@@ -172,16 +172,16 @@ public:
     virtual void applySlowEffect() {}
     virtual void aplicarEfeitoLentidao() { applySlowEffect(); }
 
-    virtual void reduceDurability(int /*qty*/) {}
+    virtual void reduceDurability(int /*qtd*/) {}
     virtual void reduzirDurabilidade(int qtd) { reduceDurability(qtd); }
 
-    virtual void increaseDurability(int /*qty*/) {}
+    virtual void increaseDurability(int /*qtd*/) {}
     virtual void aumentarDurabilidade(int qtd) { increaseDurability(qtd); }
     
-    virtual void beforeDealingDamage(Character* /*attacker*/, Character* /*target*/) {}
+    virtual void beforeDealingDamage(Character* /*atacante*/, Character* /*alvo*/) {}
     virtual void antesDeCausarDano(Character* atk, Character* def) { beforeDealingDamage(atk, def); }
 
-    virtual void onDealingDamage(Character* /*attacker*/, Character* /*target*/, int /*damageDealt*/) {}
+    virtual void onDealingDamage(Character* /*atacante*/, Character* /*alvo*/, int /*danoCausado*/) {}
     virtual void aoCausarDano(Character* atk, Character* def, int dmg) { onDealingDamage(atk, def, dmg); }
 
     virtual int ensureMinimumDamage(int finalDamage) { return std::max(finalDamage, 1); }
@@ -190,7 +190,7 @@ public:
     virtual int getSellPrice() const { return sellPrice; }
     virtual int obterPrecoVenda() const { return getSellPrice(); }
 
-    virtual std::string getStatusInfo() const { return ""; } // Vazio por padrão para itens sem status extra
+    virtual std::string getStatusInfo() const { return ""; } // Vazio por padrao para itens sem status extra
     virtual std::string obterInfoStatus() const { return getStatusInfo(); }
     
     virtual void use(Character* user, Character* target) {

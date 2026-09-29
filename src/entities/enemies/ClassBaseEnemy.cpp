@@ -1,6 +1,6 @@
 #include "ClassBaseEnemy.h"
 
-// --- INFORMACOES DA CLASSE ---
+// Informacoes da classe
 std::string ClassBaseEnemy::getClassName() const 
 { 
     return "Monstro"; 
@@ -22,15 +22,15 @@ std::vector<std::unique_ptr<Item>> ClassBaseEnemy::getClassEquipment() const
     return {}; 
 }
 
-// --- PASSIVA DA CLASSE ---
+// Passiva da classe
 std::string ClassBaseEnemy::getClassPassiveName() const { return "Nenhuma"; }
 std::string ClassBaseEnemy::getClassPassiveDescription() const { return "Enemies nao possuem passivas de classe."; }
 
-// --- HABILIDADE DA CLASSE ---
+// Habilidade da classe
 std::string ClassBaseEnemy::getClassAbilityCooldownDescription() const { return ""; }
 std::string ClassBaseEnemy::getClassAbilityName() const { return "Nenhuma"; }
 std::string ClassBaseEnemy::getClassAbilityDescription() const { return "Enemies basicos nao possuem habilidades ativas."; }
-void ClassBaseEnemy::useClassAbility(Combat* /*combat*/, Character* /*userCharacter*/, std::vector<Character*>& /*enemyList*/) 
+void ClassBaseEnemy::useClassAbility(Combat* /*combate*/, Character* /*personagemUsuario*/, std::vector<Character*>& /*listaInimigos*/) 
 {
 }
 

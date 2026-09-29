@@ -26,7 +26,7 @@
 enum InventoryState { MAIN, ARSENAL, CONSUMABLES, STORAGE, QUEST };
 
 static int readInventoryPopupSelection(const std::string& title, const std::string& message, const std::vector<std::string>& text, const std::vector<std::string>& options) {
-    // Renderização Direct2D
+    // Renderizacao Direct2D
     auto renderCb = [&](UIDynamicBox& box, int selA, float optStartX, float optStartY, float pixelScale) {
         float lw = UIRenderer2D::LOGICAL_WIDTH;
         
@@ -105,7 +105,7 @@ static void displayItemResult(const ItemUsageInfo& info, Item* item, bool* turnC
 
 static int readInventoryPopupInteger(const std::string& title, const std::string& message, int min, int max) {
     std::string currentInput = "";
-    // D2D Rendering
+    // Renderizacao Direct2D
     while (true) {
         auto renderCb = [&](UIDynamicBox& box, int selA, float lw, float lh) {
             std::wstring wTit = MenuRaycasterUtils::utf8_to_wstring(title);
@@ -248,14 +248,14 @@ void InventoryCombat::manageInventory(Character* currentPlayer, bool* turnConsum
                 lines.push_back("");
             };
 
-            // Equipados (não interativo)
+            // Equipados (nao interativo)
             lines.push_back(" " + divColor + "--- Equipados ---" + resetColor);
             bool hasEq = false;
             auto addEq = [&](const std::string& label, Item* item) {
                 if (!item) return;
                 hasEq = true;
                 std::string name = item->getItemName();
-                // também adiciona aos interativos para permitir seleção
+                // tambem adiciona aos interativos para permitir selecao
                 int idx = (int)interactive.size();
                 interactive.push_back("(E) " + name);
                 realIndices.push_back((int)indexToItemMap.size());
@@ -421,7 +421,7 @@ void InventoryCombat::manageInventory(Character* currentPlayer, bool* turnConsum
                     if (logicalChoice == 7 + offset) {
                         running = false;
                     } else if (offset == 1 && logicalChoice == 0) {
-                        // Consumível rápido
+                        // Consumivel rapido
                         Item* quickItem = currentPlayer->getQuickConsumable();
                         std::string quickName = quickItem->getItemName();
                         int countBefore = currentPlayer->getInventory()->countItem(quickName);

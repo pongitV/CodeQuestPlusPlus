@@ -3,7 +3,7 @@
 #include <iostream>
 #include "../../core/utils/Color.h"
 
-void DialogFunctions::printNPCDialog(const std::string& npcName, Color /*npcColor*/, const std::string& text, bool newlineBefore, bool /*newlineAfter*/) {
+void DialogFunctions::printNPCDialog(const std::string& npcName, Color /*corNPC*/, const std::string& text, bool newlineBefore, bool /*newlineAfter*/) {
     if (text.empty()) return;
     StringBuffer buf(3);
     buf.Append(newlineBefore ? "\n[" : "  [");

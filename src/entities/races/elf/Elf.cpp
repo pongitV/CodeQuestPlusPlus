@@ -5,7 +5,7 @@
 #include "../../../core/utils/RandomGenerator.h"
 #include "../../../ui/screens/combat/ScreenCombat.h"
 
-// --- INFORMAÇÕES DA RAÇA ---
+// Informacoes da raca
 std::string Elf::getRaceName() const 
 {
     return "Elf";
@@ -16,14 +16,14 @@ Attributes Elf::getRaceAttributes() const
     return { 90, 5, 15, 0, 10, 15, 5 };
 }
 
-// --- APARÊNCIA ---
+// Aparencia
 const std::vector<std::string>& Elf::getRaceAppearance() const 
 {
     static const std::vector<std::string> appearance;
     return appearance;
 }
 
-// --- HABILIDADE DA RAÇA ---
+// Habilidade da raca
 std::string Elf::getRaceAbilityName() const 
 { 
     return "Agil e preciso"; 
@@ -34,7 +34,7 @@ std::string Elf::getRaceAbilityDescription() const
     return "Possui 33% chance de causar 1.5x de damage em cada ataque"; 
 }
 
-// --- PROCESSAMENTO DE DANO ---
+// Processamento de dano
 int Elf::processOffensiveDamage(int baseDamage, Character* attacker) 
 {
     if (RandomGenerator::rollChance(33)) 

@@ -157,7 +157,7 @@ char RaycasterControls::processarInputEControles(
         }
     }
 
-    // Verifica se o jogador pisou em um trigger (Enemy ou Teleporte) para acionar a transicao de map/combat
+    // Verifica se o jogador pisou em um gatilho (inimigo ou teleporte) para acionar a transicao de mapa ou combate
     int newCellX = (int)jogadorX;
     int newCellY = (int)jogadorY;
     if (newCellX != oldCellX || newCellY != oldCellY) {
@@ -168,7 +168,7 @@ char RaycasterControls::processarInputEControles(
             outHitY = newCellY;
             jogadorX = oldPlayerX; // Retorna para a exata posicao anterior flutuante
             jogadorY = oldPlayerY;
-            rodando = false; // Sai do loop 3D e devolve o controle pro map top-down processar o evento!
+            rodando = false; // Sai do laco 3D e devolve o controle para o mapa top-down processar o evento
         }
     }
 

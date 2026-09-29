@@ -226,7 +226,7 @@ void UIDynamicBox::Render(D2DRenderer* d2d, D2D1_COLOR_F corBase, float opacidad
             topPadding = asciiH / 2.0f + 15.0f;
         }
         
-        // Expand horizontal bounds if ascii title is wider than the box
+        // Expande os limites horizontais se o titulo ASCII for mais largo que a caixa
         float currentW = (maxX - minX);
         if (asciiW > currentW) {
             float diff = (asciiW - currentW) / 2.0f;

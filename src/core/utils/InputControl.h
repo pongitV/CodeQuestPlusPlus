@@ -72,7 +72,7 @@ public:
         const std::vector<std::string>& asciiArt
     );
 
-    // Métodos legados para compatibilidade retroativa
+    // Metodos legados para compatibilidade retroativa
     static bool teclaPressionada() { return isKeyPressed(); }
     static char lerTecla() { return readKey(); }
     static MapCommand traduzirTeclaParaComando(char tecla) { return translateKeyToCommand(tecla); }

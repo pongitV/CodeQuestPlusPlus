@@ -11,7 +11,7 @@
 #include "../../../ui/screens/combat/ScreenCombat.h"
 #include "../../../core/utils/Color.h"
 
-// --- INFORMAÇÕES DA CLASSE ---
+// Informacoes da classe
 std::string Warrior::getClassName() const 
 { 
     return "Knight"; 
@@ -38,7 +38,7 @@ std::vector<std::unique_ptr<Item>> Warrior::getClassEquipment() const
     return equipment;
 }
 
-// --- PASSIVA DA CLASSE ---
+// Passiva da classe
 std::string Warrior::getClassPassiveName() const 
 { 
     return "Golpe decisivo"; 
@@ -49,7 +49,7 @@ std::string Warrior::getClassPassiveDescription() const
     return "Causa +10%/+20%/+30% de damage em enemies com menos de 30%/20%/10% de HP."; 
 }
 
-// --- HABILIDADE DA CLASSE ---
+// Habilidade da classe
 std::string Warrior::getClassAbilityCooldownDescription() const 
 { 
     return "Recarga: 3 turnos."; 
@@ -65,7 +65,7 @@ std::string Warrior::getClassAbilityDescription() const
     return "Gasta seu turno para aumentar Forca e Destreza em 1.5x por 2 turnos."; 
 }
 
-void Warrior::useClassAbility(Combat* /*combat*/, Character* userCharacter, std::vector<Character*>& /*enemyList*/) 
+void Warrior::useClassAbility(Combat* /*combate*/, Character* userCharacter, std::vector<Character*>& /*listaInimigos*/) 
 {
     int remainingTurns = userCharacter->obterRecargaHabilidade(AbilityID::Determination);
     if (checkAndReportCooldown(userCharacter, remainingTurns, getClassAbilityName())) return;
@@ -87,8 +87,8 @@ void Warrior::useClassAbility(Combat* /*combat*/, Character* userCharacter, std:
     notifyCombatMessage(msg, msg);
 }
 
-// --- PROCESSAMENTO DE DANO ---
-int Warrior::processPreAttackDamage(Character* /*attacker*/, Character* defender, int baseDamage, bool /*isAttackerPlayer*/, size_t /*enemyCount*/) {
+// Processamento de dano
+int Warrior::processPreAttackDamage(Character* /*atacante*/, Character* defender, int baseDamage, bool /*isAttackerPlayer*/, size_t /*qtdInimigos*/) {
     int finalDamage = baseDamage;
     
     if (!defender) return finalDamage;

@@ -21,7 +21,7 @@ bool MapHelper::checkCollision(float nextX, float nextY, const std::vector<std::
     return isWall(cell);
 }
 
-bool MapHelper::tryMove(Character* /*player*/, float deltaX, float deltaY, const std::vector<std::string>& mapMatrix, float& outNewX, float& outNewY) {
+bool MapHelper::tryMove(Character* /*jogador*/, float deltaX, float deltaY, const std::vector<std::string>& mapMatrix, float& outNewX, float& outNewY) {
     float targetX = outNewX + deltaX;
     float targetY = outNewY + deltaY;
 

@@ -32,7 +32,7 @@ namespace {
         {1, {ItemID::DispositivoLinguagem, 1000, 1}}
     };
 
-    // --- APARENCIA E DIALOGOS ---
+    // Aparencia e dialogos
     void processPotionsPurchase(Character* currentPlayer);
     void processTalismansPurchase(Character* currentPlayer);
     void processDelicaciesPurchase(Character* currentPlayer);
@@ -43,7 +43,7 @@ namespace {
     }
 }
 
-// --- INFORMACOES DO LUGAR ---
+// Informacoes do lugar
 std::string NPCMerchant::getPlaceName() const {
     return "MERCADOR AMBULANTE";
 }
@@ -60,7 +60,7 @@ const std::vector<std::string>& NPCMerchant::getASCIIArt() const {
     return NPCMerchantLayouts::merchantArt;
 }
 
-// --- INTERACAO E MENU ---
+// Interacao e menu
 void NPCMerchant::interact(Character* player) {
     InputControl::executarLoopMenuPopup(
         [this, player]() { return this->getDialogue(player); },
@@ -70,14 +70,14 @@ void NPCMerchant::interact(Character* player) {
     );
 }
 
-std::vector<std::string> NPCMerchant::getDialogue(Character* /*player*/) {
+std::vector<std::string> NPCMerchant::getDialogue(Character* /*jogador*/) {
     return std::vector<std::string>{
         "Bem-vindo! De uma olhada nas",
         "minhas mercadorias."
     };
 }
 
-std::vector<std::string> NPCMerchant::getMenuOptions(Character* /*player*/, int /*terminalWidth*/) {
+std::vector<std::string> NPCMerchant::getMenuOptions(Character* /*jogador*/, int /*larguraTerminal*/) {
     return {
         "COMPRAR Pocoes",
         "COMPRAR Talismas",
@@ -88,7 +88,7 @@ std::vector<std::string> NPCMerchant::getMenuOptions(Character* /*player*/, int 
     };
 }
 
-void NPCMerchant::processOption(Character* player, const std::string& option, int /*terminalWidth*/) {
+void NPCMerchant::processOption(Character* player, const std::string& option, int /*larguraTerminal*/) {
     if (option == "COMPRAR Pocoes") {
         processPotionsPurchase(player);
     }
@@ -107,7 +107,7 @@ void NPCMerchant::processOption(Character* player, const std::string& option, in
 }
 
 namespace {
-    // --- PROCESSAMENTO DE OPCOES ---
+    // Processamento de opcoes
     void processPotionsPurchase(Character* currentPlayer) {
         Store::processPurchase(currentPlayer, "LOJA - POCOES", Color::YELLOW, potionsStock, 
             [](const std::string& msg) { franchescoSingleDialogue(msg); }, NPCInteraction::getItemStatusFormatter, NPCMerchantLayouts::merchantArt);
@@ -199,7 +199,7 @@ namespace {
                 } else if (qtyChoice == 1) {
                     amountToSell = chosenItems.size();
                 } else if (qtyChoice == 2) {
-                    amountToSell = 0; // Not supported anymore
+                    amountToSell = 0; // Nao suportado mais
                 } else {
                     continue; // Cancelar
                 }

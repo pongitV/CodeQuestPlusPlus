@@ -9,7 +9,7 @@
 #include "../../entities/character/Character.h"
 #include "../interfaces/IMap.h"
 
-// VillageMap represents the starting Village zone in the world.
+// Representa a zona inicial da vila no mapa do mundo.
 // Controls zone geometry, tile collision matrix, sub-map transitions, and NPC interactions.
 class Mapa1Vila final : public IMap 
 {

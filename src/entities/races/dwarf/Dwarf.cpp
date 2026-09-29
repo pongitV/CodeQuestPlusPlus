@@ -5,7 +5,7 @@
 #include "../../../core/utils/RandomGenerator.h"
 #include "../../../ui/screens/combat/ScreenCombat.h"
 
-// --- INFORMAÇÕES DA RAÇA ---
+// Informacoes da raca
 std::string Dwarf::getRaceName() const
 {
     return "Dwarf";
@@ -16,14 +16,14 @@ Attributes Dwarf::getRaceAttributes() const
     return { 110, 15, 5, 0, 10, 5, 15 };
 }
 
-// --- APARÊNCIA ---
+// Aparencia
 const std::vector<std::string>& Dwarf::getRaceAppearance() const 
 {
     static const std::vector<std::string> appearance;
     return appearance;
 }
 
-// --- HABILIDADE DA RAÇA ---
+// Habilidade da raca
 std::string Dwarf::getRaceAbilityName() const 
 { 
     return "Forjado com determinacao"; 
@@ -34,7 +34,7 @@ std::string Dwarf::getRaceAbilityDescription() const
     return "Escudos possuem o dobro de durabilidade"; 
 }
 
-// --- PROCESSAMENTO DE DANO ---
+// Processamento de dano
 int Dwarf::processDefensiveDamage(int finalDamage, Character* defender) 
 {
     if (defender->obterDefendendo() && defender->obterEscudo() != nullptr) 

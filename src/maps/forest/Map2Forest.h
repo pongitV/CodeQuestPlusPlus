@@ -8,7 +8,7 @@
 #include "../../entities/character/Character.h"
 #include "../interfaces/IMap.h"
 
-// ForestMap represents the Forest zone in the world.
+// Representa a zona da floresta no mapa do mundo.
 // Handles sub-maps (Tree Heart, Maze, Boss Room), tile matrix, and environmental interactions.
 class Mapa2Floresta final : public IMap 
 {

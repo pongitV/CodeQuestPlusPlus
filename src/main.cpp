@@ -1,12 +1,9 @@
-/**
- * @file main.cpp
- * @brief Ponto de entrada (Entrypoint) principal do jogo CodeQuestPlusPlus.
- * 
- * Este arquivo orquestra a inicialização da engine, instanciando os sistemas
- * vitais (Janela, Direct2D, Pipeline de Renderização, GridEmulator e Input).
- * Ele define o ContextoDoJogo que será propagado por toda a arquitetura de
- * máquina de estados.
- */
+// @file main.cpp
+// Ponto de entrada (Entrypoint) principal do jogo CodeQuestPlusPlus.
+// Este arquivo orquestra a inicializacao da engine, instanciando os sistemas
+// vitais (Janela, Direct2D, Pipeline de Renderizacao, GridEmulator e Input).
+// Ele define o ContextoDoJogo que sera propagado por toda a arquitetura de
+// maquina de estados.
 
 #include <windows.h>
 #include <d2d1.h>
@@ -29,15 +26,12 @@ static std::unique_ptr<FramePipeline> g_pipeline;
 static std::unique_ptr<GridEmulator2D> g_grid;
 static std::unique_ptr<GameContext> g_context;
 
-/**
- * @brief Função principal (Entrypoint do Windows).
- * 
- * @param hInstance Identificador (Handle) da instância atual da aplicação.
- * @param hPrevInstance Não utilizado no Win32 moderno.
- * @param pCmdLine Argumentos de linha de comando.
- * @param nCmdShow Sinalizador de exibição inicial da janela.
- * @return int Código de saída do processo (0 para sucesso, negativo para erro).
- */
+// Funcao principal (Entrypoint do Windows).
+// @param hInstance Identificador (Handle) da instancia atual da aplicacao.
+// @param hPrevInstance Nao utilizado no Win32 moderno.
+// @param pCmdLine Argumentos de linha de comando.
+// @param nCmdShow Sinalizador de exibicao inicial da janela.
+// @return int Codigo de saida do processo (0 para sucesso, negativo para erro).
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, int nCmdShow) {
     (void)hPrevInstance;
     (void)pCmdLine;
@@ -45,7 +39,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine,
     // Inicializa o contexto global compartilhado por todos os estados do jogo.
     g_context = std::make_unique<GameContext>();
 
-    // Inicialização do sistema de janelas do SO
+    // Inicializacao do sistema de janelas do SO
     g_window = std::make_unique<GameWindow>(hInstance, nCmdShow);
     if (!g_window->getHWND()) return -1;
     g_context->setWindow(g_window.get());
@@ -82,7 +76,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine,
         }
     }
 
-    // Instancia a Máquina de Estados Finita (FSM) começando no Menu Principal e dispara o loop de atualização.
+    // Instancia a Maquina de Estados Finita (FSM) comecando no Menu Principal e dispara o loop de atualizacao.
     Game game(std::make_unique<MenuState>());
     game.runLoop();
 

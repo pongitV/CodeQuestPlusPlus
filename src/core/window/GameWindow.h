@@ -29,7 +29,7 @@ public:
     static void showCursor();
     static bool isCursorHidden();
 
-    // Métodos legados para compatibilidade
+    // Metodos legados para compatibilidade
     HWND obterHWND() const { return getHWND(); }
     HINSTANCE obterHInstance() const { return getHInstance(); }
     int obterLargura() const { return getWidth(); }

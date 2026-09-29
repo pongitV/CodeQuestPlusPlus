@@ -1,5 +1,5 @@
-// Implementação do gerenciador de estados do jogo.
-// Controla o ciclo de vida do jogador e transições entre mapas mundiais.
+// Implementacao do gerenciador de estados do jogo.
+// Controla o ciclo de vida do jogador e transicoes entre mapas mundiais.
 
 #include "StateManager.h"
 #include "../../entities/classes/archer/Archer.h"
@@ -20,7 +20,7 @@
 #include "../../systems/progress/ProgressionFlags.h"
 
 // Executa o estado do menu principal.
-// Exibe opções de criação ou seleção de personagem e transita para ExplorationState.
+// Exibe opcoes de criacao ou selecao de personagem e transita para ExplorationState.
 void MenuState::execute(Game& game, GameContext& ctx) {
     auto activePlayer = GameMenu::mainMenu();
     if (!activePlayer) {
@@ -31,13 +31,13 @@ void MenuState::execute(Game& game, GameContext& ctx) {
     game.changeState(std::make_unique<ExplorationState>());
 }
 
-// Limpeza de recursos ao sair do estado de exploração de mapas.
+// Limpeza de recursos ao sair do estado de exploracao de mapas.
 void ExplorationState::onExit(Game& game, GameContext& ctx) {
     ctx.playerEntity.reset();
 }
 
-// Executa o loop de exploração do mundo do jogo.
-// Instancia mapas e gerencia transições entre zonas ativas.
+// Executa o loop de exploracao do mundo do jogo.
+// Instancia mapas e gerencia transicoes entre zonas ativas.
 void ExplorationState::execute(Game& game, GameContext& ctx) {
     Character* player = ctx.getPlayer();
     if (!player) {

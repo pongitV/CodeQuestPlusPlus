@@ -22,7 +22,7 @@
 #include "../../../core/utils/Color.h"
 
 namespace {
-    // --- CLASSES E FUNCOES AUXILIARES ---
+    // Classes e funcoes auxiliares
     Item* findByName(Inventory* inv, const std::string& name) {
         for (auto* item : inv->getAllItems()) {
             if (item->getItemName() == name) return item;
@@ -72,7 +72,7 @@ namespace {
     }
 }
 
-// --- CRIACAO DO NPC ---
+// Criacao do NPC
 std::unique_ptr<Character> NPCGenericKnight::createKnight(const std::string& name) {
     auto knight = std::make_unique<Character>(name, std::make_unique<KnightRace>(), std::make_unique<KnightClass>());
     std::string armorName = ItemFactory::getNameFromID(ItemID::ArmaduraCavaleiro);
@@ -85,8 +85,8 @@ std::unique_ptr<Character> NPCGenericKnight::createKnight(const std::string& nam
     return knight;
 }
 
-// --- INTERACAO ---
-void NPCGenericKnight::interact(Character* currentPlayer, bool& trollDefeated, bool& invitationReceived, int /*terminalWidth*/, std::vector<std::string>& currentMapMatrix, bool explorationActive, const std::function<void()>& restoreScreen, char targetCell, int nextX, int nextY) {
+// Interacao
+void NPCGenericKnight::interact(Character* currentPlayer, bool& trollDefeated, bool& invitationReceived, int /*larguraTerminal*/, std::vector<std::string>& currentMapMatrix, bool explorationActive, const std::function<void()>& restoreScreen, char targetCell, int nextX, int nextY) {
     Diary::instance().registerNPC("Cavaleiro Real");
     if (!trollDefeated && (targetCell == 'T' || targetCell == 'C')) {
         int trollPosX = -1, trollPosY = -1;

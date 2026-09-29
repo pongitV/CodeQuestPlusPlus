@@ -58,7 +58,7 @@ class ClassBase
 public:
     virtual ~ClassBase() = default;
 
-    // INFORMAÇÕES DA CLASSE
+    // INFORMACOES DA CLASSE
     virtual std::string getClassName() const = 0;
     virtual std::string getNameClasse() const { return getClassName(); }
 
@@ -176,8 +176,8 @@ protected:
         }
     }
 
-    virtual int processPreAttackDamage(Character* /*attacker*/, Character* /*defender*/, int baseDamage, bool /*isAttackerPlayer*/, size_t /*enemyCount*/) { return baseDamage; }
-    virtual void processPostAttackDamage(Character* /*attacker*/, Character* /*currentTarget*/, Character* /*mainDefender*/, int /*baseDamage*/, int /*piercingDamage*/, const std::function<void(Character*, Character*, int, int)>& /*applyDamage*/, bool /*isAttackerPlayer*/, bool /*isArea*/, bool& /*triggeredPassive*/) {}
+    virtual int processPreAttackDamage(Character* /*atacante*/, Character* /*defensor*/, int baseDamage, bool /*isAttackerPlayer*/, size_t /*qtdInimigos*/) { return baseDamage; }
+    virtual void processPostAttackDamage(Character* /*atacante*/, Character* /*currentTarget*/, Character* /*mainDefender*/, int /*baseDamage*/, int /*piercingDamage*/, const std::function<void(Character*, Character*, int, int)>& /*applyDamage*/, bool /*isAttackerPlayer*/, bool /*isArea*/, bool& /*triggeredPassive*/) {}
 
     // Delegados legados
     virtual void executarAtaqueArea(Character* atacante, Character* defensor, int baseDamage, int danoPerfurante, std::vector<std::unique_ptr<Character>>& enemies, const std::function<void(Character*, Character*, int, int)>& applyDamage, bool isAtacanteJogador) {

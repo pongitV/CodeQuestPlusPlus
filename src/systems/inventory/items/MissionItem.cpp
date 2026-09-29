@@ -8,7 +8,7 @@ MissionItem::MissionItem(const std::string& name, int price) : Item(price), name
 std::string MissionItem::getItemName() const { return name; }
 EquipmentType MissionItem::getType() const { return EquipmentType::Quest; }
 
-std::vector<std::string> MissionItem::getInspectionDetails(Character* /*character*/) const {
+std::vector<std::string> MissionItem::getInspectionDetails(Character* /*personagem*/) const {
     std::vector<std::string> details;
     details.push_back(" > Tipo: Item de Missao");
     if (!inspectionDescription.empty()) {

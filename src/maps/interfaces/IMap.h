@@ -3,7 +3,7 @@
 #include <functional>
 #include <string>
 
-// Enum representing target transitions when transitioning between game world maps.
+// Enumerador que representa transicoes de destino entre mapas do mundo do jogo.
 enum class NextMapTransition {
     None = 0,
     ReturnToMenu = 1,
@@ -21,15 +21,15 @@ enum class NextMapTransition {
 // Legacy alias for map transitions
 using ProximaTransicaoMapa = NextMapTransition;
 
-// Interface contract for all concrete game map instances.
+// Contrato de interface para todas as instancias concretas de mapas do jogo.
 class IMap {
 public:
     virtual ~IMap() = default;
 
-    // Returns the map title for display and logs.
+    // Retorna o titulo do mapa para exibicao e registros.
     virtual std::string getTitle() const = 0;
 
-    // Starts and manages the active exploration loop for this map.
+    // Inicia e gerencia o laco ativo de exploracao para este mapa.
     virtual NextMapTransition startExplorationLoop() = 0;
 
     // Legacy backward-compatibility method signatures

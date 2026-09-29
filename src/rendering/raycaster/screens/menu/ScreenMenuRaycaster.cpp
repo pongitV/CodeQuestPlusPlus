@@ -30,8 +30,8 @@ int TelaMenuRaycaster::displayOpcoesMenuPrincipal() {
         }
         InputControl::atualizarTeclas();
 
-        // ── Input: read immediately after atualizarTeclas so rising-edge is captured
-        //    BEFORE the ~16ms render pass can cause the key to be released.
+        // Entrada: leitura logo apos atualizarTeclas para capturar a borda de subida
+        //    Antes que o passo de renderizacao de cerca de 16ms libere a tecla.
         char tecla = InputControl::lerTecla();
 
         auto d2d = D2DContext::renderer;
@@ -66,7 +66,7 @@ int TelaMenuRaycaster::displayOpcoesMenuPrincipal() {
             rt->EndDraw();
         }
 
-        // ── Process input captured at the top ──────────────────────────────────
+        // Processa a entrada capturada no topo
         if (tecla == 0) {
             std::this_thread::sleep_for(std::chrono::milliseconds(16)); // ~60fps
             continue;

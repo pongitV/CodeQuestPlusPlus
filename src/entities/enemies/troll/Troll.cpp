@@ -4,7 +4,7 @@
 #include "../../../systems/inventory/ItemFactory.h"
 #include "../../../core/state/Drops.h"
 
-// --- INFORMACOES DA RACA ---
+// Informacoes da raca
 std::string Troll::getRaceName() const 
 { 
     return "Troll"; 
@@ -22,11 +22,11 @@ std::vector<std::unique_ptr<Item>> Troll::getRaceEquipment() const
     return equipamentos;
 }
 
-// --- HABILIDADE DA RACA ---
+// Habilidade da raca
 std::string Troll::getRaceAbilityName() const { return "Regeneracao Troll"; }
 std::string Troll::getRaceAbilityDescription() const { return "Pele aspera e capacidade de regenerar as feridas mais brutais. (Boss)"; }
 
-// --- APARENCIA ---
+// Aparencia
 const std::vector<std::string>& Troll::getRaceAppearance() const
 {
     static const std::vector<std::string> appearance =
@@ -130,7 +130,7 @@ const std::vector<std::string>& Troll::getRaceAppearance() const
 }
 
 
-// --- BESTIARIO E DROPS ---
+// Bestiario e drops
 BestiaryInfo Troll::getBestiaryInfo() const {
     return {
         "Montanhas", 

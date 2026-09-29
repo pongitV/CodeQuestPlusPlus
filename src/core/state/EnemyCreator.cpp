@@ -32,10 +32,10 @@ std::vector<std::unique_ptr<Character>> EnemyCreator::createGenericEnemies(int a
             std::make_unique<ClassType>()
         );
 
-        // Aplica uma pequena variação nos atributos para que cada monstro da horda seja único
+        // Aplica uma pequena variacao nos atributos para que cada monstro da horda seja unico
         int healthVariation = RandomGenerator::getInt(-maxVariation, maxVariation);
         enemy->obterAtributosFinais().health += (enemy->obterAtributosFinais().health * healthVariation) / 100;
-        enemy->definirVida(enemy->obterAtributosFinais().health); // Sincroniza a vida atual com a nova vida máxima
+        enemy->definirVida(enemy->obterAtributosFinais().health); // Sincroniza a vida atual com a nova vida maxima
         
         int strengthVariation = RandomGenerator::getInt(-maxVariation, maxVariation);
         enemy->obterAtributosFinais().strength += (enemy->obterAtributosFinais().strength * strengthVariation) / 100;

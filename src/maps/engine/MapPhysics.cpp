@@ -32,7 +32,7 @@ void MapPhysics::moveEnemiesRandomly(std::vector<std::string>& currentMapMatrix,
     }
 
     for (const auto& enemy : currentEnemies) {
-        if (currentMapMatrix[enemy.y][enemy.x] != enemy.c) continue; // Pode ter sido alterado (morto/já movido)
+        if (currentMapMatrix[enemy.y][enemy.x] != enemy.c) continue; // Pode ter sido alterado (morto/ja movido)
         
         int originX = -1, originY = -1;
         // Encontra o spawn original no raio 3x3
@@ -59,9 +59,9 @@ void MapPhysics::moveEnemiesRandomly(std::vector<std::string>& currentMapMatrix,
                 int ty = originY + dy;
                 int tx = originX + dx;
                 if (ty >= 0 && ty < static_cast<int>(currentMapMatrix.size()) && tx >= 0 && tx < static_cast<int>(currentMapMatrix[ty].size())) {
-                    // Só pode se mover para células vazias, e não pode pisar em cima do jogador
+                    // So pode se mover para celulas vazias, e nao pode pisar em cima do jogador
                     if (currentMapMatrix[ty][tx] == '.' && (tx != playerX || ty != playerY)) {
-                        // O enemy anda 1 de cada vez, então limitamos aos adjacentes atuais dele dentro do raio 3x3 da origem
+                        // O inimigo anda 1 passo por vez, entao limitamos aos adjacentes atuais dele dentro do raio 3x3 da origem
                         if (std::abs(tx - enemy.x) <= 1 && std::abs(ty - enemy.y) <= 1) {
                             possibleMoves.push_back({tx, ty});
                         }
@@ -70,7 +70,7 @@ void MapPhysics::moveEnemiesRandomly(std::vector<std::string>& currentMapMatrix,
             }
         }
 
-        possibleMoves.push_back({enemy.x, enemy.y}); // Opção de permanecer parado
+        possibleMoves.push_back({enemy.x, enemy.y}); // Opcao de permanecer parado
 
         int choice = RandomGenerator::getInteger(0, static_cast<int>(possibleMoves.size()) - 1);
         int nx = possibleMoves[choice].first;

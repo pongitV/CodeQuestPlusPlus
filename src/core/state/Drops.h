@@ -9,7 +9,7 @@ enum class ItemID;
 class Drops 
 {
 public:
-    // Centraliza o cálculo e o processamento de XP e ouro de monstros
+    // Centraliza o calculo e o processamento de XP e ouro de monstros
     static void reportAndProcessXPGold(Character* player, int xpDrop, int goldDrop, int& totalGold, int& totalXp);
     
     // Padroniza a mensagem do recebimento de um item 

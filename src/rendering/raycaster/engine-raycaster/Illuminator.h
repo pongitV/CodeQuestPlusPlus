@@ -132,7 +132,7 @@ namespace Illuminator {
                         intensidade *= intensidade;
                         if (tipo == 0) { info.luzR += 220 * intensidade; info.luzG += 120 * intensidade; info.luzB += 30 * intensidade; } // Orange Fire
                         else if (tipo == 1) { info.luzR += 220 * intensidade; info.luzG += 220 * intensidade; info.luzB += 255 * intensidade; } // Magical White Portal
-                        else if (tipo == 2) { info.luzR += 160 * intensidade; info.luzG += 40 * intensidade; info.luzB += 40 * intensidade; } // Soft Red Enemy
+                        else if (tipo == 2) { info.luzR += 160 * intensidade; info.luzG += 40 * intensidade; info.luzB += 40 * intensidade; } // Vermelho suave para inimigo
                         else if (tipo == 3) { info.luzR += 150 * intensidade; info.luzG += 130 * intensidade; info.luzB += 60 * intensidade; } // Soft Yellow NPC
                     }
                 }

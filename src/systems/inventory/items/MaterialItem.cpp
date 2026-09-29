@@ -11,7 +11,7 @@ MaterialItem::MaterialItem(const std::string& name, int price) : Item(price), na
 std::string MaterialItem::getItemName() const { return name; }
 EquipmentType MaterialItem::getType() const { return EquipmentType::Material; }
 
-std::vector<std::string> MaterialItem::getInspectionDetails(Character* /*character*/) const {
+std::vector<std::string> MaterialItem::getInspectionDetails(Character* /*personagem*/) const {
     std::vector<std::string> lines;
     lines.push_back(" > Tipo: Material");
     

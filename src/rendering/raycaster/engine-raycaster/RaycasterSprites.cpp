@@ -148,9 +148,9 @@ SpriteCache RaycasterSprites::parseSprite(const std::vector<std::string>& raw, i
         }
     }
     
-    // Compressão de resolução (downsampling) para melhorar o desempenho
+    // Compressao de resolucao (downsampling) para melhorar o desempenho
     std::vector<std::vector<SpritePixel>> compressedTempPixels;
-    int scale = 1; // Fator de compressão global para manter paridade com o terminal
+    int scale = 1; // Fator de compressao global para manter paridade com o terminal
     int compWidth = std::max(1, sc.width / scale);
     int compHeight = std::max(1, sc.height / scale);
     compressedTempPixels.resize(compHeight);

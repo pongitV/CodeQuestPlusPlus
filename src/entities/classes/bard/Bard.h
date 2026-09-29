@@ -8,7 +8,7 @@ class Combat;
 class Bard : public ClassBase
 {
 public:
-    // INFORMAÇÕES DA CLASSE
+    // INFORMACOES DA CLASSE
     std::string getClassName() const override; 
     ClassType getClassType() const override { return ClassType::Bard; } 
     std::string getSpritePath() const override { return "assets/classes/bard.png"; }

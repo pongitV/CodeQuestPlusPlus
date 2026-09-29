@@ -21,7 +21,7 @@ public:
 
     // animarIntroducaoMapa e animarFlashbang movidos para MapAnimatora.h
 
-    // Funções de câmera e renderização movidas para RenderizadorMapa.h
+    // Funcoes de camera e renderizacao movidas para RenderizadorMapa.h
 
     static bool isExploracao3DAtiva();
     static void sinalizarTrocaDeMapa3D();

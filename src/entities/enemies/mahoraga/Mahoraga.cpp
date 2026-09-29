@@ -8,7 +8,7 @@
 #include "../../../core/utils/DialogFunctions.h"
 #include <memory>
 
-// --- INFORMACOES DA RACA ---
+// Informacoes da raca
 std::string Mahoraga::getRaceName() const { 
     return "General Divino Imoral da Espada de Oito Empunhaduras, Mahoraga"; 
 }
@@ -21,12 +21,12 @@ std::vector<std::unique_ptr<Item>> Mahoraga::getRaceEquipment() const {
     return {};
 }
 
-// --- HABILIDADE DA RACA ---
+// Habilidade da raca
 std::string Mahoraga::getRaceAbilityName() const { return "A Roda da Adaptacao"; }
 std::string Mahoraga::getRaceAbilityDescription() const { return "Adapta-se ao alvo. Apos sofrer 10 parrys perfeitos, torna-se Imparavel."; }
 
-// --- MECANICA DE ADAPTACAO ---
-void Mahoraga::onDealingDamage(Character* attacker, Character* target, int /*damageDealt*/) {
+// Mecanica de adaptacao
+void Mahoraga::onDealingDamage(Character* attacker, Character* target, int /*danoCausado*/) {
     // Efeito popup de texto piscante
     TelaCombate::adicionarMensagemFixa(TelaCombate::margemCombate() + "* KLINK! * A Roda gira...\n");
 
@@ -88,7 +88,7 @@ bool Mahoraga::ignoresShield() const {
     return sufferedShieldDefenses >= 3;
 }
 
-// --- APARENCIA ---
+// Aparencia
 const std::vector<std::string>& Mahoraga::getRaceAppearance() const
 {
     static const std::vector<std::string> aparenciaOriginal =
@@ -250,7 +250,7 @@ const std::vector<std::string>& Mahoraga::getRaceAppearance() const
 }
 
 
-// --- BESTIARIO E DROPS ---
+// Bestiario e drops
 BestiaryInfo Mahoraga::getBestiaryInfo() const {
     return {
         "Labirinto Subterraneo", 

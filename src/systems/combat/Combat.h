@@ -10,10 +10,8 @@
 #include "ICombatUI.h"
 #include "../../entities/character/Character.h"
 
-/**
- * @brief Classe responsavel por gerenciar o fluxo de combate do jogo.
- * Controla turnos, vida, acoes e UI do combate.
- */
+// Classe responsavel por gerenciar o fluxo de combate do jogo.
+// Controla turnos, vida, acoes e UI do combate.
 class Combat 
 {
 public:
@@ -87,9 +85,7 @@ private:
     void displayCombatScreen(bool animateEntry = false) const;
 
 public:
-    /**
-     * @brief Construtor que move ownership dos inimigos
-     */
+    // Construtor que move ownership dos inimigos
     Combat(Character* combatPlayer,
            std::vector<std::unique_ptr<Character>>&& combatEnemies,
            std::unique_ptr<ICombatUI> visualInterface = nullptr);

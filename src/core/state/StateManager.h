@@ -1,11 +1,8 @@
-/**
- * @file StateManager.h
- * @brief Definição da Máquina de Estados Finitos (FSM) que controla o fluxo principal do jogo.
- * 
- * Este arquivo define a arquitetura central de estados (Padrão State), permitindo
- * transições suaves entre menus, combate, exploração e outras telas. O GameContext
- * trafega os ponteiros vitais da engine entre estes estados.
- */
+// @file StateManager.h
+// Definicao da Maquina de Estados Finitos (FSM) que controla o fluxo principal do jogo.
+// Este arquivo define a arquitetura central de estados (Padrao State), permitindo
+// transicoes suaves entre menus, combate, exploracao e outras telas. O GameContext
+// trafega os ponteiros vitais da engine entre estes estados.
 
 #pragma once
 
@@ -20,13 +17,10 @@ class FramePipeline;
 class GridEmulator2D;
 class GerenciadorPerspectiva;
 
-/**
- * @struct GameContext
- * @brief Contêiner de Injeção de Dependências que centraliza referências aos subsistemas.
- * 
- * O GameContext é passado para cada estado para garantir acesso aos recursos gráficos e
- * aos dados persistentes do jogador sem acoplamento direto ou uso excessivo de Singletons.
- */
+// @struct GameContext
+// Conteiner de Injecao de Dependencias que centraliza referencias aos subsistemas.
+// O GameContext e passado para cada estado para garantir acesso aos recursos graficos e
+// aos dados persistentes do jogador sem acoplamento direto ou uso excessivo de Singletons.
 struct GameContext {
     std::unique_ptr<Character> playerEntity;
     GameWindow* window = nullptr;
@@ -55,7 +49,7 @@ struct GameContext {
     GridEmulator2D* getGrid() const { return grid; }
     bool hasGrid() const { return grid != nullptr; }
 
-    // Compatibilidade e delegações legadas
+    // Compatibilidade e delegacoes legadas
     Character* obterJogador() { return getPlayer(); }
     const Character* obterJogador() const { return getPlayer(); }
     void definirJanela(GameWindow* win) { setWindow(win); }
@@ -71,7 +65,7 @@ struct GameContext {
     GridEmulator2D* obterGrade() const { return getGrid(); }
     bool possuiGrade() const { return hasGrid(); }
 
-    // Aliases para membros acessados diretamente no código legado
+    // Aliases para membros acessados diretamente no codigo legado
     std::unique_ptr<Character>& objetoJogador = playerEntity;
     GameWindow*& janela = window;
     D2DRenderer*& renderizador = renderer;
@@ -81,27 +75,19 @@ struct GameContext {
 using ContextoDoJogo = GameContext;
 using ContextoJogo = GameContext;
 
-/**
- * @class GameState
- * @brief Interface base para todos os estados da máquina de estados do jogo.
- */
+// @class GameState
+// Interface base para todos os estados da maquina de estados do jogo.
 class GameState {
 public:
     virtual ~GameState() = default;
 
-    /**
-     * @brief Gatilho disparado uma vez ao entrar no estado.
-     */
+    // Gatilho disparado uma vez ao entrar no estado.
     virtual void onEnter(Game& game, GameContext& ctx) {}
 
-    /**
-     * @brief Função de atualização contínua, chamada a cada quadro (Game Loop).
-     */
+    // Funcao de atualizacao continua, chamada a cada quadro (Game Loop).
     virtual void execute(Game& game, GameContext& ctx) = 0;
 
-    /**
-     * @brief Gatilho disparado uma vez ao sair do estado.
-     */
+    // Gatilho disparado uma vez ao sair do estado.
     virtual void onExit(Game& game, GameContext& ctx) {}
 
     // Compatibilidade legada
@@ -113,15 +99,13 @@ public:
 using EstadoDoJogo = GameState;
 using EstadoJogo = GameState;
 
-/**
- * @class Game
- * @brief Orquestrador principal da Máquina de Estados (Contexto do Padrão State).
- */
+// @class Game
+// Orquestrador principal da Maquina de Estados (Contexto do Padrao State).
 class Game {
 private:
     std::unique_ptr<GameState> currentState;
     std::unique_ptr<GameState> nextState;
-    bool pendingChange = false; // Garante que a transição ocorra de modo atômico fora do frame
+    bool pendingChange = false; // Garante que a transicao ocorra de modo atomico fora do frame
     GameContext context;
 
 public:
@@ -161,7 +145,7 @@ public:
 
 using Jogo = Game;
 
-// Estado de exploração do mapa mundo
+// Estado de exploracao do mapa mundo
 class ExplorationState final : public GameState {
 public:
     void execute(Game& game, GameContext& ctx) override;

@@ -3,7 +3,7 @@
 #include <string>
 
 void TelaMapaMundoRaycaster::renderizarPopup(const std::vector<std::string>& arte, const std::vector<std::string>& lugares, int selecao, bool redesenhoCompleto) {
-    // Empty implementation because ScreenMapWorld directly calls MenuRaycasterUtils now
+    // Implementacao vazia porque ScreenMapWorld agora chama diretamente MenuRaycasterUtils
     (void)arte;
     (void)lugares;
     (void)selecao;

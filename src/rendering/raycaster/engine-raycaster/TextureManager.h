@@ -65,7 +65,7 @@ public:
     // English Aliases
     static CorRGB getColor(TexID id, int tx, int ty) { return obterCor(id, tx, ty); }
 
-    // Lookup tables para otimização de funções trigonométricas
+    // Lookup tables para otimizacao de funcoes trigonometricas
     static float fastSin(float angle);
 
     static float fastCos(float angle);

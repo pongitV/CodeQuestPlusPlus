@@ -72,7 +72,7 @@ ProximaTransicaoMapa Mapa3PonteReino::iniciarLoopDeExploracao()
         linhaInicialParaDesenharOMapa = MapAnimatora::animarIntroducaoMapa(tituloDoMapaAtual, arteTitulo, larguraArte, arteTrans, larguraTrans, Color::CYAN, matrizDoMapaAtual, posicaoXDoJogador, posicaoYDoJogador, formatador, true, true, nullptr);
     };
 
-    auto animarTela_ = animarTela; // Para fins estáticos
+    auto animarTela_ = animarTela; // Para fins estaticos
     animarTela();
 
     std::unordered_map<char, std::function<void(int, int, int)>> interacoes;

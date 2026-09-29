@@ -14,10 +14,10 @@ class RegistroTelas {
 public:
     static bool modoRaycasterAtivo();
 
-    // --- TelaAbertura ---
+    // TelaAbertura
     static void abertura();
 
-    // --- TelaMenu ---
+    // TelaMenu
     static void painelLogo(const std::string& tituloDaTela = "", bool animarFadeIn = false);
     static bool confirmacaoEscolha(const std::string& tipoDeEscolha, const std::string& nomeDaEscolha,
         const std::vector<std::string>& informacoesParaExibir, const std::vector<std::string>& arteAsciiParaExibir);
@@ -28,24 +28,24 @@ public:
     static int menuPrincipal();
     static void tutorialParry(const std::string& infoBox = "");
 
-    // --- TelaNome ---
+    // TelaNome
     static TelaNome::Resultado telaNome();
 
-    // --- TelaRaca ---
+    // TelaRaca
     static TelaRaca::Resultado telaRaca(const std::string& nomePersonagem);
 
-    // --- TelaClasse ---
+    // TelaClasse
     static TelaClasse::Resultado telaClasse(const std::string& nomePersonagem, const std::string& race);
 
-    // --- TelaDificuldade ---
+    // TelaDificuldade
     static TelaDificuldade::Resultado telaDificuldade(const std::string& nomePersonagem, const std::string& race, const std::string& classe);
 
-    // --- TelaParry ---
+    // TelaParry
     static TelaParry::Resultado telaParry(const std::string& nomePersonagem, const std::string& race, const std::string& classe);
 
-    // --- TelaIntroducao ---
+    // TelaIntroducao
     static void telaIntroducao();
     
-    // --- Sair do Game ---
+    // Sair do jogo
     static bool confirmarSaida();
 };

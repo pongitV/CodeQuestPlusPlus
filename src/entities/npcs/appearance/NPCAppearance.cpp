@@ -32,7 +32,7 @@ const std::vector<std::string>& NPCAppearance::getASCIIArt() const {
     return NPCAparenciaLayouts::arteAparencia;
 }
 
-std::vector<std::string> NPCAppearance::getDialogue(Character* /*player*/) {
+std::vector<std::string> NPCAppearance::getDialogue(Character* /*jogador*/) {
     std::vector<std::string> lines = {
         "Saudacoes, viajante! Eu sou Anok.",
         "Deseja renovar seu estilo?",
@@ -42,7 +42,7 @@ std::vector<std::string> NPCAppearance::getDialogue(Character* /*player*/) {
     return lines;
 }
 
-std::vector<std::string> NPCAppearance::getMenuOptions(Character* /*player*/, int /*terminalWidth*/) {
+std::vector<std::string> NPCAppearance::getMenuOptions(Character* /*jogador*/, int /*larguraTerminal*/) {
     return {
         "Comprar Icones",
         "Comprar Cores de Fundo",
@@ -51,7 +51,7 @@ std::vector<std::string> NPCAppearance::getMenuOptions(Character* /*player*/, in
     };
 }
 
-void NPCAppearance::processOption(Character* player, const std::string& option, int /*terminalWidth*/) {
+void NPCAppearance::processOption(Character* player, const std::string& option, int /*larguraTerminal*/) {
     auto& progress = Progression::instance();
 
     if (option == "Comprar Icones") {
@@ -187,7 +187,7 @@ void NPCAppearance::processOption(Character* player, const std::string& option, 
             }
         }
         else if (subChoice == 1) {
-            // Color de Fundo
+            // Cor de fundo
             std::vector<std::pair<std::string, Color>> availableColors = {
                 {"Fundo Padrao (Preto)", Color::RESET}
             };

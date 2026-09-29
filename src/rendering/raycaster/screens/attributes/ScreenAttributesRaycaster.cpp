@@ -111,7 +111,7 @@ void TelaAtributosRaycaster::gerenciarFichaDoJogador(Character* currentPlayer) {
             float currentY = optStartY;
             
             float startX = 100.0f; // Left side for info
-            float optionsX = startX + 650.0f; // Right side for options (side-by-side with info)
+            float optionsX = startX + 650.0f; // Lado direito para opcoes (lado a lado com informacoes)
             
             if (state == PRINCIPAL) {
                 // Linha 1: Nome, Raca, Classe
@@ -169,7 +169,7 @@ void TelaAtributosRaycaster::gerenciarFichaDoJogador(Character* currentPlayer) {
                 currentY += 35.0f;
                 
                 // Atributos base
-                float attrX = startX + 300.0f; // Secound column for Attributes
+                float attrX = startX + 300.0f; // Segunda coluna de atributos
                 float attrY = optStartY;
                 
                 auto drawAttr = [&](const std::wstring& name, int val, int debuffVal, float x, float y, D2D1_COLOR_F c) {
@@ -254,7 +254,7 @@ void TelaAtributosRaycaster::gerenciarFichaDoJogador(Character* currentPlayer) {
                 float maxH = std::max(raceArt.size(), classArt.size()) * 1.5f;
                 currentY += maxH + 40.0f;
                 
-                // Not fully implemented text, just simple description
+                // Descricao simplificada do texto
                 box.AddText(L"DETALHES DE ATRIBUTOS (Guia):", startX, currentY, 16.0f, D2D1::ColorF(1.0f, 0.8f, 0.0f));
                 currentY += 35.0f;
                 box.AddText(L"Vida (HP)    : Aumenta sua quantidade maxima de vida.", startX, currentY, 16.0f, D2D1::ColorF(0.2f, 1.0f, 0.4f)); currentY += 24.0f;
@@ -275,8 +275,8 @@ void TelaAtributosRaycaster::gerenciarFichaDoJogador(Character* currentPlayer) {
                 currentY += 40.0f;
             }
 
-            // Options rendering
-            float opY = optStartY + 50.0f; // Start options at the top on the right side
+            // Renderizacao das opcoes
+            float opY = optStartY + 50.0f; // Inicia opcoes no topo do lado direito
             for (int i = 0; i < currentSelCount; ++i) {
                 std::wstring wOp = MenuRaycasterUtils::utf8_to_wstring(currentOptions[i]);
                 D2D1_COLOR_F color = (i == selA) ? D2D1::ColorF(0.2f, 1.0f, 0.2f) : D2D1::ColorF(0.6f, 0.6f, 0.6f);

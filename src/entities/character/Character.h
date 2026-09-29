@@ -20,13 +20,13 @@
 
 struct Attributes 
 {
-    int health;         // Pontos de vida máximos (HP) do personagem
-    int strength;       // Influencia dano de ataques físicos frontais e armas pesadas
-    int dexterity;      // Determina ordem de turno, dano de armas ágeis e acerto crítico/esquiva
-    int resistance;     // Reduz dano físico recebido e age como requisito para escudos pesados
+    int health;         // Pontos de vida maximos (HP) do personagem
+    int strength;       // Influencia dano de ataques fisicos frontais e armas pesadas
+    int dexterity;      // Determina ordem de turno, dano de armas ageis e acerto critico/esquiva
+    int resistance;     // Reduz dano fisico recebido e age como requisito para escudos pesados
     int constitution;   // Vitalidade geral, reduz efetividade de debuffs e age como requisito para armadura
-    int intelligence;   // Multiplicador base de dano mágico e requisito para cajados/varinhas
-    int wisdom;         // Aumenta atributos mágicos secundários, força de curas e defesa mágica
+    int intelligence;   // Multiplicador base de dano magico e requisito para cajados/varinhas
+    int wisdom;         // Aumenta atributos magicos secundarios, forca de curas e defesa magica
 
     void addAttributes(const Attributes& other) 
     {
@@ -95,10 +95,8 @@ enum class GameDifficulty
 
 using DificuldadeJogo = GameDifficulty;
 
-/**
- * @brief Classe central do jogo que representa qualquer entidade viva (Jogador, Inimigos, NPCs).
- * Agrega status, atributos, inventário e lógica de persistência e interação.
- */
+// Classe central do jogo que representa qualquer entidade viva (Jogador, Inimigos, NPCs).
+// Agrega status, atributos, inventario e logica de persistencia e interacao.
 class Character : public IAttacker, public IDamageable
 {
 private:

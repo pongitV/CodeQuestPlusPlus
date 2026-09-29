@@ -85,7 +85,7 @@ struct EntidadeAtingida {
 
 void RaycasterRenderer::renderizar3D(vector<Pixel3D>& screen, int LARGURA_TELA, int ALTURA_TELA, float jogadorX, float jogadorY, float anguloVisao, float horizonte, int bobbingOffset, float profundidadeMaxima, float tempoAbsoluto, const vector<string>& matrizDoMapa, const string& tituloMapa, bool temaFloresta, int temaCeu, const map<char, SpriteCache>& cacheSprites) {
     GerenciadorTexturas::initialize();
-    float campoVisao = 3.14159f / 4.0f; // FOV 45 graus (Original, fixes the absurd zoom)
+    float campoVisao = 3.14159f / 4.0f; // Campo de visao de 45 graus (corrige o zoom excessivo)
     int larguraMapa = matrizDoMapa.empty() ? 0 : matrizDoMapa[0].size();
     int alturaMapa = matrizDoMapa.size();
 
@@ -111,7 +111,7 @@ void RaycasterRenderer::renderizar3D(vector<Pixel3D>& screen, int LARGURA_TELA, 
                 } else if (mappedC == 'F') {
                     cachedLuzes.push_back({lx, ly, 0}); // Fire (Orange)
                 } else if (mappedC == 'G' || mappedC == 'O' || mappedC == 'S' || mappedC == 'A' || mappedC == 'M' || mappedC == 'T' || mappedC == 'Y') {
-                    cachedLuzes.push_back({lx, ly, 2}); // Enemy (Red)
+                    cachedLuzes.push_back({lx, ly, 2}); // Inimigo (vermelho)
                 } else if (mappedC == 'H' || mappedC == 'R' || mappedC == 'P' || mappedC == 'Q' || mappedC == 'B' || mappedC == 'W' || mappedC == 'V' || mappedC == 'C' || mappedC == 'J' || mappedC == 'K' || mappedC == 'Z') {
                     cachedLuzes.push_back({lx, ly, 3}); // NPC (Yellow)
                 }
@@ -239,7 +239,7 @@ void RaycasterRenderer::renderizar3D(vector<Pixel3D>& screen, int LARGURA_TELA, 
         float hitX = jogadorX + olhoX * distanciaAteParede;
         float hitY = jogadorY + olhoY * distanciaAteParede;
         
-        // Corrigindo Fisheye com tabela pré-calculada
+        // Corrigindo Fisheye com tabela pre-calculada
         float cosFisheye = s_fisheyeCosTable[x];
         float invCosFisheye = s_fisheyeInvCosTable[x];
 
@@ -338,13 +338,13 @@ void RaycasterRenderer::renderizar3D(vector<Pixel3D>& screen, int LARGURA_TELA, 
         for (int y = startChao; y < ALTURA_TELA; y++) {
             screen[y * LARGURA_TELA + x] = obterPixelChaoOuAgua(y);
         }
-        } // for x
+        } // Laco para coordenadas x
         }); // lambda
-    } // for i (tasks)
+    } // Laco i para as tarefas
     
     obterThreadPool().execute(tasks);
 
-    // SPRITE CASTING (Multi-Pass)
+    // Renderizacao de sprites (multiplos passos)
     struct SpriteProj { float x, y, dist; char c, sprCh; };
     std::vector<SpriteProj> spritesGlobais;
     for (int y = 0; y < alturaMapa; y++) {
@@ -424,11 +424,11 @@ void RaycasterRenderer::renderizar3D(vector<Pixel3D>& screen, int LARGURA_TELA, 
             entityScale = 0.4f;
         }
         else if (sp.sprCh == '*') {
-            // Arvores: manter o tamanho gigante que estava com o bug anterior (1.0 * 1.725), reduzido em 20% a pedido
+            // Arvores: mantem proporcao maior (1.0 * 1.725), reduzida em 20%
             entityScale = 1.725f * 0.80f;
         }
         else if (sp.sprCh == '^' || (sp.sprCh >= '1' && sp.sprCh <= '5')) {
-            // Portas: levemente maiores que o player (0.5f da camera) + aumentos acumulados
+            // Portas: levemente maiores que o jogador (0.5f da camera) com aumentos acumulados
             entityScale = 0.6f * 1.25f * 1.50f;
         }
 
@@ -474,7 +474,7 @@ void RaycasterRenderer::renderizar3D(vector<Pixel3D>& screen, int LARGURA_TELA, 
         if (altEnt <= 0) continue;
 
         int spriteWidth = spriteHeight;
-        if (sp.sprCh == 'H') spriteWidth = (int)(spriteHeight * 4.0f); // Boss is very wide
+        if (sp.sprCh == 'H') spriteWidth = (int)(spriteHeight * 4.0f); // Chefe possui largura estendida
         if (sp.sprCh == '*') spriteWidth = (int)(spriteHeight * 1.5f); 
 
         int drawStartX = -spriteWidth / 2 + spriteScreenX;

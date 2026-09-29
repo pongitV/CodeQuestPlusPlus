@@ -7,7 +7,7 @@
 #include "../../../systems/inventory/ItemFactory.h"
 #include "../../../core/utils/DialogFunctions.h"
 
-// --- INFORMAÇÕES DA CLASSE ---
+// Informacoes da classe
 std::string Archer::getClassName() const 
 {
      return "Archer"; 
@@ -34,7 +34,7 @@ std::vector<std::unique_ptr<Item>> Archer::getClassEquipment() const
     return equipment;
 }
 
-// --- PASSIVA DA CLASSE ---
+// Passiva da classe
 std::string Archer::getClassPassiveName() const 
 { 
     return "Passos leves"; 
@@ -60,7 +60,7 @@ int Archer::revertArcherPassiveSlowPenalty(int currentDexterity) const
     return (currentDexterity * 4) / 3;
 }
 
-// --- HABILIDADE DA CLASSE ---
+// Habilidade da classe
 std::string Archer::getClassAbilityCooldownDescription() const 
 { 
     return "Recarga: 1 turno."; 
@@ -76,7 +76,7 @@ std::string Archer::getClassAbilityDescription() const
     return "Se afasta durante um turno, no proximo turno causa 2x damage"; 
 }
 
-void Archer::useClassAbility(Combat* combat, Character* userCharacter, std::vector<Character*>& /*enemyList*/) 
+void Archer::useClassAbility(Combat* combat, Character* userCharacter, std::vector<Character*>& /*listaInimigos*/) 
 {
     int remainingTurns = userCharacter->obterRecargaHabilidade(AbilityID::RetreatWithAim);
     if (checkAndReportCooldown(userCharacter, remainingTurns, getClassAbilityName())) return;

@@ -9,7 +9,7 @@
 #include "../menu/ScreenDifficulty.h"
 #include "../menu/ScreenParry.h"
 
-// Interface abstrata (DIP) para que RegistroTelas não dependa de implementações concretas (Raycaster ou IDE)
+// Interface abstrata (DIP) para que RegistroTelas nao dependa de implementacoes concretas (Raycaster ou IDE)
 class IGerenciadorTelas {
 public:
     virtual ~IGerenciadorTelas() = default;

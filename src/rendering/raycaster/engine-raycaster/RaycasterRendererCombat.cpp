@@ -10,9 +10,7 @@
 
 #include "../../../systems/combat/Parry.h"
 
-// ═══════════════════════════════════════════════════════════════════
-//  Arena de Combat por Bioma
-// ═══════════════════════════════════════════════════════════════════
+// Arena de combate por bioma
 std::vector<std::string> RaycasterRendererCombate::obterArenaPorTitulo(const std::string& titulo) {
     std::string upper = titulo;
     for (char& c : upper) c = std::toupper(static_cast<unsigned char>(c));
@@ -141,9 +139,7 @@ std::vector<std::string> RaycasterRendererCombate::obterArenaPorTitulo(const std
     };
 }
 
-// ═══════════════════════════════════════════════════════════════════
-//  Color base do sprite do enemy (mesmas cores do RaycasterInimigos)
-// ═══════════════════════════════════════════════════════════════════
+// Cor base do sprite do inimigo (mesmas cores do RaycasterInimigos)
 std::tuple<int,int,int> RaycasterRendererCombate::obterCorSpriteInimigo(Character* enemy) {
     if (!enemy) return {255, 255, 255};
     
@@ -161,9 +157,7 @@ std::tuple<int,int,int> RaycasterRendererCombate::obterCorSpriteInimigo(Characte
     }
 }
 
-// ═══════════════════════════════════════════════════════════════════
-//  Pintar texto no buffer 1D (overlay)
-// ═══════════════════════════════════════════════════════════════════
+// Pintar texto no buffer 1D (overlay)
 void RaycasterRendererCombate::pintarTextoNoBuffer(std::vector<std::string>& screen, int larguraTela, int alturaMax, int posX, int posY, const std::string& texto, const std::string& corFg, const std::string& corBgOverride) {
     (void)larguraTela;
     (void)corFg;
@@ -172,9 +166,7 @@ void RaycasterRendererCombate::pintarTextoNoBuffer(std::vector<std::string>& scr
     screen[posY] = texto;
 }
 
-// ═══════════════════════════════════════════════════════════════════
-//  Renderizar Quadro Principal
-// ═══════════════════════════════════════════════════════════════════
+// Renderizar quadro principal
 static std::vector<std::string> s_cachedBackground;
 static std::string s_cachedTituloMapa;
 static int s_cachedLarguraTela = 0;
@@ -253,7 +245,7 @@ std::vector<std::string> RaycasterRendererCombate::renderizarQuadro(
             if (srcX >= 0 && srcX < larguraTela) {
                 int idx = y * larguraTela + srcX;
                 if (idx < 0 || idx >= (int)screen.size()) {
-                    linha += "X"; // ERROR!
+                    linha += "X"; // Erro
                 } else {
                     linha += screen[idx];
                 }
@@ -263,7 +255,7 @@ std::vector<std::string> RaycasterRendererCombate::renderizarQuadro(
         }
         linhasRenderizadas[y] = std::move(linha);
     }
-    // Pad the rest with empty space to avoid Out-Of-Bounds when the HUD draws at the bottom
+    // Preenche o restante com espacos vazios para evitar ultrapassar os limites no rodape do HUD
     for (int y = altura3D; y < alturaTerminal; y++) {
         linhasRenderizadas[y] = std::string(larguraTela, ' ');
     }
@@ -271,9 +263,7 @@ std::vector<std::string> RaycasterRendererCombate::renderizarQuadro(
     return linhasRenderizadas;
 }
 
-// ═══════════════════════════════════════════════════════════════════
-//  Sobrepor Sprite do Enemy (com arte 3D texturizada)
-// ═══════════════════════════════════════════════════════════════════
+// Sobrepor sprite do inimigo (com arte 3D texturizada)
 void RaycasterRendererCombate::sobreporSprite(
     std::vector<std::string>& screen, 
     Character* enemy, 
@@ -291,7 +281,7 @@ void RaycasterRendererCombate::sobreporSprite(
     bool isSelecionado,
     float spriteOpacity
 ) {
-    // Usa a arte de MAPA (mesma do raycaster) em vez da arte de combat 2D
+    // Usa a arte de mapa (mesma do raycaster) em vez da arte de combate 2D
     const std::vector<std::string>& arteOriginalInimigo = enemy->obterRaca()->getRaceAppearance();
     if (arteOriginalInimigo.empty()) return;
 
@@ -365,7 +355,7 @@ void RaycasterRendererCombate::sobreporSprite(
         if (comp > larguraArte) larguraArte = comp;
     }
 
-    // Sway horizontal based on time (apenas se não estiver no meio da animação de morte)
+    // Balanco horizontal baseado no tempo (apenas se nao estiver no meio da animacao de morte)
     int swayOff = 0;
     if (!isMorte) {
         int stepSway = (tempoMs / 200) % 8;
@@ -380,7 +370,7 @@ void RaycasterRendererCombate::sobreporSprite(
     if (startY > maxStartY) startY = maxStartY;
     if (startY < 0) startY = 0;
     
-    int startX = 0; // Será recalculado após obter o croppedWidth
+    int startX = 0; // Sera recalculado apos obter o croppedWidth
 
     // Helper para extrair o background da celula do Raycaster
     auto getBg = [](const std::string& s) {
@@ -463,7 +453,7 @@ void RaycasterRendererCombate::sobreporSprite(
     bool desenharCorpo = (enemy->obterVida() > 0 || !enemy->obterMorteAnimada());
 
     if (desenharCorpo) {
-        // Desenha contorno preto (borda do sprite) + corpo texturizado (mesclando fundo via spriteOpacity)
+        // Desenha contorno preto (borda do sprite) e corpo texturizado (mesclando fundo via spriteOpacity)
         for (int y = 0; y < alturaArte; y++) {
             int telaY = startY + y;
             if (telaY >= 0 && telaY < alturaVisivel) {
@@ -477,10 +467,10 @@ void RaycasterRendererCombate::sobreporSprite(
                         
                         if (c != ' ') {
                             if (isMorte) {
-                                // Efeito de desintegração dithered (virando poeira)
+                                // Efeito de desintegracao dithered (virando poeira)
                                 int hash = (rawX * 37 + y * 57) % 100;
                                 if (hash < progress * 100) {
-                                    // Renderiza partículas de poeira '.' flutuantes ou some o pixel
+                                    // Renderiza particulas de poeira '.' flutuantes ou some o pixel
                                     if (progress < 0.8 && (hash % 3 == 0)) {
                                         screen[telaY * larguraTela + telaX] = ".";
                                     }
@@ -531,7 +521,7 @@ void RaycasterRendererCombate::sobreporSprite(
         }
     };
 
-    // Helper para desenhar strings no buffer (com suporte a UTF-8, alinhado à esquerda)
+    // Helper para desenhar strings no buffer (com suporte a UTF-8, alinhado a esquerda)
     auto paintStrLeft = [&](int posX, int posY, const std::string& txt, const std::string& color, const std::string& forcedBg = "") {
         (void)color;
         (void)forcedBg;
@@ -546,7 +536,7 @@ void RaycasterRendererCombate::sobreporSprite(
         }
     };
 
-    // Só desenha nameplate/HP bar se não estiver morrendo e se spriteOpacity >= 1.0f
+    // So desenha nameplate/HP bar se nao estiver morrendo e se spriteOpacity >= 1.0f
     if (desenharCorpo && !isMorte && spriteOpacity >= 1.0f) {
         int nameY = startY - 2;
         if (nameY >= 0) {
@@ -574,7 +564,7 @@ void RaycasterRendererCombate::sobreporSprite(
                 paintStrLeft(drawX, hpY, "HP: [", "");
                 drawX += 5;
                 
-                // 2. Blocks with gradient
+                // 2. Blocos com gradiente
                 int blocks = 8;
                 int qtdReal = static_cast<int>(pct * blocks * 8);
                 
@@ -599,7 +589,7 @@ void RaycasterRendererCombate::sobreporSprite(
             }
         }
 
-        // Floating Combat Text (FCT)
+        // Texto flutuante de combate (FCT)
         if (danoAmount > 0 && flashDanoInimigo > 0) {
             int fctY = startY - 3;
             if (fctY < 0) fctY = 0;
@@ -811,7 +801,7 @@ void RaycasterRendererCombate::sobreporSpriteD2D(
                     p.r = static_cast<int>(p.r * (1.0f - spriteOpacity) + tgtR * spriteOpacity);
                     p.g = static_cast<int>(p.g * (1.0f - spriteOpacity) + tgtG * spriteOpacity);
                     p.b = static_cast<int>(p.b * (1.0f - spriteOpacity) + tgtB * spriteOpacity);
-                    p.hasFg = false; // We overwrite the character with a solid color
+                    p.hasFg = false; // Sobrescreve o caractere com uma cor solida
                 }
             }
         }

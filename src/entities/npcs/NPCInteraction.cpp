@@ -7,7 +7,7 @@
 #include "../../ui/screens/ScreenBase.h"
 #include "../../core/utils/Color.h"
 
-// --- INTERACAO PRINCIPAL ---
+// Interacao principal
 void NPCInteraction::interact(Character* currentPlayer) {
     InputControl::executarLoopMenuPopup(
         [this, currentPlayer]() { return this->getDialogue(currentPlayer); },
@@ -17,7 +17,7 @@ void NPCInteraction::interact(Character* currentPlayer) {
     );
 }
 
-void NPCInteraction::processEmptyQuestsMenu(Character* /*currentPlayer*/, const std::string& menuTitle, Color headerColor, const std::string& /*npcName*/, const std::string& /*emptyDialogue*/) {
+void NPCInteraction::processEmptyQuestsMenu(Character* /*jogadorAtual*/, const std::string& menuTitle, Color headerColor, const std::string& /*nomeNPC*/, const std::string& /*dialogoVazio*/) {
     std::string questOption;
     do {
         std::vector<std::string> quests = {
@@ -46,7 +46,7 @@ bool NPCInteraction::verifyMaterialInInventory(Character* currentPlayer, const s
     return true;
 }
 
-Item* NPCInteraction::readItemFromInventory(Character* currentPlayer, const std::string& /*dialogueMessage*/, const std::string& /*npcName*/, Color /*npcColor*/, std::string& exitCode, bool displayPrices) {
+Item* NPCInteraction::readItemFromInventory(Character* currentPlayer, const std::string& /*mensagemDialogo*/, const std::string& /*nomeNPC*/, Color /*corNPC*/, std::string& exitCode, bool displayPrices) {
     Item* selectedItem = nullptr;
 
     TelaBase::executarLoop(
@@ -97,7 +97,7 @@ Item* NPCInteraction::readItemFromInventory(Character* currentPlayer, const std:
     return selectedItem;
 }
 
-void NPCInteraction::displaySuccessScreen(const std::string& headerTitle, Color headerColor, const std::string& /*equation*/, const std::vector<std::string>& asciiArt, const std::string& /*npcName*/, const std::string& npcDialogue) {
+void NPCInteraction::displaySuccessScreen(const std::string& headerTitle, Color headerColor, const std::string& /*equacao*/, const std::vector<std::string>& asciiArt, const std::string& /*nomeNPC*/, const std::string& npcDialogue) {
     InputControl::lerSelecaoMenuEmPopup(headerTitle, {npcDialogue}, {"OK"}, headerColor, asciiArt);
 }
 

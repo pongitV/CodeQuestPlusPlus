@@ -31,7 +31,7 @@ const std::vector<std::string>& NPCAlchemist::getASCIIArt() const {
     return NPCAlquimistaLayouts::arteAlquimista;
 }
 
-std::vector<std::string> NPCAlchemist::getDialogue(Character* /*player*/) {
+std::vector<std::string> NPCAlchemist::getDialogue(Character* /*jogador*/) {
     std::vector<std::string> lines = {
         "Seja bem-vindo ao laboratorio de transmutacao!",
         "Eu sou Quintus, o Alchemist Real. Se voce me trouxer ingredientes de monstros",
@@ -41,7 +41,7 @@ std::vector<std::string> NPCAlchemist::getDialogue(Character* /*player*/) {
     return lines;
 }
 
-std::vector<std::string> NPCAlchemist::getMenuOptions(Character* /*player*/, int /*terminalWidth*/) {
+std::vector<std::string> NPCAlchemist::getMenuOptions(Character* /*jogador*/, int /*larguraTerminal*/) {
     return {
         "Pocao de Cura Grande (50%VM) [1x Maca + 1x Po magico]",
         "Pocao de Forca Alquimica [1x Pao + 1x Dente de goblin]",
@@ -51,7 +51,7 @@ std::vector<std::string> NPCAlchemist::getMenuOptions(Character* /*player*/, int
     };
 }
 
-void NPCAlchemist::processOption(Character* player, const std::string& option, int /*terminalWidth*/) {
+void NPCAlchemist::processOption(Character* player, const std::string& option, int /*larguraTerminal*/) {
     std::string foodReq = "";
     std::string dropReq = "";
     ItemID productId = ItemID::None;

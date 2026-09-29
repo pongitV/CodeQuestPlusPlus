@@ -1,7 +1,7 @@
 #pragma once
 
 // Umbrella header — retrocompatibilidade total.
-// Projetos novos: inclua apenas os headers específicos necessários.
+// Projetos novos: inclua apenas os headers especificos necessarios.
 
 #include "PixelArtUtils.h"
 #include "FrameOverlayUtils.h"

@@ -104,7 +104,7 @@ namespace {
           } }
     };
 
-    // --- APARENCIA E DIALOGOS ---
+    // Aparencia e dialogos
     void processEnchantments(Character* currentPlayer, bool isUniversal);
     void processPotions(Character* currentPlayer, bool isBuff);
     void processLabyrinthQuest(Character* currentPlayer);
@@ -115,7 +115,7 @@ namespace {
     }
 }
 
-// --- INFORMACOES DO LUGAR ---
+// Informacoes do lugar
 std::string NPCMageNPC::getPlaceName() const {
     return "CABANA DA BRUXA";
 }
@@ -132,7 +132,7 @@ const std::vector<std::string>& NPCMageNPC::getASCIIArt() const {
     return NPCMageNPCLayouts::mageArt;
 }
 
-// --- INTERACAO E MENU ---
+// Interacao e menu
 void NPCMageNPC::interact(Character* player) {
     InputControl::executarLoopMenuPopup(
         [this, player]() { return this->getDialogue(player); },
@@ -142,7 +142,7 @@ void NPCMageNPC::interact(Character* player) {
     );
 }
 
-std::vector<std::string> NPCMageNPC::getDialogue(Character* /*player*/) {
+std::vector<std::string> NPCMageNPC::getDialogue(Character* /*jogador*/) {
     if (Progression::instance().getFlag(Flags::Floresta_MissaoMorgana)) {
         return std::vector<std::string>{
             "O Labirinto o aguarda..."
@@ -155,7 +155,7 @@ std::vector<std::string> NPCMageNPC::getDialogue(Character* /*player*/) {
     }
 }
 
-std::vector<std::string> NPCMageNPC::getMenuOptions(Character* /*player*/, int /*terminalWidth*/) {
+std::vector<std::string> NPCMageNPC::getMenuOptions(Character* /*jogador*/, int /*larguraTerminal*/) {
     return {
         "ENCANTAR Armas (Universais)",
         "ENCANTAR Armas (Especificas)",
@@ -166,7 +166,7 @@ std::vector<std::string> NPCMageNPC::getMenuOptions(Character* /*player*/, int /
     };
 }
 
-void NPCMageNPC::processOption(Character* player, const std::string& option, int /*terminalWidth*/) {
+void NPCMageNPC::processOption(Character* player, const std::string& option, int /*larguraTerminal*/) {
     if (option == "ENCANTAR Armas (Universais)") {
         processEnchantments(player, true);
     }
@@ -182,7 +182,7 @@ void NPCMageNPC::processOption(Character* player, const std::string& option, int
 }
 
 namespace {
-    // --- PROCESSAMENTO DE OPCOES ---
+    // Processamento de opcoes
     void processEnchantments(Character* currentPlayer, bool isUniversal) {
         std::vector<const EnchantOperation*> currentOps;
         int start = isUniversal ? 0 : 3;

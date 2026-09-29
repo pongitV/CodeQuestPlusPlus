@@ -27,7 +27,7 @@ void TelaInventarioRaycaster::displayCabecalho(bool, int startY) {
     int logoX = (larguraConsole - compVisualLogo) / 2;
     if (logoX < 0) logoX = 0;
     
-    // Apenas desenha o logo sobre a screen atual, pulando espaços para não pintar fundo preto
+    // Apenas desenha o logo sobre a tela atual, pulando espacos para nao pintar fundo preto
     std::string corTitulo = "";
     for (int i = 0; i < (int)ArtesInventario::logoInventario.size(); ++i) {
         const std::string& linha = ArtesInventario::logoInventario[i];
@@ -68,7 +68,7 @@ void TelaInventarioRaycaster::renderizarMenu(const std::vector<std::string>& lin
         for (size_t i = 0; i < linhas.size(); ++i) {
             std::string line = linhas[i];
             
-            // Strip any ANSI if it leaked
+            // Remove sequencias ANSI residuais
             size_t pos = 0;
             while ((pos = line.find("[")) != std::string::npos) {
                 size_t endPos = line.find('m', pos);
@@ -98,7 +98,7 @@ void TelaInventarioRaycaster::renderizarMenu(const std::vector<std::string>& lin
         float lh = UIRenderer2D::LOGICAL_HEIGHT;
         renderCb(box, selecaoAtual, lw, lh);
         box.Render(d2d, D2D1::ColorF(0.05f, 0.05f, 0.08f, 0.95f), 0.95f, 2.0f, D2D1::ColorF(1.0f, 0.8f, 0.0f), 20.0f, lw/2.0f, lh/2.0f);
-        outW = 800; // arbitrary, just to mark as drawn
+        outW = 800; // Valor arbitrario para marcar como desenhado
         outH = 600;
     }
 }

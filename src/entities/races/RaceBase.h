@@ -63,11 +63,11 @@ public:
 
     virtual std::vector<std::unique_ptr<Item>> getRaceEquipment() const { return {}; }
 
-    virtual int processOffensiveDamage(int baseDamage, Character* /*attacker*/) {
+    virtual int processOffensiveDamage(int baseDamage, Character* /*atacante*/) {
         return baseDamage;
     }
 
-    virtual int processDefensiveDamage(int finalDamage, Character* /*defender*/) {
+    virtual int processDefensiveDamage(int finalDamage, Character* /*defensor*/) {
         return finalDamage;
     }
     
@@ -81,7 +81,7 @@ public:
     virtual bool ignoresShield() const { return false; }
     virtual bool ignoraEscudo() const { return ignoresShield(); }
 
-    virtual void performDrops(Character* /*enemy*/, Character* /*currentPlayer*/, std::vector<std::string>& /*obtainedItems*/, int& /*totalGold*/, int& /*totalXp*/) {}
+    virtual void performDrops(Character* /*inimigo*/, Character* /*jogadorAtual*/, std::vector<std::string>& /*itensObtidos*/, int& /*totalOuro*/, int& /*totalXP*/) {}
     virtual void dropLoot(Character* enemy, Character* currentPlayer, std::vector<std::string>& items, int& gold, int& xp) {
         performDrops(enemy, currentPlayer, items, gold, xp);
     }
@@ -92,7 +92,7 @@ public:
         performDrops(enemy, currentPlayer, items, gold, xp);
     }
 
-    virtual void onDealingDamage(Character* /*attacker*/, Character* /*target*/, int /*damageDealt*/) {}
+    virtual void onDealingDamage(Character* /*atacante*/, Character* /*alvo*/, int /*danoCausado*/) {}
     virtual void onDamageDealt(Character* attacker, Character* target, int damage) {
         onDealingDamage(attacker, target, damage);
     }
@@ -100,8 +100,8 @@ public:
         onDealingDamage(attacker, target, damage);
     }
 
-    virtual bool tryUseActiveAbility(Character* /*thisEnemy*/, Character* /*target*/, int /*difficulty*/) {
-        return false; // Por padrão, inimigos não possuem habilidades ativas que consomem o turno
+    virtual bool tryUseActiveAbility(Character* /*esteInimigo*/, Character* /*alvo*/, int /*dificuldade*/) {
+        return false; // Por padrao, inimigos nao possuem habilidades ativas que consomem o turno
     }
     virtual bool tentarUsarHabilidadeAtiva(Character* thisEnemy, Character* target, int diff) {
         return tryUseActiveAbility(thisEnemy, target, diff);

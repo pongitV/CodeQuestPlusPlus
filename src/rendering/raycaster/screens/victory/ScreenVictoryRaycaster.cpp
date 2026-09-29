@@ -40,7 +40,7 @@ void TelaVitoriaRaycaster::display(Character* currentPlayer, int goldEarned, int
 
         d2d->obterRenderTarget()->BeginDraw();
 
-        // 1. Draw 3D Combat Map Backdrop Print (Same as in Combat)
+        // 1. Renderiza impressao 3D do mapa de fundo do combate (mesmo do combate)
         if (ID2D1Bitmap* tex = d2d->obterTexturaBackbuffer()) {
             D2D1_SIZE_U tsz = tex->GetPixelSize();
             D2D1_SIZE_F rsz = d2d->obterRenderTarget()->GetSize();
@@ -58,7 +58,7 @@ void TelaVitoriaRaycaster::display(Character* currentPlayer, int goldEarned, int
             float logicalW = UIRenderer2D::LOGICAL_WIDTH;
             float logicalH = UIRenderer2D::LOGICAL_HEIGHT;
 
-            // Single Centered Victory Box (Title + Combat Stats + Drops Below)
+            // Caixa centralizada de vitoria (titulo, estatisticas de combate e itens)
             UIDynamicBox vicBox;
             float centerX = logicalW / 2.0f;
             float startY = 40.0f;
@@ -72,7 +72,7 @@ void TelaVitoriaRaycaster::display(Character* currentPlayer, int goldEarned, int
                 startY += 30.0f;
             }
 
-            // Estatísticas do Combate
+            // Estatisticas do Combate
             vicBox.AddText(L"--- ESTATÍSTICAS DO COMBATE ---", centerX, startY, 15.0f, D2D1::ColorF(0.6f, 0.8f, 1.0f), true);
             startY += 28.0f;
 
@@ -95,7 +95,7 @@ void TelaVitoriaRaycaster::display(Character* currentPlayer, int goldEarned, int
                 startY += 32.0f;
             }
 
-            // Seção de Recompensas & Drops abaixo
+            // Secao de Recompensas & Drops abaixo
             vicBox.AddText(L"--- RECOMPENSAS & DROPS ---", centerX, startY, 15.0f, D2D1::ColorF(1.0f, 0.85f, 0.0f), true);
             startY += 28.0f;
 

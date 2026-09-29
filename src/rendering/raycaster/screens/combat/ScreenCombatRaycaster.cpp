@@ -29,9 +29,9 @@
 #include <algorithm>
 #include <iostream>
 
-// ═══════════════════════════════════════════════════════════════════
-// State Estático de Combate
-// ═══════════════════════════════════════════════════════════════════
+
+// State Estatico de Combate
+
 static bool s_isContexto3D = false;
 static std::vector<std::string> s_contextoMapa;
 static float s_contextoPosX = 0.0f;
@@ -54,7 +54,7 @@ struct PlayerHUDStateRaycaster {
 };
 static std::unordered_map<Character*, PlayerHUDStateRaycaster> hudStatesRaycaster;
 
-// Direct2D Dust Particle structure for enemy death animation
+// Estrutura de particulas de poeira Direct2D para animacao de morte do inimigo
 struct DustParticle {
     float x, y;
     float vx, vy;
@@ -72,7 +72,7 @@ void TelaCombateRaycaster::adicionarMensagemFixa(const std::string& msg) {
 }
 
 void TelaCombateRaycaster::limparMensagensFixas() {
-    // Keep log history intact for complete end-to-end combat tracking
+    // Mantem o historico de registro intacto para rastreamento completo do combate
 }
 
 void TelaCombateRaycaster::configurarContexto3D(bool modo3D, const std::vector<std::string>& matriz, float posX, float posY, float angulo, const std::string& titulo) {
@@ -103,9 +103,7 @@ void TelaCombateRaycaster::definirMensagemBanner(const std::string& msg, CorBann
     }
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// Master Direct2D Combat Frame Renderer (3D Map Backdrop + D2D Horde)
-// ═══════════════════════════════════════════════════════════════════
+// Renderizador principal de quadro de combate Direct2D (fundo 3D e inimigos em Direct2D)
 static void renderizarQuadroCombateD2D(
     Character* currentPlayer,
     const std::vector<Character*>& enemies,
@@ -127,20 +125,20 @@ static void renderizarQuadroCombateD2D(
     float tempoAbsoluto = std::chrono::duration<float>(agora - tempoInicio).count();
     int tempoMs = static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(agora.time_since_epoch()).count());
 
-    // 1. Render ACTUAL MAP 3D Viewport without background map enemies & with dark dimming overlay (Cached for 60 FPS)
+    // 1. Renderiza visao 3D do mapa sem inimigos de fundo e com escurecimento (cache para 60 FPS)
     if (s_isContexto3D && !s_contextoMapa.empty()) {
         if (s_backdropMapDirty) {
             int bbW = 640;
             int bbH = 360;
             std::vector<Pixel3D> tela3D(bbW * bbH);
             
-            // Strip map enemy entities so background map 3D print is clean
+            // Remove entidades inimigas do mapa para que a renderizacao 3D de fundo fique limpa
             std::vector<std::string> mapaSemInimigos = s_contextoMapa;
             std::string inimigosChars = "GOBFPMSTRCH";
             for (auto& linha : mapaSemInimigos) {
                 for (char& c : linha) {
                     if (inimigosChars.find(c) != std::string::npos) {
-                        c = '.'; // Replace enemy cell on map with floor
+                        c = '.'; // Substitui a celula do inimigo no mapa por chao
                     }
                 }
             }
@@ -167,9 +165,9 @@ static void renderizarQuadroCombateD2D(
         if (ID2D1Bitmap* tex = d2d->obterTexturaBackbuffer()) {
             D2D1_SIZE_U tsz = tex->GetPixelSize();
             D2D1_SIZE_F rsz = d2d->obterRenderTarget()->GetSize();
-            // Draw map backbuffer dimmed (0.50f opacity)
+            // Desenha backbuffer do mapa escurecido (opacidade 0.50f)
             d2d->obterRenderTarget()->DrawBitmap(tex, D2D1::RectF(0, 0, rsz.width, rsz.height), 0.50f, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, D2D1::RectF(0, 0, (FLOAT)tsz.width, (FLOAT)tsz.height));
-            // Add subtle dark dimming overlay to enhance enemy sprite visibility
+            // Adiciona sobreposicao escura sutil para destacar a visibilidade do sprite inimigo
             d2d->preencherRetangulo(0, 0, rsz.width, rsz.height, D2D1::ColorF(0.02f, 0.02f, 0.05f, 0.35f));
         }
     } else {
@@ -193,7 +191,7 @@ static void renderizarQuadroCombateD2D(
     float logicalW = UIRenderer2D::LOGICAL_WIDTH;
     float logicalH = UIRenderer2D::LOGICAL_HEIGHT;
 
-    // 2. Render Enemies Aligned Horizontally Side-by-Side with Sway Motion & Proper Scaling
+    // 2. Renderiza inimigos alinhados horizontalmente com balanco e escala correta
     int totalEnemies = (int)enemies.size();
     if (totalEnemies > 0) {
         float areaWidth = std::min(1300.0f, logicalW * 0.70f);
@@ -249,7 +247,7 @@ static void renderizarQuadroCombateD2D(
                 {"#@O0o*+.X=", (int)(corFinal.r * 255), (int)(corFinal.g * 255), (int)(corFinal.b * 255)}
             };
 
-            // Death dust particle animation or normal draw (Virar Poeira)
+            // Animacao de particulas de morte ou desenho padrao (virar poeira)
             if (isMorte && enemy == alvoAnimacao) {
                 float opacity = std::max(0.0f, 1.0f - (frameAnimacao / 20.0f));
                 UIRenderer2D::DrawPixelArt(d2d, arte, paletaD2D, enemyX - spriteWidth / 2.0f, enemyY - spriteHeight / 2.0f, pixelScale, opacity);
@@ -266,11 +264,11 @@ static void renderizarQuadroCombateD2D(
                 UIRenderer2D::DrawPixelArt(d2d, arte, paletaD2D, enemyX - spriteWidth / 2.0f, enemyY - spriteHeight / 2.0f, pixelScale, 1.0f);
             }
 
-            // --- Enemy Name, Status Badges and HP Bar directly ABOVE sprite ---
+            // Nome do inimigo, icones de status e barra de vida sobre o sprite
             UIDynamicBox enemyBox;
             float topY = enemyY - (spriteHeight / 2.0f) - 60.0f;
 
-            // Render enemy status badges (Text only, no emojis)
+            // Renderiza emblemas de status do inimigo (apenas texto, sem emojis)
             std::vector<std::string> statusBadges;
             if (enemy->obterDefendendo()) statusBadges.push_back("[DEFESA]");
             if (enemy->possuiEfeito(EfeitoID::Atordoamento)) statusBadges.push_back("[ATORDOADO]");
@@ -323,18 +321,18 @@ static void renderizarQuadroCombateD2D(
         }
     }
 
-    // 3. Render Player Exploration HUD at bottom (with solid dark grey mortar base)
+    // 3. Renderiza HUD de exploracao do jogador na base
     if (currentPlayer) {
         RaycasterHUD::desenharProcedural(*d2d, (int)tam.width, (int)tam.height, s_contextoPosX, s_contextoPosY, s_contextoAngulo, s_contextoMapa, s_contextoTituloMapa, false, currentPlayer);
     }
 
-    // 4. Render Combat Options Bar or Custom Banner / PRESSIONE ENTER Prompt directly ABOVE Player HUD
+    // 4. Renderiza barra de opcoes de combate ou aviso acima do HUD do jogador
     RaycasterHUD::desenharOpcoesCombateProcedural(*d2d, (int)tam.width, (int)tam.height, opcaoMenuSelecionada, s_mensagemBannerCombate, s_corBannerCombate, s_mensagemBannerLinha2);
 
-    // 4b. Render Parry Minigame Overlay directly on Direct2D target if active
+    // 4b. Renderiza sobreposicao do minigame de aparo no Direct2D se ativo
     Parry::renderizarOverlaysD2D(*d2d, (int)tam.width, (int)tam.height);
 
-    // 5. Expandable Real-Time Combat Log Panel (Right side)
+    // 5. Painel expansivel de registro de combate em tempo real (lado direito)
     float logX = logicalW - 440.0f;
     float logY = 50.0f;
 
@@ -342,7 +340,7 @@ static void renderizarQuadroCombateD2D(
     if (s_logExpandido) {
         logPanelBox.AddText(L"LOG DE BATALHA (Clique/L para recolher)", logX + 200.0f, logY, 15.0f, D2D1::ColorF(1.0f, 0.84f, 0.0f), true);
 
-        // Turn Order Bar at Top of Expanded Log
+        // Barra de ordem dos turnos no topo do registro expandido
         std::vector<Character*> ordemTurnos;
         if (currentPlayer) ordemTurnos.push_back(currentPlayer);
         for (Character* enemy : enemies) {
@@ -438,9 +436,7 @@ static void renderizarQuadroCombateD2D(
     rt->EndDraw();
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// Implementation of TelaCombateRaycaster Class Methods
-// ═══════════════════════════════════════════════════════════════════
+// Implementacao dos metodos da classe TelaCombateRaycaster
 
 void TelaCombateRaycaster::displayLogoParaTelaDeCombate(const std::string& tituloDaTela, bool animar) {
     (void)tituloDaTela; (void)animar;
@@ -548,7 +544,7 @@ void TelaCombateRaycaster::animarCuraNoJogador(const std::string& tituloCombate,
 void TelaCombateRaycaster::animarMorteInimigo(const std::string& tituloCombate, const std::vector<Character*>& listaDeInimigos, Character* inimigoMorto, Character* currentPlayer, const std::vector<Character*>& listaDeAliados, const std::vector<std::string>& drops) {
     (void)tituloCombate; (void)listaDeAliados; (void)drops;
     
-    // Gerar 120 partículas de poeira e brasas para a animação de dissolução do inimigo
+    // Gerar 120 particulas de poeira e brasas para a animacao de dissolucao do inimigo
     std::vector<DustParticle> particles;
     for (int i = 0; i < 120; ++i) {
         DustParticle p;
@@ -575,9 +571,7 @@ void TelaCombateRaycaster::animarMorteInimigo(const std::string& tituloCombate, 
 }
 
 
-// ═══════════════════════════════════════════════════════════════════
-// Player Action Menu Input
-// ═══════════════════════════════════════════════════════════════════
+// Entrada do menu de acao do jogador
 
 int TelaCombateRaycaster::obterAcaoDoJogador(int turnoAtual, Character* personagemAgindo, const std::vector<Character*>& enemies, Character* currentPlayer, const std::vector<Character*>& aliados) {
     (void)turnoAtual; (void)personagemAgindo; (void)aliados;
@@ -586,7 +580,7 @@ int TelaCombateRaycaster::obterAcaoDoJogador(int turnoAtual, Character* personag
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     InputControl::limparBuffer();
 
-    // Notificação exigindo ENTER do jogador para abrir as opções de ação
+    // Notificacao exigindo ENTER do jogador para abrir as opcoes de acao
     definirMensagemBanner("TURNO DO JOGADOR - PRESSIONE ENTER PARA ESCOLHER UMA ACAO", CorBanner::OURO);
     renderizarQuadroCombateD2D(currentPlayer, enemies, -1, -1, nullptr, 0, -1, false, false, 0);
     InputControl::aguardarEnter("Pressione ENTER para escolher uma acao...");
@@ -601,7 +595,7 @@ int TelaCombateRaycaster::obterAcaoDoJogador(int turnoAtual, Character* personag
 
         char tecla = InputControl::lerTecla();
 
-        // Check for Mouse Toggle of Log Panel
+        // Alternancia do painel de registro via clique do mouse
         if (GameWindow::mouseClicado()) {
             int mx = GameWindow::obterMouseX();
             int my = GameWindow::obterMouseY();
@@ -633,14 +627,14 @@ int TelaCombateRaycaster::obterAcaoDoJogador(int turnoAtual, Character* personag
             if (selecionado == 1) return 3; // Habilidade
             if (selecionado == 2) return 2; // Defender
             if (selecionado == 3) return 4; // Itens
-            if (selecionado == 4) return 6; // Diário
+            if (selecionado == 4) return 6; // Diario
         }
     }
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// Manual Target Selection with A / D Keys (Rapid Yellow Flash)
-// ═══════════════════════════════════════════════════════════════════
+
+// Selecao manual de alvo com teclas A e D
+
 
 int TelaCombateRaycaster::obterAlvoAtaque(const std::string& tituloCombate, const std::vector<Character*>& enemies, Character* currentPlayer, const std::vector<Character*>& aliados) {
     (void)tituloCombate; (void)aliados;
@@ -672,7 +666,7 @@ int TelaCombateRaycaster::obterAlvoAtaque(const std::string& tituloCombate, cons
             continue;
         }
 
-        // Navigate targets using A and D keys or Left / Right arrows
+        // Navega entre alvos usando as teclas A e D ou setas para esquerda e direita
         if (tecla == 'a' || tecla == 'A' || tecla == 75) {
             alvoSel = (alvoSel - 1 + (int)enemies.size()) % (int)enemies.size();
         } else if (tecla == 'd' || tecla == 'D' || tecla == 77) {

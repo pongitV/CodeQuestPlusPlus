@@ -17,7 +17,7 @@ public:
     static std::string formatCombatMsg(const std::string& text, Color themeColor = Color::WHITE);
     static std::string formatInteractionMsg(const std::string& text, Color themeColor = Color::CYAN);
 
-    // Métodos legados para compatibilidade
+    // Metodos legados para compatibilidade
     static std::string formatarMsgNarracao(const std::string& texto) { return formatNarrationMsg(texto); }
     static std::string formatarMsgSistema(const std::string& texto, Color corTema = Color::YELLOW) { return formatSystemMsg(texto, corTema); }
     static std::string formatarMsgHabilidade(const std::string& texto, Color corTema = Color::LIGHT_GREEN) { return formatAbilityMsg(texto, corTema); }

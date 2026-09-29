@@ -9,7 +9,7 @@
 #include "../../../ui/screens/combat/ScreenCombat.h"
 #include "../../../core/utils/Color.h"
 
-// --- INFORMAÇÕES DA CLASSE ---
+// Informacoes da classe
 std::string Mage::getClassName() const 
 {
      return "Mage"; 
@@ -36,7 +36,7 @@ std::vector<std::unique_ptr<Item>> Mage::getClassEquipment() const
     return equipment;
 }
 
-// --- PASSIVA DA CLASSE ---
+// Passiva da classe
 std::string Mage::getClassPassiveName() const 
 { 
     return "Foco arcano"; 
@@ -47,7 +47,7 @@ std::string Mage::getClassPassiveDescription() const
     return "Ataques ressoam (25% em area) ou causam +25% de damage em alvo unico."; 
 }
 
-// --- HABILIDADE DA CLASSE ---
+// Habilidade da classe
 std::string Mage::getClassAbilityCooldownDescription() const 
 { 
     return "Recarga: 3 turnos."; 
@@ -63,7 +63,7 @@ std::string Mage::getClassAbilityDescription() const
     return "Pula seu turno para se defender e dobra o damage no proximo turno. Recarga: 3 turnos."; 
 }
 
-void Mage::useClassAbility(Combat* /*combat*/, Character* userCharacter, std::vector<Character*>& /*enemyList*/) 
+void Mage::useClassAbility(Combat* /*combate*/, Character* userCharacter, std::vector<Character*>& /*listaInimigos*/) 
 {
     int remainingTurns = userCharacter->obterRecargaHabilidade(AbilityID::ArcaneChanneling);
     if (checkAndReportCooldown(userCharacter, remainingTurns, getClassAbilityName())) return;
@@ -83,8 +83,8 @@ void Mage::useClassAbility(Combat* /*combat*/, Character* userCharacter, std::ve
     }
 }
 
-// --- PROCESSAMENTO DE DANO ---
-int Mage::processPreAttackDamage(Character* /*attacker*/, Character* defender, int baseDamage, bool isAttackerPlayer, size_t enemyCount) {
+// Processamento de dano
+int Mage::processPreAttackDamage(Character* /*atacante*/, Character* defender, int baseDamage, bool isAttackerPlayer, size_t enemyCount) {
     if (defender == nullptr) return baseDamage;
     if (!isAttackerPlayer || enemyCount <= 1) {
         int increasedDamage = static_cast<int>(baseDamage * 1.25);

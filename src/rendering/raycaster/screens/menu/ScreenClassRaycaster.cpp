@@ -61,7 +61,7 @@ TelaClasse::Resultado TelaClasseRaycaster::display(const std::string& nomeJogado
             float logicalW = UIRenderer2D::LOGICAL_WIDTH;
             float logicalH = UIRenderer2D::LOGICAL_HEIGHT;
 
-            // Draw Top Box with Race and Name
+            // Desenha caixa superior com raca e nome
             std::string infoBoxStr = nomeJogador + " | " + nomeRaca;
             std::wstring wInfoBox(infoBoxStr.begin(), infoBoxStr.end());
             
@@ -89,7 +89,7 @@ TelaClasse::Resultado TelaClasseRaycaster::display(const std::string& nomeJogado
                 std::string spritePath = classe->obterCaminhoSprite();
                 GerenciadorTexturas2D::desenharImagem(d2d->obterRenderTarget(), spritePath, arteX, arteY, spriteWidth, spriteHeight);
 
-                // Right panel: Attributes and Skills
+                // Painel direito: atributos e habilidades
                 Attributes atr = classe->obterAtributosClasse();
                 float rightX = logicalW - 550.0f;
                 float rightY = 200.0f;
@@ -166,7 +166,7 @@ TelaClasse::Resultado TelaClasseRaycaster::display(const std::string& nomeJogado
             rt->EndDraw();
         }
 
-        // Process input captured at the top of the loop
+        // Processa a entrada capturada no inicio do laco
         if (tecla == 0) {
             std::this_thread::sleep_for(std::chrono::milliseconds(16));
             continue;

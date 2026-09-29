@@ -14,10 +14,10 @@
 #include "../rendering/raycaster/screens/map/ScreenMapWorldRaycaster.h"
 #include "../core/utils/Color.h"
 
-// ─── Adaptadores de UI ────────────────────────────────────────────────────────
-// Envoltórios leves que implementam as interfaces abstratas de UI delegando
-// para os métodos estáticos dos renderizadores do Raycaster.
-// Mantém as dependências concretas isoladas na raiz de composição.
+// Adaptadores de interface
+// Envoltorios leves que implementam as interfaces abstratas de UI delegando
+// para os metodos estaticos dos renderizadores do Raycaster.
+// Mantem as dependencias concretas isoladas na raiz de composicao.
 
 class AtributosUIAdapter : public IAtributosUI {
     void display(Character* jogador) override { TelaAtributosRaycaster::display(jogador); }

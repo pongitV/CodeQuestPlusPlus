@@ -39,7 +39,7 @@ void RaycasterHUD::desenharMinimapaProcedural(D2DRenderer& d2d, int screenWidth,
     float offsetX = 20.0f;
     float offsetY = 20.0f;
 
-    // Fundo metálico e borda do minimapa
+    // Fundo metalico e borda do minimapa
     d2d.preencherRetangulo(offsetX - 2.0f, offsetY - 2.0f, minimapWidth + 4.0f, minimapHeight + 4.0f, D2D1::ColorF(0.05f, 0.05f, 0.08f, 0.90f));
     d2d.desenharRetangulo(offsetX - 2.0f, offsetY - 2.0f, minimapWidth + 4.0f, minimapHeight + 4.0f, D2D1::ColorF(0.6f, 0.6f, 0.7f, 1.0f), 2.0f);
 
@@ -54,28 +54,28 @@ void RaycasterHUD::desenharMinimapaProcedural(D2DRenderer& d2d, int screenWidth,
             if (mapX >= 0 && mapX < larguraMapa && mapY >= 0 && mapY < alturaMapa) {
                 char c = matrizDoMapa[mapY][mapX];
                 
-                // Terreno e Células
+                // Terreno e Celulas
                 if (c == '#' || c == '=' || c == '|') {
                     // Parede de Pedra / Muro
                     d2d.preencherRetangulo(px + 0.5f, py + 0.5f, cellSize - 1.0f, cellSize - 1.0f, D2D1::ColorF(0.42f, 0.44f, 0.48f, 1.0f));
                 } else if (c == '*' || c == 'T' || c == 'F') {
-                    // Árvore / Folhagem
+                    // Arvore / Folhagem
                     d2d.preencherRetangulo(px + 0.5f, py + 0.5f, cellSize - 1.0f, cellSize - 1.0f, D2D1::ColorF(0.12f, 0.45f, 0.18f, 1.0f));
                 } else if (c == '~') {
-                    // Água
+                    // Agua
                     d2d.preencherRetangulo(px + 0.5f, py + 0.5f, cellSize - 1.0f, cellSize - 1.0f, D2D1::ColorF(0.10f, 0.40f, 0.85f, 1.0f));
                 } else if (c == 'D' || c == 'P' || c == 'B' || c == 'N' || c == 'M' || c == 'E' || c == 'S' || c == 'A' || c == 'R') {
-                    // Objeto Interativo / Porta / Baú / NPC
+                    // Objeto Interativo / Porta / Bau / NPC
                     d2d.preencherRetangulo(px + 0.5f, py + 0.5f, cellSize - 1.0f, cellSize - 1.0f, D2D1::ColorF(1.0f, 0.84f, 0.0f, 1.0f));
                 } else if (RaycasterWorld::isEntity(c)) {
                     // Inimigos (Vermelho Carmim)
                     d2d.preencherRetangulo(px + 0.5f, py + 0.5f, cellSize - 1.0f, cellSize - 1.0f, D2D1::ColorF(1.0f, 0.15f, 0.15f, 1.0f));
                 } else {
-                    // Chão Caminhável
+                    // Chao Caminhavel
                     d2d.preencherRetangulo(px + 0.5f, py + 0.5f, cellSize - 1.0f, cellSize - 1.0f, D2D1::ColorF(0.14f, 0.15f, 0.18f, 0.85f));
                 }
 
-                // Ícone do Jogador no Centro com Indicador de Direção
+                // Icone do Jogador no Centro com Indicador de Direcao
                 if (mx == minimapCols / 2 && my == minimapRows / 2) {
                     d2d.preencherRetangulo(px + 2.0f, py + 2.0f, cellSize - 4.0f, cellSize - 4.0f, D2D1::ColorF(0.0f, 1.0f, 0.5f, 1.0f));
                     float pCx = px + cellSize / 2.0f;
@@ -96,7 +96,7 @@ void RaycasterHUD::desenharBarraStatusProcedural(D2DRenderer& d2d, int screenWid
     float panelHeight = 140.0f;
     float offsetY = screenHeight - panelHeight;
 
-    // Fundo cinza escuro solido (evita transparência do rejunte quando anda)
+    // Fundo cinza escuro solido (evita transparencia do rejunte quando anda)
     d2d.preencherRetangulo(0, offsetY, screenWidth, panelHeight, D2D1::ColorF(0.12f, 0.12f, 0.14f, 1.0f));
     
     // Parede de pedras medievais (Tijolos procedurais)
@@ -139,9 +139,9 @@ void RaycasterHUD::desenharBarraStatusProcedural(D2DRenderer& d2d, int screenWid
         d2d.preencherRetangulo((float)i + 1.0f, offsetY + 4.0f, 1.0f, 1.0f, D2D1::ColorF(0.5f, 0.5f, 0.5f, 1.0f));
     }
 
-    // ═══════════════════════════════════════════════════════════════════
-    // PAINÉIS LADO ESQUERDO: ATRIBUTOS E STATUS & CURA
-    // ═══════════════════════════════════════════════════════════════════
+    
+    // Paineis lado esquerdo: atributos, status e cura
+    
     // 1. Caixa de Atributos (Extremo Esquerdo)
     float attrBoxX = 25.0f;
     float attrBoxY = offsetY + 15.0f;
@@ -214,9 +214,9 @@ void RaycasterHUD::desenharBarraStatusProcedural(D2DRenderer& d2d, int screenWid
     d2d.desenharTexto(L"Buffs: " + buffsStr, statusBoxX + 12.0f, statusTextY + 46.0f, bList.empty() ? D2D1::ColorF(0.7f, 0.7f, 0.7f) : D2D1::ColorF(0.2f, 1.0f, 0.5f), 12.0f);
     d2d.desenharTexto(L"Debuffs: " + debuffsStr, statusBoxX + 12.0f, statusTextY + 68.0f, dList.empty() ? D2D1::ColorF(0.7f, 0.7f, 0.7f) : D2D1::ColorF(1.0f, 0.3f, 0.3f), 12.0f);
 
-    // ═══════════════════════════════════════════════════════════════════
-    // PAINÉIS LADO DIREITO: EQUIPAMENTOS E CONTROLES
-    // ═══════════════════════════════════════════════════════════════════
+    
+    // Paineis lado direito: equipamentos e controles
+    
     // 3. Controles Box (Extremo Direito)
     float ctrlBoxX = screenWidth - 245.0f;
     float ctrlBoxY = offsetY + 15.0f;
@@ -261,9 +261,9 @@ void RaycasterHUD::desenharBarraStatusProcedural(D2DRenderer& d2d, int screenWid
     d2d.desenharTexto(L"Escudo: " + shName, eqTextX, eqTextY + 46.0f, D2D1::ColorF(0.9f, 0.9f, 0.9f), 12.0f);
     d2d.desenharTexto(L"Traje: " + arName, eqTextX, eqTextY + 68.0f, D2D1::ColorF(0.9f, 0.9f, 0.9f), 12.0f);
 
-    // ═══════════════════════════════════════════════════════════════════
-    // ÁREA CENTRAL DO HUD: ESCUDO OVAL-RETANGULAR METÁLICO (TEXTURIZADO)
-    // ═══════════════════════════════════════════════════════════════════
+    
+    // Area central do HUD: escudo oval-retangular metalico (texturizado)
+    
     float centerW = 440.0f; // Mais largo que alto
     float centerH = 140.0f;
     float centerX = (screenWidth - centerW) / 2.0f;
@@ -272,7 +272,7 @@ void RaycasterHUD::desenharBarraStatusProcedural(D2DRenderer& d2d, int screenWid
     if (d2d.obterRenderTarget()) {
         d2d.preencherRetangulo(centerX, pedY, centerW, centerH, D2D1::ColorF(0.15f, 0.17f, 0.20f, 1.0f));
 
-        // 2. Textura Procedural de Aço Escovado (Linhas Metálicas Horizontais com Shading)
+        // 2. Textura Procedural de Aco Escovado (Linhas Metalicas Horizontais com Shading)
         for (float y = pedY + 3.0f; y < pedY + centerH - 3.0f; y += 3.5f) {
             float distFromCenter = std::abs((y - (pedY + centerH / 2.0f)) / (centerH / 2.0f));
             float specHighlight = std::pow(1.0f - distFromCenter, 2.0f) * 0.08f;
@@ -295,11 +295,11 @@ void RaycasterHUD::desenharBarraStatusProcedural(D2DRenderer& d2d, int screenWid
             }
         }
 
-        // 4. Bisel Duplo Metálico Cinza Escuro
+        // 4. Bisel Duplo Metalico Cinza Escuro
         d2d.desenharRetangulo(centerX, pedY, centerW, centerH, D2D1::ColorF(0.30f, 0.32f, 0.36f, 1.0f), 3.0f);
         d2d.desenharRetangulo(centerX + 3.5f, pedY + 3.5f, centerW - 7.0f, centerH - 7.0f, D2D1::ColorF(0.30f, 0.32f, 0.36f, 1.0f), 1.5f);
 
-        // 5. Rebites Metálicos de Ferro nos Cantos do Escudo Oval
+        // 5. Rebites Metalicos de Ferro nos Cantos do Escudo Oval
         float rX[] = { centerX + 22.0f, centerX + centerW - 22.0f, centerX + 22.0f, centerX + centerW - 22.0f };
         float rY[] = { pedY + 16.0f, pedY + 16.0f, pedY + centerH - 16.0f, pedY + centerH - 16.0f };
         for (int i = 0; i < 4; ++i) {
@@ -326,7 +326,7 @@ void RaycasterHUD::desenharBarraStatusProcedural(D2DRenderer& d2d, int screenWid
     float hpX = (screenWidth - barW) / 2.0f + shakeOffsetX;
     float hpY = offsetY + 6.0f + shakeOffsetY;
     
-    // Fundo Carvão e Preenchimento Vermelho Sangue
+    // Fundo Carvao e Preenchimento Vermelho Sangue
     d2d.preencherRetangulo(hpX, hpY, barW, barH, D2D1::ColorF(0.18f, 0.04f, 0.04f, 0.9f));
     d2d.preencherRetangulo(hpX, hpY, barW * std::clamp(hpPercent, 0.0f, 1.0f), barH, D2D1::ColorF(0.82f, 0.05f, 0.05f, 1.0f));
 
@@ -350,7 +350,7 @@ void RaycasterHUD::desenharBarraStatusProcedural(D2DRenderer& d2d, int screenWid
         // < 30%: Vidro Quebrado Severo + Sangue Vazando pela Barra
         d2d.desenharRetangulo(hpX, hpY, barW, barH, D2D1::ColorF(1.0f, 0.15f, 0.15f, 0.95f), 2.0f);
         
-        // Fissuras profundas de vidro destruído (Usa brush cacheado do D2DRenderer)
+        // Fissuras profundas de vidro destruido (Usa brush cacheado do D2DRenderer)
         D2D1_COLOR_F deepCrackColor = D2D1::ColorF(1.0f, 0.9f, 0.9f, 0.95f);
         d2d.desenharLinha(hpX + barW * 0.15f, hpY + 1.0f, hpX + barW * 0.24f, hpY + barH - 1.0f, deepCrackColor, 1.8f);
         d2d.desenharLinha(hpX + barW * 0.20f, hpY + 6.0f, hpX + barW * 0.36f, hpY + 15.0f, deepCrackColor, 1.4f);
@@ -385,7 +385,7 @@ void RaycasterHUD::desenharBarraStatusProcedural(D2DRenderer& d2d, int screenWid
     float xpY = hpY + 24.0f;
 
     if (xpCheia) {
-        // Efeito de pulso em Luz Azul Neon quando a barra de XP está cheia
+        // Efeito de pulso em Luz Azul Neon quando a barra de XP esta cheia
         float pulse = (std::sin(GetTickCount64() * 0.007f) + 1.0f) * 0.5f; // 0.0 a 1.0
         d2d.preencherRetangulo(hpX, xpY, barW, barH, D2D1::ColorF(0.02f, 0.12f + pulse * 0.2f, 0.35f + pulse * 0.3f, 0.95f));
         d2d.preencherRetangulo(hpX, xpY, barW, barH, D2D1::ColorF(0.0f, 0.60f + pulse * 0.40f, 1.0f, 1.0f)); // Azul Brilhante Pulsante
@@ -412,7 +412,7 @@ void RaycasterHUD::desenharBarraStatusProcedural(D2DRenderer& d2d, int screenWid
     float nameX = (screenWidth / 2.0f) - (nameText.size() * 5.5f);
     d2d.desenharTexto(nameText, nameX, nameY, D2D1::ColorF(1.0f, 0.85f, 0.0f), 19.0f); // Texto Grande Dourado
 
-    // 4. Classe e Raça ("Classe" / "Raça") Centralizados
+    // 4. Classe e Raca ("Classe" / "Raca") Centralizados
     std::string racaStr = jogador->obterRaca() ? jogador->obterRaca()->getRaceName() : "Humano";
     std::string classeStr = jogador->getNameClasse();
 
@@ -423,7 +423,7 @@ void RaycasterHUD::desenharBarraStatusProcedural(D2DRenderer& d2d, int screenWid
     float infoX = (screenWidth / 2.0f) - (classRaceText.size() * 3.6f);
     d2d.desenharTexto(classRaceText, infoX, infoY, D2D1::ColorF(0.9f, 0.9f, 0.9f), 13.0f);
 
-    // 5. Ouro Info (Centralizado no Rodapé)
+    // 5. Ouro Info (Centralizado no Rodape)
     wstring goldText = L"Ouro: " + to_wstring(jogador->obterInventario()->obterOuro()) + L"g";
     float goldX = (screenWidth / 2.0f) - (goldText.size() * 3.5f);
     d2d.desenharTexto(goldText, goldX, infoY + 18.0f, D2D1::ColorF(1.0f, 0.84f, 0.0f), 13.0f);
@@ -480,7 +480,7 @@ void RaycasterHUD::desenharOpcoesCombateProcedural(D2DRenderer& d2d, int screenW
     d2d.preencherRetangulo(panelX, panelY, panelW, 4.0f, D2D1::ColorF(0.25f, 0.25f, 0.3f, 1.0f));
     d2d.preencherRetangulo(panelX, panelY + panelH - 4.0f, panelW, 4.0f, D2D1::ColorF(0.25f, 0.25f, 0.3f, 1.0f));
 
-    // Renderizar as 5 Opções de Combate ou o Aviso Customizado / PRESSIONE ENTER no Tema da HUD
+    // Renderizar as 5 Opcoes de Combate ou o Aviso Customizado / PRESSIONE ENTER no Tema da HUD
     if (opcaoSelecionada == -1) {
         float pulse = (std::sin(GetTickCount64() * 0.005f) + 1.0f) * 0.5f;
         D2D1_COLOR_F goldPulse = D2D1::ColorF(1.0f, 0.84f + pulse * 0.16f, pulse * 0.35f);

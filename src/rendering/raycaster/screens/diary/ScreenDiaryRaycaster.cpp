@@ -95,11 +95,11 @@ void TelaDiarioRaycaster::renderizarCaixa(const std::vector<std::string>& linhas
         float totalHeight = 40.0f + linhas.size() * 30.0f;
         float y = (logicalH - totalHeight) / 2.0f;
         
-        // y += 40.0f; // SetTitle makes Title draw inside border natively.
+        // y += 40.0f; // SetTitle desenha o titulo dentro da borda nativamente.
         for (const auto& l : linhas) {
             std::string plain = MenuRaycasterUtils::stripAnsi(l);
             if (plain.length() >= 5 && plain.substr(0, 5) == "[OPC]") {
-                std::string content = plain.substr(8); // "[OPC] > " or "[OPC]   "
+                std::string content = plain.substr(8); // Formato de exibicao da opcao selecionada ou nao selecionada
                 std::wstring wContent = MenuRaycasterUtils::utf8_to_wstring(content);
                 bool isSel = (plain.substr(5, 3) == " > ");
                 MenuRaycasterUtils::adicionarOpcaoMenu(box, wContent, logicalW / 2.0f, y, isSel, D2D1::ColorF(1.0f, 1.0f, 1.0f), true);
@@ -109,7 +109,7 @@ void TelaDiarioRaycaster::renderizarCaixa(const std::vector<std::string>& linhas
             }
             y += 30.0f;
         }
-        // Border color is fallback, SetTitle overrides it
+        // Cor da borda como reserva, SetTitle a sobrescreve
         box.Render(d2d, D2D1::ColorF(0.05f, 0.05f, 0.08f, 0.95f), 0.9f, 2.0f, D2D1::ColorF(1.0f, 0.6f, 0.0f), 20.0f, logicalW / 2.0f, logicalH / 2.0f);
         UIRenderer2D::ResetTransform(d2d);
     }

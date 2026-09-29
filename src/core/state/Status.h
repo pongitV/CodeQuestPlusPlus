@@ -65,7 +65,7 @@ public:
     virtual int processIncomingDamage(int damage) { return damage; }
     virtual bool preventsAction() const { return false; }
 
-    // Métodos legados para compatibilidade retroativa
+    // Metodos legados para compatibilidade retroativa
     EffectID obterID() const { return getId(); }
     int obterTurnosRestantes() const { return getRemainingTurns(); }
     void decrementarTurno() { decrementTurn(); }

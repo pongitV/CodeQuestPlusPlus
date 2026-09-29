@@ -45,11 +45,11 @@ const std::vector<std::string>& NPCPriest::getASCIIArt() const {
     return NPCPriestLayouts::priestArt;
 }
 
-std::vector<std::string> NPCPriest::getDialogue(Character* /*player*/) {
+std::vector<std::string> NPCPriest::getDialogue(Character* /*jogador*/) {
     return { "Que os Deuses iluminem seu caminho, filho." };
 }
 
-std::vector<std::string> NPCPriest::getMenuOptions(Character* /*player*/, int /*terminalWidth*/) {
+std::vector<std::string> NPCPriest::getMenuOptions(Character* /*jogador*/, int /*larguraTerminal*/) {
     return {
         "Pedir Bencao (Restaurar HP)",
         "Conversar sobre o Palacio",
@@ -57,7 +57,7 @@ std::vector<std::string> NPCPriest::getMenuOptions(Character* /*player*/, int /*
     };
 }
 
-void NPCPriest::processOption(Character* player, const std::string& option, int /*terminalWidth*/) {
+void NPCPriest::processOption(Character* player, const std::string& option, int /*larguraTerminal*/) {
     if (option == "Pedir Bencao (Restaurar HP)") {
         if (player->getHealth() >= player->getMaxHealth()) {
         } else {

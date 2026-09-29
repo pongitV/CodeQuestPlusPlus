@@ -22,7 +22,7 @@ std::string ConsumableItem::getItemName() const { return name; }
 
 EquipmentType ConsumableItem::getType() const { return EquipmentType::Consumable; }
 
-std::vector<std::string> ConsumableItem::getInspectionDetails(Character* /*character*/) const {
+std::vector<std::string> ConsumableItem::getInspectionDetails(Character* /*personagem*/) const {
     std::vector<std::string> details;
     details.push_back(" > Tipo: Consumable");
     if (!inspectionDescription.empty()) {
@@ -202,7 +202,7 @@ std::unique_ptr<Item> buildConsumableItem(ItemID id) {
             user->setItemSelectedForUse(item);
             return true;
         });
-        debuff->setUseAction([](Character* /*user*/, Character* target) {
+        debuff->setUseAction([](Character* /*usuario*/, Character* target) {
             if (!Character::isValid(target) || target->getHealth() <= 0) return;
             target->addEffect(std::make_unique<NecrosisEffect>(3, 12));
             TelaCombate::adicionarMensagemFixa("\n" + TelaCombate::margemCombate() + std::string(">> Voce arremessou a pocao! ") + target->getName() + " sofreu necrose (12 damage/turno) por 3 turnos!" + std::string("\n"));
@@ -219,7 +219,7 @@ std::unique_ptr<Item> buildConsumableItem(ItemID id) {
             user->setItemSelectedForUse(item);
             return true;
         });
-        debuff->setUseAction([](Character* /*user*/, Character* target) {
+        debuff->setUseAction([](Character* /*usuario*/, Character* target) {
             if (!Character::isValid(target) || target->getHealth() <= 0) return;
             target->addEffect(std::make_unique<SlowEffect>(3));
             TelaCombate::adicionarMensagemFixa("\n" + TelaCombate::margemCombate() + std::string(">> Voce arremessou a pocao! ") + target->getName() + " esta sob efeito de Lentidao por 3 turnos!" + std::string("\n"));
@@ -248,7 +248,7 @@ std::unique_ptr<Item> buildConsumableItem(ItemID id) {
                 user->setItemSelectedForUse(item);
                 return true;
             });
-            debuff->setUseAction([](Character* /*user*/, Character* target) {
+            debuff->setUseAction([](Character* /*usuario*/, Character* target) {
                 if (!Character::isValid(target) || target->getHealth() <= 0) return;
                 target->addEffect(std::make_unique<SlowEffect>(3));
             TelaCombate::adicionarMensagemFixa("\n" + TelaCombate::margemCombate() + std::string(">> Voce jogou o frasco! ") + target->getName() + " esta com lentidao por 3 turnos!" + std::string("\n"));
@@ -264,7 +264,7 @@ std::unique_ptr<Item> buildConsumableItem(ItemID id) {
                 user->setItemSelectedForUse(item);
                 return true;
             });
-            debuff->setUseAction([](Character* /*user*/, Character* target) {
+            debuff->setUseAction([](Character* /*usuario*/, Character* target) {
                 if (!Character::isValid(target) || target->getHealth() <= 0) return;
                 target->addEffect(std::make_unique<WeaknessEffect>(3));
             TelaCombate::adicionarMensagemFixa("\n" + TelaCombate::margemCombate() + std::string(">> Voce jogou o frasco! ") + target->getName() + " teve sua strength reduzida em 25% por 3 turnos!" + std::string("\n"));

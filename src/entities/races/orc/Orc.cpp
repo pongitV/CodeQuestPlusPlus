@@ -3,7 +3,7 @@
 #include <iostream>
 #include "../../../ui/screens/combat/ScreenCombat.h"
 
-// --- INFORMAÇÕES DA RAÇA ---
+// Informacoes da raca
 std::string Orc::getRaceName() const 
 {
     return "Ork";
@@ -14,14 +14,14 @@ Attributes Orc::getRaceAttributes() const
     return { 120, 20, 10, 0, 10, 5, 5 };
 }
 
-// --- APARÊNCIA ---
+// Aparencia
 const std::vector<std::string>& Orc::getRaceAppearance() const 
 {
     static const std::vector<std::string> appearance;
     return appearance;
 }
 
-// --- HABILIDADE DA RAÇA ---
+// Habilidade da raca
 std::string Orc::getRaceAbilityName() const 
 { 
     return "Furia cega"; 
@@ -32,7 +32,7 @@ std::string Orc::getRaceAbilityDescription() const
     return "Damage extra baseado na porcentagem de health perdida"; 
 }
 
-// --- PROCESSAMENTO DE DANO ---
+// Processamento de dano
 int Orc::processOffensiveDamage(int baseDamage, Character* attacker) 
 {
     double percHealthLost = 1.0 - (static_cast<double>(attacker->obterVida()) / attacker->obterVidaMaxima());

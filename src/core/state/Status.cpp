@@ -56,7 +56,7 @@ void ArmorBreakEffect::onExit(Character* target) {
     target->getFinalStats().constitution += lostConstitution;
 }
 
-void ArmorBreakEffect::applyTurnStart(Character* /*target*/) {
+void ArmorBreakEffect::applyTurnStart(Character* /*alvo*/) {
 }
 
 void BleedingEffect::applyTurnStart(Character* target) {
@@ -115,7 +115,7 @@ void AdaptationWheelEffect::onExit(Character* target) {
 void AdaptationWheelEffect::adapt(Character* target, Character* enemy) {
     if (!enemy) return;
     
-    // --- 1. Adaptação Defensiva (Baseada no inimigo) ---
+    // 1. Adaptacao Defensiva (Baseada no inimigo)
     int enemyPhysicalPower = enemy->getStrength() + enemy->getDexterity();
     int enemyMagicalPower = enemy->getIntelligence() + enemy->getWisdom();
     
@@ -132,7 +132,7 @@ void AdaptationWheelEffect::adapt(Character* target, Character* enemy) {
         msgDefesa = "defesa magica";
     }
 
-    // --- 2. Adaptação Ofensiva (Baseada na arma do jogador) ---
+    // 2. Adaptacao Ofensiva (Baseada na arma do jogador)
     int weaponPhysicalDamage = 1;
     int weaponMagicalDamage = 0;
     if (target->getWeapon()) {
@@ -152,7 +152,7 @@ void AdaptationWheelEffect::adapt(Character* target, Character* enemy) {
         bonusStrength += 2; bonusDexterity += 2;
         msgAtaque = "poder fisico";
     } else {
-        // Armas híbridas (ex: Espada de Extermínio)
+        // Armas hibridas (ex: Espada de Exterminio)
         target->alterStaticAttribute(AttributeType::Strength, 2); 
         target->alterStaticAttribute(AttributeType::Dexterity, 2);
         target->alterStaticAttribute(AttributeType::Intelligence, 2);

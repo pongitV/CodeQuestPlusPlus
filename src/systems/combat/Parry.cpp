@@ -62,7 +62,7 @@ bool Parry::attemptParry(Character* attacker, Character* defender, int mitigated
     bool success = false;
     std::string attackerName = attacker ? attacker->getName() : "Inimigo";
 
-    // Notificação de aviso do Parry exigindo ENTER do jogador para iniciar
+    // Notificacao de aviso do Parry exigindo ENTER do jogador para iniciar
     if (Parry::onUpdateScreen) {
         Parry::minigameMessage = "PARRY! " + attackerName + " VAI ATACAR! PRESSIONE ENTER PARA INICIAR (USARA ESPACO)";
         Parry::onUpdateScreen();

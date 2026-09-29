@@ -8,7 +8,7 @@
 #include "../../../ui/screens/combat/ScreenCombat.h"
 #include "../../../core/utils/DialogFunctions.h"
 
-// --- INFORMACOES DA RACA ---
+// Informacoes da raca
 std::string Slime::getRaceName() const 
 { 
     return "Slime"; 
@@ -26,11 +26,11 @@ std::vector<std::unique_ptr<Item>> Slime::getRaceEquipment() const
     return equipamentos;
 }
 
-// --- HABILIDADE DA RACA ---
+// Habilidade da raca
 std::string Slime::getRaceAbilityName() const { return "Toque Gosmento"; }
 std::string Slime::getRaceAbilityDescription() const { return "Ataques tem 20% de chance de causar Lentidao"; }
 
-// --- APARENCIA ---
+// Aparencia
 const std::vector<std::string>& Slime::getRaceAppearance() const
 {
     static const std::vector<std::string> appearance =
@@ -109,7 +109,7 @@ const std::vector<std::string>& Slime::getRaceAppearance() const
 
 
 
-// --- BESTIARIO E DROPS ---
+// Bestiario e drops
 BestiaryInfo Slime::getBestiaryInfo() const {
     return {
         "Forest", 
@@ -129,12 +129,12 @@ void Slime::performDrops(Character* enemy, Character* currentPlayer, std::vector
     Drops::giveAndProcessItem(currentPlayer, ItemID::NucleoPegajoso, 1, obtainedItems, 30);
 }
 
-// --- PROCESSAMENTO DE DANO  ---
-void Slime::onDealingDamage(Character* /*attacker*/, Character* target, int /*damageDealt*/) {
+// Processamento de dano
+void Slime::onDealingDamage(Character* /*atacante*/, Character* target, int /*danoCausado*/) {
     if (RandomGenerator::rollChance(15)) {
         if (!target->hasEffect(EffectID::Slow)) {
             target->addEffect(std::make_unique<SlowEffect>(3));
-            // A mensagem na UI foi removida para priorizar o combat limpo
+            // A mensagem na interface foi removida para priorizar o combate limpo
             // TelaCombate::adicionarMensagemFixa(msg);
         }
     }

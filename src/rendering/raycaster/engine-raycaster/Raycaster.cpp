@@ -154,7 +154,7 @@ char Raycaster::iniciarExploracao3D(const vector<string>& matrizDoMapa, float& j
         d2d->copiarBackbufferParaTextura();
     }
 
-    // 2. Disparar o Fade In cinematografico estilo Skyrim e initialize a animacao de queda do titulo do mapa
+    // 2. Disparar o fade-in cinematografico estilo Skyrim e inicializar a animacao de queda do titulo do mapa
     if (tipoAnimacaoEntrada == 1 || tipoAnimacaoEntrada == 2) {
         animacaoTituloMapaTimer = animacaoTituloMapaDuracao;
         arteTituloMapa = obterArteTituloMapaRaycaster(tituloMapa);
@@ -239,12 +239,12 @@ char Raycaster::iniciarExploracao3D(const vector<string>& matrizDoMapa, float& j
             return acaoRetorno;
         }
 
-        // --- RENDERIZACAO RAYCASTING (3D) ---
+        // Renderizacao raycasting (3D)
         float horizonteInterno = (ALTURA_INTERNA / 2.0f) + (bobbingOffset * 2) + (pitchOffset * ALTURA_INTERNA);
         int offsetGeral = (bobbingOffset * 2) + (int)(pitchOffset * ALTURA_INTERNA);
         
 
-        // --- CICLO DIA/NOITE GLOBAL ---
+        // Ciclo dia e noite global
         int temaAtivo = temaCeu;
         if (temaCeu == 1 || temaCeu == 2) {
             long long globalMs = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
@@ -292,7 +292,7 @@ char Raycaster::iniciarExploracao3D(const vector<string>& matrizDoMapa, float& j
                         
                         if (t < 0.3f) {
                             float progress = t / 0.3f;
-                            progress = 1.0f - (1.0f - progress) * (1.0f - progress); // ease out
+                            progress = 1.0f - (1.0f - progress) * (1.0f - progress); // Transicao suave de saida (ease out)
                             currentY = -height + (targetY + height) * progress;
                         } else if (t < 0.7f) {
                             currentY = targetY;
@@ -326,9 +326,9 @@ char Raycaster::iniciarExploracao3D(const vector<string>& matrizDoMapa, float& j
         GameWindow::mostrarCursor();
     }
 
-    // Ao apertar ESC, o loop morre, limpa o console e o controle volta para o game top-down padrao
+    // Ao pressionar ESC, encerra o laco, limpa o console e o controle retorna para o jogo top-down padrao
     InputControl::limparBuffer();
-    // So limpa a screen se o fechamento foi manual (ESC). Se bateu em entity, preserva a visao 3D como fundo pro Popup!
+    // So limpa a tela se o fechamento foi manual (ESC). Se colidiu com entidade, preserva a visao 3D como fundo para a janela suspensa
     if (outHitX == -1 && outHitY == -1) {
     }
     return 0;
@@ -393,7 +393,7 @@ void Raycaster::renderizarFundoAtualizadoD2D() {
     int ALTURA_INTERNA = ALTURA_TELA;
     std::vector<Pixel3D> tela3D(LARGURA_TELA * ALTURA_INTERNA);
 
-    // Keep horizontal bobbing exactly where it was frozen at 0
+    // Mantem a oscilacao horizontal congelada em zero
     float horizonteInterno = (ALTURA_INTERNA / 2.0f);
     int offsetGeral = 0;
     
@@ -414,7 +414,7 @@ void Raycaster::executarAnimacaoPortaAbrindo() {
     auto* d2d = D2DContext::renderer;
     if (!d2d) return;
 
-    const int TOTAL_FRAMES = 15; // Fade-in rapido e elegante de ~0.25s a 60 FPS
+    const int TOTAL_FRAMES = 15; // Fade-in rapido de cerca de 0.25s a 60 FPS
     const float screenW = (float)D2DRenderer::BACKBUFFER_WIDTH;
     const float screenH = (float)D2DRenderer::BACKBUFFER_HEIGHT;
 
@@ -429,7 +429,7 @@ void Raycaster::executarAnimacaoPortaAbrindo() {
         // 1. Desenhar o novo mapa 3D ao fundo
         RaycasterD2DUtils::desenharBitmapTelaCheia(*d2d, d2d->obterTexturaBackbuffer());
 
-        // 2. Camada preta de Fade Out suave cobrindo 100% da janela para revelar a visao 3D
+        // 2. Camada preta de fade-out suave cobrindo 100% da janela para revelar a visao 3D
         if (alphaPreto > 0.001f) {
             D2D1_SIZE_F rsz = d2d->obterRenderTarget()->GetSize();
             d2d->preencherRetangulo(0, 0, rsz.width, rsz.height, D2D1::ColorF(0.0f, 0.0f, 0.0f, alphaPreto));

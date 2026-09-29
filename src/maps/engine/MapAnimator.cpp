@@ -10,12 +10,12 @@
 #include "../../core/utils/Color.h"
 
 int MapAnimator::animateMapIntroduction(
-    const std::string& /*mapTitle*/,
+    const std::string& /*tituloMapa*/,
     const std::vector<std::string>& mapArt,
-    int /*artWidth*/,
+    int /*larguraArte*/,
     const std::vector<std::string>& transitionArt,
-    int /*transitionWidth*/,
-    Color /*themeColor*/,
+    int /*larguraTransicao*/,
+    Color /*corTema*/,
     const std::vector<std::string>& mapMatrix,
     int playerPosX,
     int playerPosY,

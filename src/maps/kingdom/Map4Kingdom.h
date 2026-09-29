@@ -6,7 +6,7 @@
 #include "../../entities/character/Character.h"
 #include "../interfaces/IMap.h"
 
-// KingdomMap represents the capital Kingdom map zone.
+// Representa a zona da capital do reino no mapa.
 // Controls main kingdom zone, Church sub-map, final boss encounters, and story conclusions.
 class Mapa4Reino final : public IMap 
 {

@@ -6,7 +6,7 @@
 #include "../../../core/utils/DialogFunctions.h"
 #include "../../../ui/screens/combat/ScreenCombat.h"
 
-// --- INFORMACOES DA RACA ---
+// Informacoes da raca
 std::string ForestAbomination::getRaceName() const 
 { 
     return "Abominacao da Forest"; 
@@ -17,7 +17,7 @@ Attributes ForestAbomination::getRaceAttributes() const
     return { 300, 30, 5, 20, 25, 0, 20 };
 }
 
-// --- HABILIDADE DA RACA ---
+// Habilidade da raca
 std::string ForestAbomination::getRaceAbilityName() const 
 { 
     return "Raizes Parasitas"; 
@@ -28,8 +28,8 @@ std::string ForestAbomination::getRaceAbilityDescription() const
     return "Abaixo de 40% de HP, recupera HP igual a 100% do damage causado ate 60% de HP"; 
 }
 
-// --- PROCESSAMENTO DE DANO  ---
-void ForestAbomination::onDealingDamage(Character* attacker, Character* /*target*/, int damageDealt) 
+// Processamento de dano
+void ForestAbomination::onDealingDamage(Character* attacker, Character* /*alvo*/, int damageDealt) 
 {
     int maxHealth = attacker->getMaxHealth();
     int currentHealth = attacker->getHealth();
@@ -59,7 +59,7 @@ void ForestAbomination::onDealingDamage(Character* attacker, Character* /*target
             if (healAmount > 0)
             {
                 attacker->modifyHealth(healAmount);
-                // A mensagem na UI foi removida para priorizar o combat limpo
+                // A mensagem na interface foi removida para priorizar o combate limpo
                 // TelaCombate::adicionarMensagemFixa(msg);
             }
         }
@@ -70,7 +70,7 @@ void ForestAbomination::onDealingDamage(Character* attacker, Character* /*target
     }
 }
 
-// --- APARENCIA ---
+// Aparencia
 const std::vector<std::string>& ForestAbomination::getRaceAppearance() const
 {
     static const std::vector<std::string> appearance =
@@ -154,7 +154,7 @@ const std::vector<std::string>& ForestAbomination::getRaceAppearance() const
 }
 
 
-// --- BESTIARIO E DROPS ---
+// Bestiario e drops
 BestiaryInfo ForestAbomination::getBestiaryInfo() const {
     return {
         "Forest", 

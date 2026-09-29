@@ -6,7 +6,7 @@
 #include "../../entities/character/Character.h"
 #include "../interfaces/IMap.h"
 
-// KingdomBridgeMap represents the Bridge to Kingdom transition map zone.
+// Representa a zona de transicao da ponte para o reino no mapa.
 // Controls bridge tile matrix, Troll boss trigger, and zone transition logic.
 class Mapa3PonteReino final : public IMap 
 {

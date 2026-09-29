@@ -282,7 +282,7 @@ ProximaTransicaoMapa Mapa1Vila::iniciarLoopDeExploracao()
         precisaRenderizar = false;
     };
 
-    // Substitui o Bjorn por uma placa se ele ainda nao foi resgatado (Antes de animar a screen)
+    // Substitui o Bjorn por uma placa se ele ainda nao foi resgatado (antes de animar a tela)
     if (tituloDoMapaAtual == "VILA INICIAL" && !bjornResgatado) {
         for (auto& linha : matrizDoMapaAtual) {
             std::replace(linha.begin(), linha.end(), 'B', 'P');

@@ -13,7 +13,7 @@
 #include "../../../ui/screens/combat/ScreenCombat.h"
 #include "../../../core/utils/Color.h"
 
-// --- INFORMAÇÕES DA CLASSE ---
+// Informacoes da classe
 std::string Bard::getClassName() const 
 {
      return "Bard"; 
@@ -40,7 +40,7 @@ std::vector<std::unique_ptr<Item>> Bard::getClassEquipment() const
     return equipment;
 }
 
-// --- PASSIVA DA CLASSE ---
+// Passiva da classe
 std::string Bard::getClassPassiveName() const 
 { 
     return "Touch the sky"; 
@@ -62,7 +62,7 @@ double Bard::processBardPassiveBuffMultiplier(double baseMultiplier) const
     return baseMultiplier;
 }
 
-// --- HABILIDADE DA CLASSE ---
+// Habilidade da classe
 std::string Bard::getClassAbilityCooldownDescription() const 
 { 
     return "Recarga: 3 turnos (Individuais)."; 
@@ -78,7 +78,7 @@ std::string Bard::getClassAbilityDescription() const
     return "Possui 3 habilidades: Flashing lights, On sight e Through the wire."; 
 }
 
-void Bard::useClassAbility(Combat* /*combat*/, Character* userCharacter, std::vector<Character*>& /*enemyList*/)
+void Bard::useClassAbility(Combat* /*combate*/, Character* userCharacter, std::vector<Character*>& /*listaInimigos*/)
 {
     struct SubAbility {
         AbilityID id;

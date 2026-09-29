@@ -454,7 +454,7 @@ Pixel3D RaycasterWorld::obterPixelChao(const std::string& tituloMapa, float curr
         else if (spiral > -0.3f) c = '.';
         else c = ' ';
     } else if (isCoracao) {
-        // Chão de musgo e terra para Coracao da Forest
+        // Chao de musgo e terra para Coracao da Forest
         float cx = (globX & 255) - 128.0f;
         float cy = (globY & 255) - 128.0f;
         float dist = std::sqrt(cx*cx + cy*cy);
@@ -657,7 +657,7 @@ char RaycasterWorld::obterSpriteChar(int /*mapX*/, int mapY, char c, const std::
         return c; // Retorna ! ou % para serem desenhados como sprite pelo RaycasterRenderer (IDE)
     }
     if (c == '@') {
-        return '@'; // Terminal hackeável
+        return '@'; // Terminal hackeavel
     }
     if (c == 'Y' || c == '*') {
         return c;
@@ -683,7 +683,7 @@ char RaycasterWorld::obterSpriteChar(int /*mapX*/, int mapY, char c, const std::
         return 'X';
     }
 
-    // Customizações para o PATIO DO REINO (e REINO) e Igreja
+    // Customizacoes para o PATIO DO REINO (e REINO) e Igreja
     if (flags.tituloUpper.find("PATIO DO REINO") != std::string::npos || flags.tituloUpper == "REINO") {
         if (c == 'F') return 'V'; // Franchesco
         if (c == 'N') return 'Z'; // Anok (Manequim)

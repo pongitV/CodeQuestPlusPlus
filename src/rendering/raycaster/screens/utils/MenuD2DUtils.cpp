@@ -71,14 +71,14 @@ static void atualizarFisicaCeleste(D2D1_SIZE_F tam, float dt) {
 
     float t = s_tempoMenuAnimacao / 120.0f;
 
-    // Calculate current Sun screen position
+    // Calcula a posicao do sol na tela
     float sunAng = (t - 0.25f) * 3.2f;
     float sunColFrac = (sunAng / 1.6f) + 0.5f;
     float sunScreenX = offsetX + sunColFrac * (cols * cellW);
     float sunRatioY = 0.5f - 0.2f * std::cos((t - 0.25f) * 2.0f * 3.14159f);
     float sunScreenY = offsetY + sunRatioY * (rows * cellH);
 
-    // Calculate current Moon screen position
+    // Calcula a posicao da lua na tela
     float moonAng = (t - 0.75f) * 3.2f;
     float moonColFrac = (moonAng / 1.6f) + 0.5f;
     float moonScreenX = offsetX + moonColFrac * (cols * cellW);
@@ -226,7 +226,7 @@ int renderizarMenuPadrao(
 
         float contentStartY = 100.0f;
         float opcoesStartCol = logicalW / 2.0f;
-        float menuTotalW = 400.0f; // Approx width for options
+        float menuTotalW = 400.0f; // Largura aproximada para as opcoes
         float artX = 0.0f;
         float artY = 0.0f;
 
@@ -237,7 +237,7 @@ int renderizarMenuPadrao(
             artY = contentStartY;
             opcoesStartCol = startX + arteW + 50.0f + menuTotalW / 2.0f;
             
-            // Calculate text block height to center vertically
+            // Calcula a altura do bloco de texto para centralizar verticalmente
             float blockH = 0.0f;
             if (!textoContexto.empty()) blockH += textoContexto.size() * 25.0f + 20.0f;
             blockH += opcoes.size() * 40.0f;
@@ -273,17 +273,17 @@ int renderizarMenuPadrao(
         } else {
             float opY = contentStartY;
             
-            // Draw Context Text
+            // Desenha texto de contexto
             if (!textoContexto.empty()) {
                 for (const auto& linha : textoContexto) {
                     std::wstring wLinha = MenuRaycasterUtils::utf8_to_wstring(linha);
                     box.AddText(wLinha, opcoesStartCol, opY, 16.0f, D2D1::ColorF(D2D1::ColorF::White), true);
                     opY += 25.0f;
                 }
-                opY += 20.0f; // Extra padding between text and options
+                opY += 20.0f; // Espacamento adicional entre texto e opcoes
             }
             
-            // Draw options if no custom builder provided or if it relies on this
+            // Desenha opcoes se nenhum construtor personalizado for fornecido
             for (int i = 0; i < (int)opcoes.size(); ++i) {
                 std::string opcStr = opcoes[i];
                 std::wstring wOpc(opcStr.begin(), opcStr.end());
@@ -350,10 +350,10 @@ int renderizarPopupCaixa(
             float logicalW = UIRenderer2D::LOGICAL_WIDTH;
             float logicalH = UIRenderer2D::LOGICAL_HEIGHT;
 
-            // Render Title Art
+            // Renderiza arte do titulo
             if (!tituloAscii.empty()) {
                 float baseScale = 8.0f;
-                // Zoom in and out animation (pulse)
+                // Animacao de pulsar (aproximacao e afastamento)
                 float scaleMultiplier = 1.0f + std::sin(s_tempoMenuAnimacao * 4.0f) * 0.1f;
                 float pixelScale = baseScale * scaleMultiplier;
                 
@@ -364,7 +364,7 @@ int renderizarPopupCaixa(
                 float asciiW = maxChars * pixelScale;
                 float asciiX = (logicalW - asciiW) / 2.0f;
                 
-                // Keep the center of the title steady while scaling
+                // Mantem o centro do titulo estavel durante a escala
                 float baseHeight = tituloAscii.size() * baseScale;
                 float currentHeight = tituloAscii.size() * pixelScale;
                 float asciiY = 50.0f - (currentHeight - baseHeight) / 2.0f;
@@ -389,7 +389,7 @@ int renderizarPopupCaixa(
         }
 
         if (handlerEntradaExtra && handlerEntradaExtra(tecla, selecaoAtual)) {
-            continue; // Extra handler took care of the key
+            continue; // Manipulador adicional tratou a tecla
         }
         
         if (numOpcoes > 0) {
@@ -410,7 +410,7 @@ int renderizarPopupCaixa(
 }
 
 void adicionarOpcaoMenu(UIDynamicBox& box, const std::wstring& texto, float x, float y, bool selecionado, D2D1_COLOR_F corBase, bool centralizado) {
-    // If centered, shift slightly to the left to compensate for the "> " prefix optical illusion
+    // Se centralizado, desloca levemente para a esquerda para compensar a ilusao de otica do prefixo "> "
     float drawX = centralizado ? (x - 12.0f) : x;
 
     if (selecionado) {

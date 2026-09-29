@@ -12,7 +12,7 @@ CorRGB GerenciadorTexturas::cache[256][16384];
 float GerenciadorTexturas::tabelaSin[4096];
 
 float GerenciadorTexturas::fastSin(float angle) {
-    // angle in radians. Normalize to 0-2PI
+    // Angulo em radianos, normalizado para 0 a 2PI
     constexpr float TWO_PI = 2.0f * 3.14159265f;
     float a = std::fmod(angle, TWO_PI);
     if (a < 0) a += TWO_PI;
@@ -120,7 +120,7 @@ void GerenciadorTexturas::initialize() {
     std::call_once(initFlag, []() {
         if (inicializado) return;
 
-        // Gerar tabelas trigonométricas
+        // Gerar tabelas trigonometricas
         for (int i = 0; i < 4096; i++) {
             tabelaSin[i] = std::sin((float)i / 4096.0f * 2.0f * 3.14159265f);
         }
@@ -151,7 +151,7 @@ void GerenciadorTexturas::initialize() {
     carregarPNGEmCache(TexID::PadraoEstrutura, "assets/walls/castleWalls.png");
     carregarPNGEmCache(TexID::FlorestaEstrutura, "assets/walls/forestWall.png");
 
-    // Chão de Ponte e Castelo / Labirinto / Reino
+    // Chao de Ponte e Castelo / Labirinto / Reino
     carregarPNGEmCache(TexID::PonteMadeira, "assets/floors/castleBridgeFloor.png");
     carregarPNGEmCache(TexID::ChaoLabirinto, "assets/floors/castleFloor.png");
     carregarPNGEmCache(TexID::ChaoLabirintoBorda, "assets/floors/castleFloor.png");
@@ -161,7 +161,7 @@ void GerenciadorTexturas::initialize() {
     carregarPNGEmCache(TexID::CavernaCoracaoParede, "assets/walls/caveWall.png");
     carregarPNGEmCache(TexID::SalaChefeParede, "assets/walls/caveWall.png");
 
-    // Chão de Caverna / Sala do Chefe
+    // Chao de Caverna / Sala do Chefe
     carregarPNGEmCache(TexID::ChaoCoracaoMusgo, "assets/floors/caveFloor.png");
     carregarPNGEmCache(TexID::ChaoCoracaoTerra, "assets/floors/caveFloor.png");
     carregarPNGEmCache(TexID::ChaoCoracaoEscuro, "assets/floors/caveFloor.png");
@@ -277,10 +277,10 @@ void GerenciadorTexturas::gerar(TexID id) {
                 case TexID::IgrejaVitral: {
                     // TEMA: Belos vitrais coloridos da igreja, filtrando luz celestial.
 
-                    // Temática da Igreja (Vitral, Altar, Parede, Teto)
+                    // Tematica da Igreja (Vitral, Altar, Parede, Teto)
                     float detail = fastSin(tx * 0.2f) * fastSin(ty * 0.2f);
                     if (id == TexID::IgrejaVitral) {
-                        // Coloridos vitrais em padrão de diamante
+                        // Coloridos vitrais em padrao de diamante
                         float diag = std::abs(fastSin((tx + ty)*0.1f) + fastSin((tx - ty)*0.1f));
                         if (diag < 0.2f) { r = 10; g = 10; b = 10; } // chumbo do vitral
                         else {
@@ -290,10 +290,10 @@ void GerenciadorTexturas::gerar(TexID id) {
                             if (colorId == 2) { r = 250; g = 200; b = 50; }
                         }
                     } else if (id == TexID::IgrejaAltar || id == TexID::IgrejaParedeAltar) {
-                        // Mármore com veios dourados
+                        // Marmore com veios dourados
                         float vein = std::abs(fastSin(tx * 0.1f + ty * 0.2f + fastSin(tx * 0.05f)*2.0f));
                         if (vein < 0.15f) { r = 230; g = 180; b = 50; } // Ouro
-                        else { r = 240; g = 240; b = 245; } // Mármore
+                        else { r = 240; g = 240; b = 245; } // Marmore
                     } else {
                         // Pedra clara sagrada
                         int bx = tx / 32; int by = ty / 32;
@@ -332,9 +332,9 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::Alchemist: {
-                    // TEMA: Azulejos e estantes de pedra sujos de poções do alquimista.
+                    // TEMA: Azulejos e estantes de pedra sujos de pocoes do alquimista.
 
-                    // Generic HD Pattern for other unspecified items
+                    // Padrao em alta definicao generico para itens nao especificados
                     float pattern = fastSin(tx * 0.2f) * fastCos(ty * 0.2f);
                     int base = 128 + (int)(pattern * 50);
                     r = std::clamp(base, 0, 255);
@@ -343,12 +343,12 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::EntradaIgreja: {
-                    // TEMA: Grandes portões pesados de madeira e pedra na entrada da igreja.
+                    // TEMA: Grandes portoes pesados de madeira e pedra na entrada da igreja.
 
-                    // Temática da Igreja (Vitral, Altar, Parede, Teto)
+                    // Tematica da Igreja (Vitral, Altar, Parede, Teto)
                     float detail = fastSin(tx * 0.2f) * fastSin(ty * 0.2f);
                     if (id == TexID::IgrejaVitral) {
-                        // Coloridos vitrais em padrão de diamante
+                        // Coloridos vitrais em padrao de diamante
                         float diag = std::abs(fastSin((tx + ty)*0.1f) + fastSin((tx - ty)*0.1f));
                         if (diag < 0.2f) { r = 10; g = 10; b = 10; } // chumbo do vitral
                         else {
@@ -358,10 +358,10 @@ void GerenciadorTexturas::gerar(TexID id) {
                             if (colorId == 2) { r = 250; g = 200; b = 50; }
                         }
                     } else if (id == TexID::IgrejaAltar || id == TexID::IgrejaParedeAltar) {
-                        // Mármore com veios dourados
+                        // Marmore com veios dourados
                         float vein = std::abs(fastSin(tx * 0.1f + ty * 0.2f + fastSin(tx * 0.05f)*2.0f));
                         if (vein < 0.15f) { r = 230; g = 180; b = 50; } // Ouro
-                        else { r = 240; g = 240; b = 245; } // Mármore
+                        else { r = 240; g = 240; b = 245; } // Marmore
                     } else {
                         // Pedra clara sagrada
                         int bx = tx / 32; int by = ty / 32;
@@ -375,9 +375,9 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::ManequimAnok: {
-                    // TEMA: Madeira talhada com inscrições de batalha, alvo de treinos de Anok.
+                    // TEMA: Madeira talhada com inscricoes de batalha, alvo de treinos de Anok.
 
-                    // Generic HD Pattern for other unspecified items
+                    // Padrao em alta definicao generico para itens nao especificados
                     float pattern = fastSin(tx * 0.2f) * fastCos(ty * 0.2f);
                     int base = 128 + (int)(pattern * 50);
                     r = std::clamp(base, 0, 255);
@@ -388,7 +388,7 @@ void GerenciadorTexturas::gerar(TexID id) {
                 case TexID::Franchesco: {
                     // TEMA: Tecidos finos e pedras polidas da loja do mercador Franchesco.
 
-                    // Generic HD Pattern for other unspecified items
+                    // Padrao em alta definicao generico para itens nao especificados
                     float pattern = fastSin(tx * 0.2f) * fastCos(ty * 0.2f);
                     int base = 128 + (int)(pattern * 50);
                     r = std::clamp(base, 0, 255);
@@ -399,7 +399,7 @@ void GerenciadorTexturas::gerar(TexID id) {
                 case TexID::Bjorn: {
                     // TEMA: Paredes brutas de ferro e pedra da forja de Bjorn.
 
-                    // Generic HD Pattern for other unspecified items
+                    // Padrao em alta definicao generico para itens nao especificados
                     float pattern = fastSin(tx * 0.2f) * fastCos(ty * 0.2f);
                     int base = 128 + (int)(pattern * 50);
                     r = std::clamp(base, 0, 255);
@@ -408,9 +408,9 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::Cavaleiro: {
-                    // TEMA: Superfície de pedra nobre com brasões, próxima ao cavaleiro.
+                    // TEMA: Superficie de pedra nobre com brasoes, proxima ao cavaleiro.
 
-                    // Generic HD Pattern for other unspecified items
+                    // Padrao em alta definicao generico para itens nao especificados
                     float pattern = fastSin(tx * 0.2f) * fastCos(ty * 0.2f);
                     int base = 128 + (int)(pattern * 50);
                     r = std::clamp(base, 0, 255);
@@ -444,12 +444,12 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::IgrejaAltar: {
-                    // TEMA: Mármore branco e dourado compondo o altar sagrado.
+                    // TEMA: Marmore branco e dourado compondo o altar sagrado.
 
-                    // Temática da Igreja (Vitral, Altar, Parede, Teto)
+                    // Tematica da Igreja (Vitral, Altar, Parede, Teto)
                     float detail = fastSin(tx * 0.2f) * fastSin(ty * 0.2f);
                     if (id == TexID::IgrejaVitral) {
-                        // Coloridos vitrais em padrão de diamante
+                        // Coloridos vitrais em padrao de diamante
                         float diag = std::abs(fastSin((tx + ty)*0.1f) + fastSin((tx - ty)*0.1f));
                         if (diag < 0.2f) { r = 10; g = 10; b = 10; } // chumbo do vitral
                         else {
@@ -459,10 +459,10 @@ void GerenciadorTexturas::gerar(TexID id) {
                             if (colorId == 2) { r = 250; g = 200; b = 50; }
                         }
                     } else if (id == TexID::IgrejaAltar || id == TexID::IgrejaParedeAltar) {
-                        // Mármore com veios dourados
+                        // Marmore com veios dourados
                         float vein = std::abs(fastSin(tx * 0.1f + ty * 0.2f + fastSin(tx * 0.05f)*2.0f));
                         if (vein < 0.15f) { r = 230; g = 180; b = 50; } // Ouro
-                        else { r = 240; g = 240; b = 245; } // Mármore
+                        else { r = 240; g = 240; b = 245; } // Marmore
                     } else {
                         // Pedra clara sagrada
                         int bx = tx / 32; int by = ty / 32;
@@ -478,10 +478,10 @@ void GerenciadorTexturas::gerar(TexID id) {
                 case TexID::IgrejaParede: {
                     // TEMA: Paredes sagradas de pedra lisa da igreja.
 
-                    // Temática da Igreja (Vitral, Altar, Parede, Teto)
+                    // Tematica da Igreja (Vitral, Altar, Parede, Teto)
                     float detail = fastSin(tx * 0.2f) * fastSin(ty * 0.2f);
                     if (id == TexID::IgrejaVitral) {
-                        // Coloridos vitrais em padrão de diamante
+                        // Coloridos vitrais em padrao de diamante
                         float diag = std::abs(fastSin((tx + ty)*0.1f) + fastSin((tx - ty)*0.1f));
                         if (diag < 0.2f) { r = 10; g = 10; b = 10; } // chumbo do vitral
                         else {
@@ -491,10 +491,10 @@ void GerenciadorTexturas::gerar(TexID id) {
                             if (colorId == 2) { r = 250; g = 200; b = 50; }
                         }
                     } else if (id == TexID::IgrejaAltar || id == TexID::IgrejaParedeAltar) {
-                        // Mármore com veios dourados
+                        // Marmore com veios dourados
                         float vein = std::abs(fastSin(tx * 0.1f + ty * 0.2f + fastSin(tx * 0.05f)*2.0f));
                         if (vein < 0.15f) { r = 230; g = 180; b = 50; } // Ouro
-                        else { r = 240; g = 240; b = 245; } // Mármore
+                        else { r = 240; g = 240; b = 245; } // Marmore
                     } else {
                         // Pedra clara sagrada
                         int bx = tx / 32; int by = ty / 32;
@@ -508,12 +508,12 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::IgrejaParedeAltar: {
-                    // TEMA: A parede principal logo atrás do altar, ricamente adornada.
+                    // TEMA: A parede principal logo atras do altar, ricamente adornada.
 
-                    // Temática da Igreja (Vitral, Altar, Parede, Teto)
+                    // Tematica da Igreja (Vitral, Altar, Parede, Teto)
                     float detail = fastSin(tx * 0.2f) * fastSin(ty * 0.2f);
                     if (id == TexID::IgrejaVitral) {
-                        // Coloridos vitrais em padrão de diamante
+                        // Coloridos vitrais em padrao de diamante
                         float diag = std::abs(fastSin((tx + ty)*0.1f) + fastSin((tx - ty)*0.1f));
                         if (diag < 0.2f) { r = 10; g = 10; b = 10; } // chumbo do vitral
                         else {
@@ -523,10 +523,10 @@ void GerenciadorTexturas::gerar(TexID id) {
                             if (colorId == 2) { r = 250; g = 200; b = 50; }
                         }
                     } else if (id == TexID::IgrejaAltar || id == TexID::IgrejaParedeAltar) {
-                        // Mármore com veios dourados
+                        // Marmore com veios dourados
                         float vein = std::abs(fastSin(tx * 0.1f + ty * 0.2f + fastSin(tx * 0.05f)*2.0f));
                         if (vein < 0.15f) { r = 230; g = 180; b = 50; } // Ouro
-                        else { r = 240; g = 240; b = 245; } // Mármore
+                        else { r = 240; g = 240; b = 245; } // Marmore
                     } else {
                         // Pedra clara sagrada
                         int bx = tx / 32; int by = ty / 32;
@@ -540,12 +540,12 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::IgrejaTeto: {
-                    // TEMA: Teto em arco da igreja, desenhado com padrões arquitetônicos altos.
+                    // TEMA: Teto em arco da igreja, desenhado com padroes arquitetonicos altos.
 
-                    // Temática da Igreja (Vitral, Altar, Parede, Teto)
+                    // Tematica da Igreja (Vitral, Altar, Parede, Teto)
                     float detail = fastSin(tx * 0.2f) * fastSin(ty * 0.2f);
                     if (id == TexID::IgrejaVitral) {
-                        // Coloridos vitrais em padrão de diamante
+                        // Coloridos vitrais em padrao de diamante
                         float diag = std::abs(fastSin((tx + ty)*0.1f) + fastSin((tx - ty)*0.1f));
                         if (diag < 0.2f) { r = 10; g = 10; b = 10; } // chumbo do vitral
                         else {
@@ -555,10 +555,10 @@ void GerenciadorTexturas::gerar(TexID id) {
                             if (colorId == 2) { r = 250; g = 200; b = 50; }
                         }
                     } else if (id == TexID::IgrejaAltar || id == TexID::IgrejaParedeAltar) {
-                        // Mármore com veios dourados
+                        // Marmore com veios dourados
                         float vein = std::abs(fastSin(tx * 0.1f + ty * 0.2f + fastSin(tx * 0.05f)*2.0f));
                         if (vein < 0.15f) { r = 230; g = 180; b = 50; } // Ouro
-                        else { r = 240; g = 240; b = 245; } // Mármore
+                        else { r = 240; g = 240; b = 245; } // Marmore
                     } else {
                         // Pedra clara sagrada
                         int bx = tx / 32; int by = ty / 32;
@@ -572,11 +572,11 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::PatioMuro: {
-                    // TEMA: Muros de pedra do pátio, cobertos por finos musgos.
+                    // TEMA: Muros de pedra do patio, cobertos por finos musgos.
 
-                    // Tijolos cobertos de musgo / Árvores densas
+                    // Tijolos cobertos de musgo / Arvores densas
                     if (id == TexID::ArvoreFloresta) {
-                        // Casca de árvore
+                        // Casca de arvore
                         float bark = fastSin(tx * 0.4f + fastSin(ty * 0.1f)*3.0f);
                         int baseR = 60, baseG = 40, baseB = 20;
                         r = std::clamp(baseR + (int)(bark*15), 0, 255);
@@ -600,11 +600,11 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::FlorestaEstrutura: {
-                    // TEMA: Ruínas esquecidas cobertas pela densa floresta.
+                    // TEMA: Ruinas esquecidas cobertas pela densa floresta.
 
-                    // Tijolos cobertos de musgo / Árvores densas
+                    // Tijolos cobertos de musgo / Arvores densas
                     if (id == TexID::ArvoreFloresta) {
-                        // Casca de árvore
+                        // Casca de arvore
                         float bark = fastSin(tx * 0.4f + fastSin(ty * 0.1f)*3.0f);
                         int baseR = 60, baseG = 40, baseB = 20;
                         r = std::clamp(baseR + (int)(bark*15), 0, 255);
@@ -628,11 +628,11 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::PadraoEstrutura: {
-                    // TEMA: Paredes de alvenaria abandonada genérica.
+                    // TEMA: Paredes de alvenaria abandonada generica.
 
-                    // Tijolos cobertos de musgo / Árvores densas
+                    // Tijolos cobertos de musgo / Arvores densas
                     if (id == TexID::ArvoreFloresta) {
-                        // Casca de árvore
+                        // Casca de arvore
                         float bark = fastSin(tx * 0.4f + fastSin(ty * 0.1f)*3.0f);
                         int baseR = 60, baseG = 40, baseB = 20;
                         r = std::clamp(baseR + (int)(bark*15), 0, 255);
@@ -656,15 +656,15 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::ArvoreCoracao: {
-                    // TEMA: Casca retorcida e viva das imensas árvores do coração.
+                    // TEMA: Casca retorcida e viva das imensas arvores do coracao.
 
-                    // Ambientes Corruptos/Vivos (Coloração, Chefe)
+                    // Ambientes Corruptos/Vivos (Coloracao, Chefe)
                     float distCenter = std::sqrt((tx-64.0f)*(tx-64.0f) + (ty-64.0f)*(ty-64.0f));
                     float spiral = fastSin(distCenter * 0.1f + fastSin(tx * 0.05f) * 3.0f);
                     float detail = fastSin(tx * 0.3f) * fastSin(ty * 0.3f);
                     
                     if (id == TexID::ArvoreCoracao || id == TexID::TetoIndoorsCoracaoMadeira) {
-                        // Raízes espirais e escuras pulsantes
+                        // Raizes espirais e escuras pulsantes
                         if (spiral > 0.0f) { r = 60; g = 20; b = 20; }
                         else { r = 40; g = 15; b = 15; }
                     } else if (id == TexID::ChaoCoracaoMusgo || id == TexID::TetoIndoorsCoracaoMusgo) {
@@ -672,7 +672,7 @@ void GerenciadorTexturas::gerar(TexID id) {
                         if (detail > 0.3f) { r = 50; g = 180; b = 80; }
                         else { r = 30; g = 100; b = 40; }
                     } else if (id == TexID::SalaChefeParede || id == TexID::ChaoSalaChefeDentro || id == TexID::ChaoSalaChefeFora) {
-                        // Rocha vulcânica vulcânica rasgada
+                        // Rocha vulcanica vulcanica rasgada
                         bool crack = std::abs(fastSin(tx*0.2f + ty*0.1f + fastSin(tx*0.1f)*5.0f)) < 0.1f;
                         if (crack) { r = 250; g = 100; b = 20; } // Lava
                         else {
@@ -725,7 +725,7 @@ void GerenciadorTexturas::gerar(TexID id) {
                     float sx = tx / stoneSize;
                     float sy = ty / stoneSize;
                     
-                    // Add noise to the coordinates to make the stones irregular
+                    // Adiciona ruido as coordenadas para tornar as pedras irregulares
                     float noiseX = fastSin(ty * 0.15f) * 0.5f;
                     float noiseY = fastSin(tx * 0.15f) * 0.5f;
                     
@@ -765,15 +765,15 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::SalaChefeParede: {
-                    // TEMA: Rochas negras e afiadas isolando a fúria do chefe.
+                    // TEMA: Rochas negras e afiadas isolando a furia do chefe.
 
-                    // Ambientes Corruptos/Vivos (Coloração, Chefe)
+                    // Ambientes Corruptos/Vivos (Coloracao, Chefe)
                     float distCenter = std::sqrt((tx-64.0f)*(tx-64.0f) + (ty-64.0f)*(ty-64.0f));
                     float spiral = fastSin(distCenter * 0.1f + fastSin(tx * 0.05f) * 3.0f);
                     float detail = fastSin(tx * 0.3f) * fastSin(ty * 0.3f);
                     
                     if (id == TexID::ArvoreCoracao || id == TexID::TetoIndoorsCoracaoMadeira) {
-                        // Raízes espirais e escuras pulsantes
+                        // Raizes espirais e escuras pulsantes
                         if (spiral > 0.0f) { r = 60; g = 20; b = 20; }
                         else { r = 40; g = 15; b = 15; }
                     } else if (id == TexID::ChaoCoracaoMusgo || id == TexID::TetoIndoorsCoracaoMusgo) {
@@ -781,7 +781,7 @@ void GerenciadorTexturas::gerar(TexID id) {
                         if (detail > 0.3f) { r = 50; g = 180; b = 80; }
                         else { r = 30; g = 100; b = 40; }
                     } else if (id == TexID::SalaChefeParede || id == TexID::ChaoSalaChefeDentro || id == TexID::ChaoSalaChefeFora) {
-                        // Rocha vulcânica vulcânica rasgada
+                        // Rocha vulcanica vulcanica rasgada
                         bool crack = std::abs(fastSin(tx*0.2f + ty*0.1f + fastSin(tx*0.1f)*5.0f)) < 0.1f;
                         if (crack) { r = 250; g = 100; b = 20; } // Lava
                         else {
@@ -798,9 +798,9 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::ParedeInvalida: {
-                    // TEMA: Fallback para texturas não encontradas.
+                    // TEMA: Fallback para texturas nao encontradas.
 
-                    // Generic HD Pattern for other unspecified items
+                    // Padrao em alta definicao generico para itens nao especificados
                     float pattern = fastSin(tx * 0.2f) * fastCos(ty * 0.2f);
                     int base = 128 + (int)(pattern * 50);
                     r = std::clamp(base, 0, 255);
@@ -809,7 +809,7 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::ChaoLabirintoBorda: {
-                    // TEMA: Borda do chão do labirinto, misturando pedra com terra úmida.
+                    // TEMA: Borda do chao do labirinto, misturando pedra com terra umida.
 
                     // Chaos (Labirinto, Terra, Padrao)
                     float noise = fastSin(tx * 0.2f) * fastSin(ty * 0.2f);
@@ -823,7 +823,7 @@ void GerenciadorTexturas::gerar(TexID id) {
                         g = std::clamp(base - 30, 0, 255);
                         b = std::clamp(base - 50, 0, 255);
                     } else {
-                        // Chao Padrao genérico poeira
+                        // Chao Padrao generico poeira
                         int base = 60 + (int)(noise * 15);
                         r = std::clamp(base, 0, 255);
                         g = std::clamp(base, 0, 255);
@@ -846,7 +846,7 @@ void GerenciadorTexturas::gerar(TexID id) {
                         g = std::clamp(base - 30, 0, 255);
                         b = std::clamp(base - 50, 0, 255);
                     } else {
-                        // Chao Padrao genérico poeira
+                        // Chao Padrao generico poeira
                         int base = 60 + (int)(noise * 15);
                         r = std::clamp(base, 0, 255);
                         g = std::clamp(base, 0, 255);
@@ -857,13 +857,13 @@ void GerenciadorTexturas::gerar(TexID id) {
                 case TexID::ChaoSalaChefeFora: {
                     // TEMA: Solo de pedra escura antes da entrada do chefe.
 
-                    // Ambientes Corruptos/Vivos (Coloração, Chefe)
+                    // Ambientes Corruptos/Vivos (Coloracao, Chefe)
                     float distCenter = std::sqrt((tx-64.0f)*(tx-64.0f) + (ty-64.0f)*(ty-64.0f));
                     float spiral = fastSin(distCenter * 0.1f + fastSin(tx * 0.05f) * 3.0f);
                     float detail = fastSin(tx * 0.3f) * fastSin(ty * 0.3f);
                     
                     if (id == TexID::ArvoreCoracao || id == TexID::TetoIndoorsCoracaoMadeira) {
-                        // Raízes espirais e escuras pulsantes
+                        // Raizes espirais e escuras pulsantes
                         if (spiral > 0.0f) { r = 60; g = 20; b = 20; }
                         else { r = 40; g = 15; b = 15; }
                     } else if (id == TexID::ChaoCoracaoMusgo || id == TexID::TetoIndoorsCoracaoMusgo) {
@@ -871,7 +871,7 @@ void GerenciadorTexturas::gerar(TexID id) {
                         if (detail > 0.3f) { r = 50; g = 180; b = 80; }
                         else { r = 30; g = 100; b = 40; }
                     } else if (id == TexID::SalaChefeParede || id == TexID::ChaoSalaChefeDentro || id == TexID::ChaoSalaChefeFora) {
-                        // Rocha vulcânica vulcânica rasgada
+                        // Rocha vulcanica vulcanica rasgada
                         bool crack = std::abs(fastSin(tx*0.2f + ty*0.1f + fastSin(tx*0.1f)*5.0f)) < 0.1f;
                         if (crack) { r = 250; g = 100; b = 20; } // Lava
                         else {
@@ -888,15 +888,15 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::ChaoSalaChefeDentro: {
-                    // TEMA: Piso vulcânico e irregular na arena do chefe.
+                    // TEMA: Piso vulcanico e irregular na arena do chefe.
 
-                    // Ambientes Corruptos/Vivos (Coloração, Chefe)
+                    // Ambientes Corruptos/Vivos (Coloracao, Chefe)
                     float distCenter = std::sqrt((tx-64.0f)*(tx-64.0f) + (ty-64.0f)*(ty-64.0f));
                     float spiral = fastSin(distCenter * 0.1f + fastSin(tx * 0.05f) * 3.0f);
                     float detail = fastSin(tx * 0.3f) * fastSin(ty * 0.3f);
                     
                     if (id == TexID::ArvoreCoracao || id == TexID::TetoIndoorsCoracaoMadeira) {
-                        // Raízes espirais e escuras pulsantes
+                        // Raizes espirais e escuras pulsantes
                         if (spiral > 0.0f) { r = 60; g = 20; b = 20; }
                         else { r = 40; g = 15; b = 15; }
                     } else if (id == TexID::ChaoCoracaoMusgo || id == TexID::TetoIndoorsCoracaoMusgo) {
@@ -904,7 +904,7 @@ void GerenciadorTexturas::gerar(TexID id) {
                         if (detail > 0.3f) { r = 50; g = 180; b = 80; }
                         else { r = 30; g = 100; b = 40; }
                     } else if (id == TexID::SalaChefeParede || id == TexID::ChaoSalaChefeDentro || id == TexID::ChaoSalaChefeFora) {
-                        // Rocha vulcânica vulcânica rasgada
+                        // Rocha vulcanica vulcanica rasgada
                         bool crack = std::abs(fastSin(tx*0.2f + ty*0.1f + fastSin(tx*0.1f)*5.0f)) < 0.1f;
                         if (crack) { r = 250; g = 100; b = 20; } // Lava
                         else {
@@ -921,15 +921,15 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::ChaoCoracaoMusgo: {
-                    // TEMA: Chão coberto de musgo espesso que pulsa health.
+                    // TEMA: Chao coberto de musgo espesso que pulsa health.
 
-                    // Ambientes Corruptos/Vivos (Coloração, Chefe)
+                    // Ambientes Corruptos/Vivos (Coloracao, Chefe)
                     float distCenter = std::sqrt((tx-64.0f)*(tx-64.0f) + (ty-64.0f)*(ty-64.0f));
                     float spiral = fastSin(distCenter * 0.1f + fastSin(tx * 0.05f) * 3.0f);
                     float detail = fastSin(tx * 0.3f) * fastSin(ty * 0.3f);
                     
                     if (id == TexID::ArvoreCoracao || id == TexID::TetoIndoorsCoracaoMadeira) {
-                        // Raízes espirais e escuras pulsantes
+                        // Raizes espirais e escuras pulsantes
                         if (spiral > 0.0f) { r = 60; g = 20; b = 20; }
                         else { r = 40; g = 15; b = 15; }
                     } else if (id == TexID::ChaoCoracaoMusgo || id == TexID::TetoIndoorsCoracaoMusgo) {
@@ -937,7 +937,7 @@ void GerenciadorTexturas::gerar(TexID id) {
                         if (detail > 0.3f) { r = 50; g = 180; b = 80; }
                         else { r = 30; g = 100; b = 40; }
                     } else if (id == TexID::SalaChefeParede || id == TexID::ChaoSalaChefeDentro || id == TexID::ChaoSalaChefeFora) {
-                        // Rocha vulcânica vulcânica rasgada
+                        // Rocha vulcanica vulcanica rasgada
                         bool crack = std::abs(fastSin(tx*0.2f + ty*0.1f + fastSin(tx*0.1f)*5.0f)) < 0.1f;
                         if (crack) { r = 250; g = 100; b = 20; } // Lava
                         else {
@@ -954,15 +954,15 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::ChaoCoracaoTerra: {
-                    // TEMA: Terra fértil, espiralada e macia da área do coração.
+                    // TEMA: Terra fertil, espiralada e macia da area do coracao.
 
-                    // Ambientes Corruptos/Vivos (Coloração, Chefe)
+                    // Ambientes Corruptos/Vivos (Coloracao, Chefe)
                     float distCenter = std::sqrt((tx-64.0f)*(tx-64.0f) + (ty-64.0f)*(ty-64.0f));
                     float spiral = fastSin(distCenter * 0.1f + fastSin(tx * 0.05f) * 3.0f);
                     float detail = fastSin(tx * 0.3f) * fastSin(ty * 0.3f);
                     
                     if (id == TexID::ArvoreCoracao || id == TexID::TetoIndoorsCoracaoMadeira) {
-                        // Raízes espirais e escuras pulsantes
+                        // Raizes espirais e escuras pulsantes
                         if (spiral > 0.0f) { r = 60; g = 20; b = 20; }
                         else { r = 40; g = 15; b = 15; }
                     } else if (id == TexID::ChaoCoracaoMusgo || id == TexID::TetoIndoorsCoracaoMusgo) {
@@ -970,7 +970,7 @@ void GerenciadorTexturas::gerar(TexID id) {
                         if (detail > 0.3f) { r = 50; g = 180; b = 80; }
                         else { r = 30; g = 100; b = 40; }
                     } else if (id == TexID::SalaChefeParede || id == TexID::ChaoSalaChefeDentro || id == TexID::ChaoSalaChefeFora) {
-                        // Rocha vulcânica vulcânica rasgada
+                        // Rocha vulcanica vulcanica rasgada
                         bool crack = std::abs(fastSin(tx*0.2f + ty*0.1f + fastSin(tx*0.1f)*5.0f)) < 0.1f;
                         if (crack) { r = 250; g = 100; b = 20; } // Lava
                         else {
@@ -987,15 +987,15 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::ChaoCoracaoEscuro: {
-                    // TEMA: Raízes mortas e terra petrificada nas sombras.
+                    // TEMA: Raizes mortas e terra petrificada nas sombras.
 
-                    // Ambientes Corruptos/Vivos (Coloração, Chefe)
+                    // Ambientes Corruptos/Vivos (Coloracao, Chefe)
                     float distCenter = std::sqrt((tx-64.0f)*(tx-64.0f) + (ty-64.0f)*(ty-64.0f));
                     float spiral = fastSin(distCenter * 0.1f + fastSin(tx * 0.05f) * 3.0f);
                     float detail = fastSin(tx * 0.3f) * fastSin(ty * 0.3f);
                     
                     if (id == TexID::ArvoreCoracao || id == TexID::TetoIndoorsCoracaoMadeira) {
-                        // Raízes espirais e escuras pulsantes
+                        // Raizes espirais e escuras pulsantes
                         if (spiral > 0.0f) { r = 60; g = 20; b = 20; }
                         else { r = 40; g = 15; b = 15; }
                     } else if (id == TexID::ChaoCoracaoMusgo || id == TexID::TetoIndoorsCoracaoMusgo) {
@@ -1003,7 +1003,7 @@ void GerenciadorTexturas::gerar(TexID id) {
                         if (detail > 0.3f) { r = 50; g = 180; b = 80; }
                         else { r = 30; g = 100; b = 40; }
                     } else if (id == TexID::SalaChefeParede || id == TexID::ChaoSalaChefeDentro || id == TexID::ChaoSalaChefeFora) {
-                        // Rocha vulcânica vulcânica rasgada
+                        // Rocha vulcanica vulcanica rasgada
                         bool crack = std::abs(fastSin(tx*0.2f + ty*0.1f + fastSin(tx*0.1f)*5.0f)) < 0.1f;
                         if (crack) { r = 250; g = 100; b = 20; } // Lava
                         else {
@@ -1044,7 +1044,7 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::ChaoGramaVila: {
-                    // TEMA: Grama vibrante, macia e aparada da pacífica vila.
+                    // TEMA: Grama vibrante, macia e aparada da pacifica vila.
 
                     float nx = tx * 0.15f;
                     float ny = ty * 0.15f;
@@ -1082,7 +1082,7 @@ void GerenciadorTexturas::gerar(TexID id) {
                         g = std::clamp(base - 30, 0, 255);
                         b = std::clamp(base - 50, 0, 255);
                     } else {
-                        // Chao Padrao genérico poeira
+                        // Chao Padrao generico poeira
                         int base = 60 + (int)(noise * 15);
                         r = std::clamp(base, 0, 255);
                         g = std::clamp(base, 0, 255);
@@ -1091,7 +1091,7 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::ChaoPadrao: {
-                    // TEMA: Solo básico de poeira e pedregulhos finos.
+                    // TEMA: Solo basico de poeira e pedregulhos finos.
 
                     // Chaos (Labirinto, Terra, Padrao)
                     float noise = fastSin(tx * 0.2f) * fastSin(ty * 0.2f);
@@ -1105,7 +1105,7 @@ void GerenciadorTexturas::gerar(TexID id) {
                         g = std::clamp(base - 30, 0, 255);
                         b = std::clamp(base - 50, 0, 255);
                     } else {
-                        // Chao Padrao genérico poeira
+                        // Chao Padrao generico poeira
                         int base = 60 + (int)(noise * 15);
                         r = std::clamp(base, 0, 255);
                         g = std::clamp(base, 0, 255);
@@ -1114,15 +1114,15 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::TetoIndoorsCoracaoMusgo: {
-                    // TEMA: Teto abobadado de rocha incrustado de musgos biológicoscentes.
+                    // TEMA: Teto abobadado de rocha incrustado de musgos biologicoscentes.
 
-                    // Ambientes Corruptos/Vivos (Coloração, Chefe)
+                    // Ambientes Corruptos/Vivos (Coloracao, Chefe)
                     float distCenter = std::sqrt((tx-64.0f)*(tx-64.0f) + (ty-64.0f)*(ty-64.0f));
                     float spiral = fastSin(distCenter * 0.1f + fastSin(tx * 0.05f) * 3.0f);
                     float detail = fastSin(tx * 0.3f) * fastSin(ty * 0.3f);
                     
                     if (id == TexID::ArvoreCoracao || id == TexID::TetoIndoorsCoracaoMadeira) {
-                        // Raízes espirais e escuras pulsantes
+                        // Raizes espirais e escuras pulsantes
                         if (spiral > 0.0f) { r = 60; g = 20; b = 20; }
                         else { r = 40; g = 15; b = 15; }
                     } else if (id == TexID::ChaoCoracaoMusgo || id == TexID::TetoIndoorsCoracaoMusgo) {
@@ -1130,7 +1130,7 @@ void GerenciadorTexturas::gerar(TexID id) {
                         if (detail > 0.3f) { r = 50; g = 180; b = 80; }
                         else { r = 30; g = 100; b = 40; }
                     } else if (id == TexID::SalaChefeParede || id == TexID::ChaoSalaChefeDentro || id == TexID::ChaoSalaChefeFora) {
-                        // Rocha vulcânica vulcânica rasgada
+                        // Rocha vulcanica vulcanica rasgada
                         bool crack = std::abs(fastSin(tx*0.2f + ty*0.1f + fastSin(tx*0.1f)*5.0f)) < 0.1f;
                         if (crack) { r = 250; g = 100; b = 20; } // Lava
                         else {
@@ -1147,15 +1147,15 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::TetoIndoorsCoracaoMadeira: {
-                    // TEMA: Raízes gigantescas se entrelaçando no teto acima.
+                    // TEMA: Raizes gigantescas se entrelacando no teto acima.
 
-                    // Ambientes Corruptos/Vivos (Coloração, Chefe)
+                    // Ambientes Corruptos/Vivos (Coloracao, Chefe)
                     float distCenter = std::sqrt((tx-64.0f)*(tx-64.0f) + (ty-64.0f)*(ty-64.0f));
                     float spiral = fastSin(distCenter * 0.1f + fastSin(tx * 0.05f) * 3.0f);
                     float detail = fastSin(tx * 0.3f) * fastSin(ty * 0.3f);
                     
                     if (id == TexID::ArvoreCoracao || id == TexID::TetoIndoorsCoracaoMadeira) {
-                        // Raízes espirais e escuras pulsantes
+                        // Raizes espirais e escuras pulsantes
                         if (spiral > 0.0f) { r = 60; g = 20; b = 20; }
                         else { r = 40; g = 15; b = 15; }
                     } else if (id == TexID::ChaoCoracaoMusgo || id == TexID::TetoIndoorsCoracaoMusgo) {
@@ -1163,7 +1163,7 @@ void GerenciadorTexturas::gerar(TexID id) {
                         if (detail > 0.3f) { r = 50; g = 180; b = 80; }
                         else { r = 30; g = 100; b = 40; }
                     } else if (id == TexID::SalaChefeParede || id == TexID::ChaoSalaChefeDentro || id == TexID::ChaoSalaChefeFora) {
-                        // Rocha vulcânica vulcânica rasgada
+                        // Rocha vulcanica vulcanica rasgada
                         bool crack = std::abs(fastSin(tx*0.2f + ty*0.1f + fastSin(tx*0.1f)*5.0f)) < 0.1f;
                         if (crack) { r = 250; g = 100; b = 20; } // Lava
                         else {
@@ -1180,15 +1180,15 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::TetoIndoorsCoracaoEscuro: {
-                    // TEMA: Teto cavernoso e negro onde a luz mal consegue alcançar.
+                    // TEMA: Teto cavernoso e negro onde a luz mal consegue alcancar.
 
-                    // Ambientes Corruptos/Vivos (Coloração, Chefe)
+                    // Ambientes Corruptos/Vivos (Coloracao, Chefe)
                     float distCenter = std::sqrt((tx-64.0f)*(tx-64.0f) + (ty-64.0f)*(ty-64.0f));
                     float spiral = fastSin(distCenter * 0.1f + fastSin(tx * 0.05f) * 3.0f);
                     float detail = fastSin(tx * 0.3f) * fastSin(ty * 0.3f);
                     
                     if (id == TexID::ArvoreCoracao || id == TexID::TetoIndoorsCoracaoMadeira) {
-                        // Raízes espirais e escuras pulsantes
+                        // Raizes espirais e escuras pulsantes
                         if (spiral > 0.0f) { r = 60; g = 20; b = 20; }
                         else { r = 40; g = 15; b = 15; }
                     } else if (id == TexID::ChaoCoracaoMusgo || id == TexID::TetoIndoorsCoracaoMusgo) {
@@ -1196,7 +1196,7 @@ void GerenciadorTexturas::gerar(TexID id) {
                         if (detail > 0.3f) { r = 50; g = 180; b = 80; }
                         else { r = 30; g = 100; b = 40; }
                     } else if (id == TexID::SalaChefeParede || id == TexID::ChaoSalaChefeDentro || id == TexID::ChaoSalaChefeFora) {
-                        // Rocha vulcânica vulcânica rasgada
+                        // Rocha vulcanica vulcanica rasgada
                         bool crack = std::abs(fastSin(tx*0.2f + ty*0.1f + fastSin(tx*0.1f)*5.0f)) < 0.1f;
                         if (crack) { r = 250; g = 100; b = 20; } // Lava
                         else {
@@ -1213,9 +1213,9 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 case TexID::TetoIndoorsPadrao: {
-                    // TEMA: Um teto genérico e plano de pedra rústica para interiores.
+                    // TEMA: Um teto generico e plano de pedra rustica para interiores.
 
-                    // Generic HD Pattern for other unspecified items
+                    // Padrao em alta definicao generico para itens nao especificados
                     float pattern = fastSin(tx * 0.2f) * fastCos(ty * 0.2f);
                     int base = 128 + (int)(pattern * 50);
                     r = std::clamp(base, 0, 255);
@@ -1224,7 +1224,7 @@ void GerenciadorTexturas::gerar(TexID id) {
                     break;
                 }
                 default: {
-                    // TEMA: Textura de depuração para TexIDs não implementados
+                    // TEMA: Textura de depuracao para TexIDs nao implementados
                     bool checker = ((tx / 16) % 2) == ((ty / 16) % 2);
                     r = checker ? 255 : 0;
                     g = 0;

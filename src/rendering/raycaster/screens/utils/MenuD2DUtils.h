@@ -13,7 +13,7 @@ namespace MenuRaycasterUtils {
     extern float s_tempoMenuAnimacao;
     extern bool s_mostrarLogoAbertura;
     
-    // Renders sky and map grid. Pass abrirFrame=true to open a BeginDraw before drawing.
+    // Renderiza ceu e grade do mapa. Passe abrirFrame=true para abrir um BeginDraw antes do desenho.
     void desenharFundoNativoD2D(bool abrirFrame = false);
 
     // General purpose box popup loop

@@ -111,17 +111,17 @@ public:
                 if (c == 0xE2) { 
                     if (i + 2 < linha.length() && static_cast<unsigned char>(linha[i+1]) == 0x94) {
                         unsigned char b3 = linha[i+2];
-                        if (b3 == 0x80) novaLinha += "=";      // ─
-                        else if (b3 == 0x82) novaLinha += "|"; // │
-                        else if (b3 == 0x8C) novaLinha += "."; // ┌
-                        else if (b3 == 0x90) novaLinha += "."; // ┐
-                        else if (b3 == 0x94) novaLinha += "'"; // └
-                        else if (b3 == 0x98) novaLinha += "'"; // ┘
-                        else if (b3 == 0x9C) novaLinha += "|"; // ├
-                        else if (b3 == 0xA4) novaLinha += "|"; // ┤
-                        else if (b3 == 0xAC) novaLinha += "."; // ┬
-                        else if (b3 == 0xB4) novaLinha += "'"; // ┴
-                        else if (b3 == 0xBC) novaLinha += "+"; // ┼
+                        if (b3 == 0x80) novaLinha += "=";      // 
+                        else if (b3 == 0x82) novaLinha += "|"; // 
+                        else if (b3 == 0x8C) novaLinha += "."; // 
+                        else if (b3 == 0x90) novaLinha += "."; // 
+                        else if (b3 == 0x94) novaLinha += "'"; // 
+                        else if (b3 == 0x98) novaLinha += "'"; // 
+                        else if (b3 == 0x9C) novaLinha += "|"; // 
+                        else if (b3 == 0xA4) novaLinha += "|"; // 
+                        else if (b3 == 0xAC) novaLinha += "."; // 
+                        else if (b3 == 0xB4) novaLinha += "'"; // 
+                        else if (b3 == 0xBC) novaLinha += "+"; // 
                         else novaLinha += "?";
                         i += 3;
                     } else {

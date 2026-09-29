@@ -14,7 +14,7 @@
 #include "../../races/RaceBase.h"
 #include "../../../core/utils/Color.h"
 
-// --- INFORMAÇÕES DA CLASSE ---
+// Informacoes da classe
 std::string Necromancer::getClassName() const {
     return "Necromancer";
 }
@@ -35,7 +35,7 @@ std::vector<std::unique_ptr<Item>> Necromancer::getClassEquipment() const {
     return equipment;
 }
 
-// --- PASSIVA DA CLASSE ---
+// Passiva da classe
 std::string Necromancer::getClassPassiveName() const {
     return "Toque Necrotico";
 }
@@ -46,7 +46,7 @@ std::string Necromancer::getClassPassiveDescription() const {
 }
 
 void Necromancer::executeAttackWithClassPassive(Character* attacker, Character* defender, int baseDamage, int piercingDamage, std::vector<std::unique_ptr<Character>>& enemyList, const std::function<void(Character*, Character*, int, int)>& applyDamage, bool applyPassive) {
-    // Comportamento padrão: apenas ataca o alvo principal ou todos se a arma for de área
+    // Comportamento padrao: apenas ataca o alvo principal ou todos se a arma for de area
     ClassBase::executeAttackWithClassPassive(attacker, defender, baseDamage, piercingDamage, enemyList,
         [&](Character* atk, Character* def, int dmg, int perf) {
             // Callback para aplicar o dano e depois o efeito da passiva
@@ -61,7 +61,7 @@ void Necromancer::executeAttackWithClassPassive(Character* attacker, Character* 
         }, applyPassive);
 }
 
-// --- HABILIDADE DA CLASSE ---
+// Habilidade da classe
 std::string Necromancer::getClassAbilityCooldownDescription() const {
     return "Recarga: Nenhuma (consome 1 alma).";
 }
@@ -74,7 +74,7 @@ std::string Necromancer::getClassAbilityDescription() const {
     return "Usa uma alma para invocar um clone com 80% dos attributes (Chefes 60%). Max: 3 lacaios.\nLacaios perdem 15% de sua Health Max a cada turno do jogador.";
 }
 
-void Necromancer::useClassAbility(Combat* combat, Character* userCharacter, std::vector<Character*>& /*enemyList*/) {
+void Necromancer::useClassAbility(Combat* combat, Character* userCharacter, std::vector<Character*>& /*listaInimigos*/) {
     bool hasMiniBoss = false;
     int minionCount = 0;
     for (const auto& ally : combat->obterAliadosVivosRaw()) {
@@ -172,7 +172,7 @@ void Necromancer::useClassAbility(Combat* combat, Character* userCharacter, std:
                 userCharacter->definirHabilidadeCancelada(true);
                 return;
             }
-            break; // Para as invocações mas mantém as que já foram feitas
+            break; // Para as invocacoes mas mantem as que ja foram feitas
         }
 
         int realIndexToRemove = groups[choice].firstIndex;
@@ -201,11 +201,11 @@ void Necromancer::useClassAbility(Combat* combat, Character* userCharacter, std:
                 std::string msgBoss = DialogFunctions::formatarMsgSistema("A invocacao de um Chefe consumiu seu foco! Invocacoes adicionais canceladas.", Color::YELLOW);
                 notifyCombatMessage(msgBoss, msgBoss);
             }
-            break; // Interrompe o laço
+            break; // Interrompe o laco
         }
     }
     
-    // Se invocou mais de um minion na mesma ação, eles saltam seu turno ("Stun") para que o inimigo atue de imediato!
+    // Se invocou mais de um minion na mesma acao, eles saltam seu turno ("Stun") para que o inimigo atue de imediato!
     if (newlySummonedMinions.size() > 1) {
         std::string msg = DialogFunctions::formatarMsgSistema("A invocacao multipla exauriu seu controle! O turno enemy comecara imediatamente!", Color::LIGHT_RED);
         notifyCombatMessage(msg, msg);

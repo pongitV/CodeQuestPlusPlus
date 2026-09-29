@@ -5,7 +5,7 @@
 #include "../../entities/character/Character.h"
 #include "../../core/utils/InputControl.h"
 
-// Classe utilitária para centralizar rotinas comuns de mapas (colisão, transição e movimentação)
+// Classe utilitaria para centralizar rotinas comuns de mapas (colisao, transicao e movimentacao)
 class MapHelper {
 public:
     static bool checkCollision(float nextX, float nextY, const std::vector<std::string>& mapMatrix);

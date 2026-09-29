@@ -88,7 +88,7 @@ TelaDificuldade::Resultado TelaDificuldadeRaycaster::display(const std::string& 
                 mainBox.AddText(wOpStr, opX, opY + i * 60.0f, 18.0f, corText, false);
             }
 
-            // Skull art inside the box, positioned to the right of text
+            // Arte de caveira dentro da caixa, posicionada a direita do texto
             float arteX = opX + 350.0f;
             float arteY = opY;
             D2D1_COLOR_F arteColor = D2D1::ColorF(cores[selecaoAtual].r/255.0f, cores[selecaoAtual].g/255.0f, cores[selecaoAtual].b/255.0f);

@@ -29,10 +29,10 @@ void TelaAberturaRaycaster::display() {
         auto d2d = D2DContext::renderer;
         if (!d2d) break;
 
-        // 1. Draw Native Sky
+        // 1. Desenha o ceu nativo
         MenuRaycasterUtils::desenharFundoNativoD2D(/*abrirFrame=*/true);
 
-        // 2. Setup Transform for 1920x1080 UI Space
+        // 2. Configuracao da transformacao para espaco de interface 1920x1080
         auto rt = d2d->obterRenderTarget();
         if (rt) {
             auto tam = rt->GetSize();
@@ -42,7 +42,7 @@ void TelaAberturaRaycaster::display() {
             float logicalW = UIRenderer2D::LOGICAL_WIDTH;
             float logicalH = UIRenderer2D::LOGICAL_HEIGHT;
 
-            // Pixel size of the logo blocks
+            // Tamanho em pixels dos blocos do logo
             float pixelScale = 8.0f;
             
             auto countUtf8Chars = [](const std::string& str) {
@@ -91,10 +91,10 @@ void TelaAberturaRaycaster::display() {
                 {"█", 255, 140, 0}
             };
 
-            // Draw Logo CodeQuest
+            // Desenha logo CodeQuest
             UIRenderer2D::DrawPixelArt(d2d, ArtesRaycaster::logoTexto, paletaLogo, startX, startY, currentPixelScale, 1.0f);
             
-            // Draw Plus
+            // Desenha plus
             if (!ArtesRaycaster::logoPlus.empty()) {
                 UIRenderer2D::DrawPixelArt(d2d, ArtesRaycaster::logoPlus, paletaPlus, startX + logoPixelWidth + espacamentoPlus, startY, currentPixelScale, 1.0f);
             }
@@ -102,7 +102,7 @@ void TelaAberturaRaycaster::display() {
             float logoHeight = ArtesRaycaster::logoTexto.size() * (pixelScale * 1.5f);
             UIRenderer2D::DrawTextNative(d2d, L"Pressione qualquer tecla para continuar...", logicalW / 2.0f, startY + logoHeight + 100.0f, D2D1::ColorF(0.8f, 0.8f, 0.8f), 18.0f, true);
 
-            // Draw Version
+            // Desenha versao
             UIRenderer2D::DrawTextNative(d2d, L"Versão 0.1", logicalW - 200.0f, logicalH - 40.0f, D2D1::ColorF(0.5f, 0.5f, 0.5f), 24.0f, false);
 
             UIRenderer2D::ResetTransform(d2d);

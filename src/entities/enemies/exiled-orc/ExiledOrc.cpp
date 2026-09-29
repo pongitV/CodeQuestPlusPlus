@@ -5,7 +5,7 @@
 #include "../../../core/state/Drops.h"
 #include <memory>
 
-// --- INFORMACOES DA RACA ---
+// Informacoes da raca
 std::string ExiledOrc::getRaceName() const 
 { 
     return "Ork Exilado"; 
@@ -24,7 +24,7 @@ std::vector<std::unique_ptr<Item>> ExiledOrc::getRaceEquipment() const
     return equipment;
 }
 
-// --- APARENCIA ---
+// Aparencia
 const std::vector<std::string>& ExiledOrc::getRaceAppearance() const
 {
     static const std::vector<std::string> appearance =
@@ -149,7 +149,7 @@ const std::vector<std::string>& ExiledOrc::getRaceAppearance() const
 }
 
 
-// --- BESTIARIO E DROPS ---
+// Bestiario e drops
 BestiaryInfo ExiledOrc::getBestiaryInfo() const {
     return {
         "Village Inicial", 

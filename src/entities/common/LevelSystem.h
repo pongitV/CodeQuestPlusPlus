@@ -1,6 +1,6 @@
 #pragma once
 
-// LevelSystem gerencia o nível do personagem, acúmulo de XP e cálculo de progressão.
+// LevelSystem gerencia o nivel do personagem, acumulo de XP e calculo de progressao.
 class LevelSystem {
 private:
     int level;
@@ -22,7 +22,7 @@ public:
     void addXp(int amount) { currentXp += amount; }
     bool canLevelUp() const { return currentXp >= xpToLevelUp; }
 
-    // Métodos legados para compatibilidade retroativa
+    // Metodos legados para compatibilidade retroativa
     int getXpAtual() const { return getCurrentXp(); }
     int getXpParaSubir() const { return getXpToLevelUp(); }
     void definirNivel(int l) { setLevel(l); }

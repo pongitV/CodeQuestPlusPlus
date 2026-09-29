@@ -26,7 +26,7 @@ const std::vector<std::string>& NPCFoodMerchant::getASCIIArt() const {
     return NPCFoodMerchantLayouts::foodMerchantArt;
 }
 
-std::vector<std::string> NPCFoodMerchant::getDialogue(Character* /*player*/) {
+std::vector<std::string> NPCFoodMerchant::getDialogue(Character* /*jogador*/) {
     std::vector<std::string> lines = {
         "Olá, combatente! Sente fome? A jornada deve ser cansativa.",
         "Tenho as melhores e mais frescas provisões do reino!",
@@ -35,7 +35,7 @@ std::vector<std::string> NPCFoodMerchant::getDialogue(Character* /*player*/) {
     return lines;
 }
 
-std::vector<std::string> NPCFoodMerchant::getMenuOptions(Character* /*player*/, int /*terminalWidth*/) {
+std::vector<std::string> NPCFoodMerchant::getMenuOptions(Character* /*jogador*/, int /*larguraTerminal*/) {
     return {
         "Maca (Cura 15 HP) - 5G",
         "Pao (Cura 25 HP) - 10G",
@@ -45,7 +45,7 @@ std::vector<std::string> NPCFoodMerchant::getMenuOptions(Character* /*player*/, 
     };
 }
 
-void NPCFoodMerchant::processOption(Character* player, const std::string& option, int /*terminalWidth*/) {
+void NPCFoodMerchant::processOption(Character* player, const std::string& option, int /*larguraTerminal*/) {
     ItemID purchaseId = ItemID::None;
     int cost = 0;
 

@@ -137,7 +137,7 @@ TelaRaca::Resultado TelaRacaRaycaster::display(const std::string& nomeJogador) {
             rt->EndDraw();
         }
 
-        // Process input captured at the top of the loop
+        // Processa a entrada capturada no inicio do laco
         if (tecla == 0) {
             std::this_thread::sleep_for(std::chrono::milliseconds(16));
             continue;

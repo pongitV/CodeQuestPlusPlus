@@ -11,7 +11,7 @@ private:
     AttackType currentAttackType = AttackType::Single;
 
 public:
-    // INFORMAÇÕES DA CLASSE
+    // INFORMACOES DA CLASSE
     std::string getClassName() const override;
     ClassType getClassType() const override { return ClassType::Mage; }
     std::string getSpritePath() const override { return "assets/classes/mage.png"; }

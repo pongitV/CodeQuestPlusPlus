@@ -2,14 +2,12 @@
 
 #include "../Item.h"
 
-/**
- * @brief Classe base padronizada para todos os equipamentos do jogo (Armas, Escudos e Armaduras).
- * Implementa o padrao Template Method para checagem de requisitos e inspecao de itens equipaveis.
- */
+// Classe base padronizada para todos os equipamentos do jogo (Armas, Escudos e Armaduras).
+// Implementa o padrao Template Method para checagem de requisitos e inspecao de itens equipaveis.
 class BaseEquipment : public Item 
 {
 protected:
-    virtual bool checkSpecificRequirements(Character* /*character*/) const { return true; }
+    virtual bool checkSpecificRequirements(Character* /*personagem*/) const { return true; }
     virtual bool checarRequisitosEspecificos(Character* character) const { return checkSpecificRequirements(character); }
 
 public:

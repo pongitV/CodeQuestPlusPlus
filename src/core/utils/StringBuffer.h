@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-// Buffer de strings reutilizável para evitar alocações dinâmicas em loops de renderização/UI
+// Buffer de strings reutilizavel para evitar alocacoes dinamicas em loops de renderizacao/UI
 class StringBuffer {
 private:
     std::vector<std::string> buffer;

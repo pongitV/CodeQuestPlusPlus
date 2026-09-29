@@ -34,7 +34,7 @@ int GerenciadorTelasRaycaster::menuPrincipal() {
 }
 
 void GerenciadorTelasRaycaster::tutorialParry(const std::string& infoBox) {
-    TelaTutorial::displayTutorialDeParry(infoBox); // Tutorial não é separado ainda
+    TelaTutorial::displayTutorialDeParry(infoBox); // Tutorial nao e separado ainda
 }
 
 TelaNome::Resultado GerenciadorTelasRaycaster::telaNome() {
